@@ -11,14 +11,23 @@ const methodLabel = (tx: Transaction): string => {
 
 interface TransactionItemProps {
   transaction: Transaction
+  /** 'card' berdiri sendiri; 'row' untuk di dalam container ber-divider. */
+  variant?: 'card' | 'row'
 }
 
-export function TransactionItem({ transaction: tx }: TransactionItemProps) {
+export function TransactionItem({ transaction: tx, variant = 'card' }: TransactionItemProps) {
   const category = DEFAULT_CATEGORIES.find((c) => c.id === tx.category)
   const isIncome = tx.type === 'income'
 
   return (
-    <div className="flex items-center gap-3 rounded-rapi-lg bg-white p-3.5 shadow-rapi-card transition-all hover:shadow-rapi-elevated">
+    <div
+      className={cn(
+        'flex items-center gap-3',
+        variant === 'card'
+          ? 'rounded-rapi-lg bg-white p-3.5 shadow-rapi-card transition-all hover:shadow-rapi-elevated'
+          : 'px-4 py-3 transition-colors hover:bg-rapi-gray-100/60',
+      )}
+    >
       <div
         className={cn(
           'flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md text-lg',

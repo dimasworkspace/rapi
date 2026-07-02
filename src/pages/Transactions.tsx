@@ -31,7 +31,9 @@ export default function Transactions() {
 
       {groups.length === 0 ? (
         <RapiCard className="mt-4 flex flex-col items-center gap-3 px-6 py-10 text-center">
-          <span className="text-4xl">🎉</span>
+          <span className="animate-bounce text-4xl" style={{ animationDuration: '1.8s' }}>
+            🎉
+          </span>
           <p className="text-sm leading-relaxed text-rapi-gray-600">
             Belum ada catatan nih. Yuk mulai #RapiinAja!
           </p>
@@ -43,10 +45,12 @@ export default function Transactions() {
         <div className="flex flex-col gap-5">
           {groups.map(([label, txs]) => (
             <section key={label}>
-              <h2 className="mb-2 text-xs font-bold text-rapi-gray-600">{label}</h2>
-              <div className="flex flex-col gap-2.5">
+              <h2 className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-gray-600">
+                {label}
+              </h2>
+              <div className="divide-y divide-rapi-gray-100 rounded-rapi-lg bg-white py-1 shadow-rapi-card">
                 {txs.map((tx) => (
-                  <TransactionItem key={tx.id} transaction={tx} />
+                  <TransactionItem key={tx.id} transaction={tx} variant="row" />
                 ))}
               </div>
             </section>
