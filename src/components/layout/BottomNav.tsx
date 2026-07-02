@@ -46,7 +46,7 @@ export function BottomNav() {
 
   return (
     <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2 px-4 pb-[max(env(safe-area-inset-bottom),12px)]">
-      <nav className="flex items-center rounded-full border border-rapi-gray-100 bg-white px-2 py-1.5 shadow-rapi-elevated">
+      <nav className="flex items-center rounded-full border border-white/60 bg-white/75 px-2 py-1.5 shadow-rapi-elevated backdrop-blur-xl">
         {LEFT_ITEMS.map((item) => (
           <NavItem key={item.to} {...item} />
         ))}

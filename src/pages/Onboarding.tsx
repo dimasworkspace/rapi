@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { AmbientBackground } from '@/components/layout/AmbientBackground'
+import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { useUserStore } from '@/store/userStore'
 
@@ -20,6 +22,7 @@ export default function Onboarding() {
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
+      <AmbientBackground />
       <div className="relative flex flex-col items-center justify-center overflow-hidden bg-rapi-navy px-6 pb-14 pt-20 text-center text-white">
         <div
           aria-hidden
@@ -29,7 +32,9 @@ export default function Onboarding() {
           aria-hidden
           className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-rapi-blue/30"
         />
-        <span className="relative text-5xl">👋</span>
+        <span className="relative">
+          <Icon3D name="wave" size={64} fallback="👋" />
+        </span>
         <h1 className="relative mt-4 text-3xl font-bold">Halo! Aku Rapi</h1>
         <p className="relative mt-2 max-w-xs text-sm leading-relaxed text-white/75">
           Teman kamu buat catat keuangan tanpa ribet — ketik, ngomong, atau foto struk,

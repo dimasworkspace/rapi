@@ -3,6 +3,7 @@ import { Camera, Keyboard, Mic } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
+import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { formatRupiah } from '@/lib/formatters'
 import { parseTransaction } from '@/lib/parser'
@@ -97,11 +98,11 @@ export default function AddTransaction() {
         placeholder={'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt" · "grab 18rb"'}
         rows={3}
         autoFocus
-        className="mt-3 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white px-4 py-3.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
+        className="mt-3 w-full resize-none rounded-rapi-md border-[1.5px] border-white/70 bg-white/70 px-4 py-3.5 text-sm leading-relaxed shadow-rapi-card outline-none backdrop-blur-xl transition-colors focus:border-rapi-blue"
       />
 
       {/* Preview hasil parse */}
-      <div className="mt-4 rounded-rapi-lg bg-white p-4 shadow-rapi-card">
+      <div className="rapi-glass mt-4 rounded-rapi-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-xs font-bold text-rapi-gray-600">Preview</p>
           {input.trim() && (
@@ -174,13 +175,14 @@ export default function AddTransaction() {
               type="button"
               onClick={() => setManualCategory(cat.id)}
               className={cn(
-                'min-h-10 rounded-full px-3.5 py-2 text-xs font-bold transition-colors',
+                'inline-flex min-h-10 items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-bold transition-colors',
                 activeCategory === cat.id
                   ? 'bg-rapi-navy text-white'
-                  : 'bg-rapi-gray-100 text-rapi-gray-600',
+                  : 'bg-rapi-gray-100/80 text-rapi-gray-600',
               )}
             >
-              {cat.emoji} {cat.name}
+              <Icon3D name={cat.id} size={17} fallback={cat.emoji} />
+              {cat.name}
             </button>
           ))}
         </div>

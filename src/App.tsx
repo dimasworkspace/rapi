@@ -25,6 +25,7 @@ export default function App() {
               <ComingSoon
                 title="Laporan"
                 emoji="📊"
+                icon="report"
                 message="Bentar ya, grafik donat & tren pengeluaranmu lagi dirapiin. Nyusul segera! ✨"
               />
             }
@@ -35,6 +36,7 @@ export default function App() {
               <ComingSoon
                 title="Rapi AI"
                 emoji="🤖"
+                icon="robot"
                 message="Rapi AI bentar lagi siap nemenin kamu ngobrolin keuangan. Sabar ya! 😉"
               />
             }
@@ -45,6 +47,7 @@ export default function App() {
               <ComingSoon
                 title="Profil"
                 emoji="⚙️"
+                icon="gear"
                 message="Pengaturan profil & preferensi kamu lagi disiapin. Nyusul segera! 🙌"
               />
             }
@@ -55,6 +58,7 @@ export default function App() {
               <ComingSoon
                 title="Investasi"
                 emoji="📈"
+                icon="invest"
                 message="Detail portofolio investasimu lagi dihitung. Bentar lagi jadi! 🚀"
                 showBack
               />
@@ -66,6 +70,7 @@ export default function App() {
               <ComingSoon
                 title="Halaman Nggak Ketemu"
                 emoji="🧭"
+                icon="compass"
                 message="Waduh, halaman ini nggak ada. Yuk balik ke beranda! 😊"
                 showBack
               />

@@ -1,3 +1,4 @@
+import { Icon3D } from '@/components/rapi/Icon3D'
 import type { Transaction } from '@/types'
 import { DEFAULT_CATEGORIES } from '@/types'
 import { formatRupiahSigned } from '@/lib/formatters'
@@ -24,18 +25,18 @@ export function TransactionItem({ transaction: tx, variant = 'card' }: Transacti
       className={cn(
         'flex items-center gap-3',
         variant === 'card'
-          ? 'rounded-rapi-lg bg-white p-3.5 shadow-rapi-card transition-all hover:shadow-rapi-elevated'
-          : 'px-4 py-3 transition-colors hover:bg-rapi-gray-100/60',
+          ? 'rapi-glass rounded-rapi-lg p-3.5 transition-all hover:shadow-rapi-elevated'
+          : 'px-4 py-3 transition-colors hover:bg-white/50',
       )}
     >
       <div
         className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md text-lg',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md',
           isIncome ? 'bg-rapi-income-soft' : 'bg-rapi-expense-soft',
           tx.type === 'transfer' && 'bg-rapi-savings-soft',
         )}
       >
-        {category?.emoji ?? '💸'}
+        <Icon3D name={tx.category} size={26} fallback={category?.emoji ?? '💸'} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold">{tx.note || category?.name || 'Transaksi'}</p>

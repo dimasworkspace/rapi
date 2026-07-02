@@ -1,8 +1,9 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, Camera, ChevronRight, Mic, Sparkles } from 'lucide-react'
+import { ArrowDown, ArrowUp, Camera, ChevronRight, Mic } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
+import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
@@ -88,16 +89,17 @@ export default function Dashboard() {
         </p>
 
         <div className="relative mt-4 flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
             <ArrowUp size={12} className="text-emerald-300" strokeWidth={3} />
             {formatRupiah(monthIncome)}
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
             <ArrowDown size={12} className="text-red-300" strokeWidth={3} />
             {formatRupiah(monthExpense)}
           </span>
           <span className="inline-flex items-center gap-1.5 rounded-full bg-rapi-yellow px-3 py-1.5 text-xs font-bold text-rapi-navy">
-            {todayCount > 0 ? `🔥 ${todayCount} kecatat hari ini` : '⚡ Gas #RapiinAja!'}
+            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={15} fallback={todayCount > 0 ? '🔥' : '⚡'} />
+            {todayCount > 0 ? `${todayCount} kecatat hari ini` : 'Gas #RapiinAja!'}
           </span>
         </div>
       </header>
@@ -106,10 +108,10 @@ export default function Dashboard() {
       <button
         type="button"
         onClick={() => navigate('/tambah')}
-        className="relative z-10 -mt-7 mx-5 flex items-center gap-3 rounded-rapi-lg bg-white p-3.5 text-left shadow-rapi-elevated transition-transform hover:-translate-y-0.5 active:translate-y-0"
+        className="relative z-10 -mt-7 mx-5 flex items-center gap-3 rounded-rapi-lg border border-white/60 bg-white/65 p-3.5 text-left shadow-rapi-elevated backdrop-blur-xl transition-transform hover:-translate-y-0.5 active:translate-y-0"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
-          <Sparkles size={17} className="text-rapi-navy" />
+          <Icon3D name="sparkles" size={22} fallback="✨" />
         </span>
         <span className="flex-1 truncate text-sm text-rapi-gray-600">
           Ketik aja: <span className="font-bold text-rapi-navy">"makan 25rb"</span> — sisanya Rapi
@@ -133,7 +135,7 @@ export default function Dashboard() {
             className="relative cursor-pointer overflow-hidden"
           >
             <div aria-hidden className="absolute -bottom-8 -right-6 h-20 w-20 rounded-full bg-white/10" />
-            <span className="text-xl">📈</span>
+            <Icon3D name="invest" size={30} fallback="📈" />
             <p className="mt-2 text-sm font-bold">Investasi</p>
             <p className="mt-0.5 text-[11px] leading-snug text-white/70">
               Profit/loss kehitung otomatis
@@ -146,8 +148,8 @@ export default function Dashboard() {
             onKeyDown={(e) => e.key === 'Enter' && navigate('/laporan')}
             className="cursor-pointer"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rapi-warning-soft text-lg">
-              📊
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rapi-warning-soft">
+              <Icon3D name="report" size={24} fallback="📊" />
             </span>
             <p className="mt-2 text-sm font-bold">Laporan</p>
             <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
@@ -171,8 +173,8 @@ export default function Dashboard() {
 
         {recent.length === 0 ? (
           <RapiCard className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-            <span className="animate-bounce text-4xl" style={{ animationDuration: '1.8s' }}>
-              🎉
+            <span className="animate-bounce" style={{ animationDuration: '1.8s' }}>
+              <Icon3D name="party" size={52} fallback="🎉" />
             </span>
             <p className="text-sm leading-relaxed text-rapi-gray-600">
               Belum ada catatan nih. Yuk mulai #RapiinAja!
@@ -182,7 +184,7 @@ export default function Dashboard() {
             </RapiButton>
           </RapiCard>
         ) : (
-          <div className="divide-y divide-rapi-gray-100 rounded-rapi-lg bg-white py-1 shadow-rapi-card">
+          <div className="rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
             {recent.map((tx, i) => (
               <div
                 key={tx.id}

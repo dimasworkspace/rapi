@@ -30,6 +30,13 @@
   --shadow-fab: 0 8px 22px rgba(2, 72, 193, 0.35);
 }
 
+@layer components {
+  /* Kartu kaca premium Rapi — pakai di atas AmbientBackground */
+  .rapi-glass {
+    @apply border border-white/60 bg-white/55 shadow-rapi-card backdrop-blur-xl;
+  }
+}
+
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
