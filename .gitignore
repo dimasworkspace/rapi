@@ -42,3 +42,6 @@ Thumbs.db
 
 # Testing
 coverage/
+
+# Claude Code local settings (personal, jangan di-share)
+.claude/settings.local.json
