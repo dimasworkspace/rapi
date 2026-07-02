@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --rapi-yellow: #F8D613; /* Sunshine Yellow — energi, CTA, highlight */
+  --rapi-navy: #111835;   /* Deep Navy — teks utama, UI gelap, kepercayaan */
+  --rapi-blue: #0248C1;   /* Rapi Blue — interaktif, link, grafik */
+  --rapi-offwhite: #FBFCFC; /* Off-White — background utama app & web */
+
+  /* Semantik (turunan, bukan warna inti brand) */
+  --rapi-income: #16A34A;
+  --rapi-expense: #EF4444;
+  --rapi-savings: var(--rapi-blue);
+  --rapi-warning: var(--rapi-yellow);
+
+  /* Netral pendukung */
+  --rapi-gray-600: #5B6478;
+  --rapi-gray-300: #D8DCE6;
+  --rapi-gray-100: #F1F3F8;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 2px 14px rgba(17, 24, 53, 0.07);
+  --shadow-elevated: 0 10px 30px rgba(17, 24, 53, 0.14);
+  --shadow-fab: 0 8px 22px rgba(2, 72, 193, 0.35);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-rapi-offwhite font-sulphur text-rapi-navy;
+    margin: 0;
+    min-height: 100dvh;
+  }
+
+  /* Target sentuh nyaman di mobile */
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
