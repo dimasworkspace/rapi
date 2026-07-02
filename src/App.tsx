@@ -1,25 +1,81 @@
-import { formatRupiah } from '@/lib/formatters'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { AppLayout } from '@/components/layout/AppLayout'
+import ComingSoon from '@/pages/ComingSoon'
+import Dashboard from '@/pages/Dashboard'
+import Transactions from '@/pages/Transactions'
 
-// Placeholder Fase 0 — memverifikasi design token & font jalan.
-// Diganti dengan router + layout shell di Fase 1.
 export default function App() {
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4">
-      <div className="w-full max-w-sm rounded-rapi-xl bg-rapi-navy p-6 text-white shadow-rapi-elevated">
-        <p className="text-xs opacity-70">Total Saldo</p>
-        <p className="mt-1 text-3xl font-bold">{formatRupiah(4_280_000)}</p>
-        <div className="mt-4 flex gap-2">
-          <span className="rounded-rapi-sm bg-rapi-yellow px-3 py-1 text-xs font-bold text-rapi-navy">
-            #RapiinAja
-          </span>
-          <span className="rounded-rapi-sm bg-rapi-blue px-3 py-1 text-xs font-bold text-white">
-            Fase 0 ✓
-          </span>
-        </div>
-        <p className="mt-4 text-sm opacity-80">
-          Halo! Fondasi Rapi udah kepasang. Yuk lanjut bangun dashboard-nya 🚀
-        </p>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/transaksi" element={<Transactions />} />
+          <Route
+            path="/laporan"
+            element={
+              <ComingSoon
+                title="Laporan"
+                emoji="📊"
+                message="Bentar ya, grafik donat & tren pengeluaranmu lagi dirapiin. Nyusul segera! ✨"
+              />
+            }
+          />
+          <Route
+            path="/ai"
+            element={
+              <ComingSoon
+                title="Rapi AI"
+                emoji="🤖"
+                message="Rapi AI bentar lagi siap nemenin kamu ngobrolin keuangan. Sabar ya! 😉"
+              />
+            }
+          />
+          <Route
+            path="/profil"
+            element={
+              <ComingSoon
+                title="Profil"
+                emoji="⚙️"
+                message="Pengaturan profil & preferensi kamu lagi disiapin. Nyusul segera! 🙌"
+              />
+            }
+          />
+          <Route
+            path="/investasi"
+            element={
+              <ComingSoon
+                title="Investasi"
+                emoji="📈"
+                message="Detail portofolio investasimu lagi dihitung. Bentar lagi jadi! 🚀"
+                showBack
+              />
+            }
+          />
+          <Route
+            path="/tambah"
+            element={
+              <ComingSoon
+                title="Tambah Transaksi"
+                emoji="✍️"
+                message="Form catat transaksi (ketik, ngomong, atau foto struk) hadir di update berikutnya. Yuk siap-siap #RapiinAja! 🎉"
+                showBack
+              />
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <ComingSoon
+                title="Halaman Nggak Ketemu"
+                emoji="🧭"
+                message="Waduh, halaman ini nggak ada. Yuk balik ke beranda! 😊"
+                showBack
+              />
+            }
+          />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   )
 }
