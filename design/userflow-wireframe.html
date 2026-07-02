@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Rapi — User Flow & Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#111835; --blue:#0248C1; --yellow:#F8D613; --offwhite:#FBFCFC;
+    --wf-bg:#F4F5F7; --wf-line:#9AA0AC; --wf-line-dark:#5B6478; --wf-fill:#E3E5EA; --wf-text:#3A4050;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Sulphur Point',sans-serif;background:#F1F3F8;color:var(--navy);}
+  .wrap{max-width:1200px;margin:0 auto;padding:40px 24px 100px;}
+  .eyebrow{font-size:12px;font-weight:700;letter-spacing:2px;color:var(--blue);text-transform:uppercase;margin:0 0 8px;}
+  .title{font-size:30px;font-weight:700;margin:0 0 10px;}
+  .sub{font-size:14.5px;color:#5B6478;max-width:680px;line-height:1.55;margin:0 0 30px;}
+  .block{margin-bottom:64px;}
+  .block-head{margin-bottom:20px;}
+  .block-title{font-size:19px;font-weight:700;margin:0 0 4px;}
+  .block-desc{font-size:13.5px;color:#5B6478;margin:0;}
+  .flow-card{background:#fff;border-radius:16px;padding:26px 20px;box-shadow:0 2px 14px rgba(17,24,53,0.06);overflow-x:auto;}
+
+  /* ===== WIREFRAME SCREEN FRAME ===== */
+  .wf-row{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+  @media(max-width:1000px){.wf-row{grid-template-columns:repeat(2,1fr);}}
+  .wf-col{display:flex;flex-direction:column;align-items:center;}
+  .wf-caption{margin-top:12px;font-size:12.5px;font-weight:700;color:var(--wf-text);text-align:center;}
+  .wf-num{display:inline-block;background:var(--navy);color:#fff;border-radius:50%;width:18px;height:18px;font-size:10px;line-height:18px;text-align:center;margin-right:6px;}
+  .device{background:var(--navy);border-radius:26px;padding:8px;width:100%;max-width:230px;box-shadow:0 6px 20px rgba(17,24,53,0.15);}
+  .wf-screen{background:var(--wf-bg);border-radius:18px;min-height:420px;padding:12px;display:flex;flex-direction:column;gap:8px;font-family:'Sulphur Point',sans-serif;}
+  .wf-box{background:var(--wf-fill);border:1.4px dashed var(--wf-line);border-radius:6px;color:var(--wf-text);font-size:9.5px;display:flex;align-items:center;justify-content:center;text-align:center;padding:4px;}
+  .wf-solid{background:#fff;border:1.2px solid var(--wf-line);border-radius:6px;}
+  .wf-bar{height:20px;border-radius:5px;}
+  .wf-text-line{height:6px;background:var(--wf-line);border-radius:3px;opacity:.55;}
+  .wf-circle{border-radius:50%;background:var(--wf-fill);border:1.4px dashed var(--wf-line);}
+  .wf-x{position:relative;}
+  .wf-x:before,.wf-x:after{content:"";position:absolute;top:6px;bottom:6px;left:50%;width:1.2px;background:var(--wf-line);}
+  .wf-x:before{transform:rotate(45deg);} .wf-x:after{transform:rotate(-45deg);}
+
+  /* Flow diagram */
+  .flow{display:flex;align-items:flex-start;gap:0;min-width:max-content;padding:6px 4px;}
+  .fbox{width:158px;flex-shrink:0;border-radius:10px;padding:12px 12px;font-size:12px;line-height:1.4;}
+  .fbox.step{background:#fff;border:1.4px solid #D8DCE6;color:var(--navy);}
+  .fbox.decision{background:#EFF3FE;border:1.4px solid var(--blue);color:var(--navy);}
+  .fbox.start{background:var(--navy);color:#fff;border:none;}
+  .fbox.end{background:var(--yellow);color:var(--navy);border:none;}
+  .fbox .flabel{font-weight:700;margin-bottom:3px;}
+  .fbox .fsub{font-size:10.5px;opacity:.75;}
+  .fnum{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--blue);color:#fff;font-size:9px;line-height:16px;text-align:center;margin-right:5px;}
+  .arrow-h{width:34px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-top:34px;}
+  .arrow-h svg{width:100%;height:14px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="eyebrow">Rapi Product Design</p>
+  <h1 class="title">User Flow & Wireframe</h1>
+  <p class="sub">Alur pengguna dan wireframe low-fidelity untuk fitur inti Rapi MVP — turunan langsung dari PRD. Fokus di struktur & urutan interaksi, belum masuk visual final (lihat UI Kit untuk versi high-fidelity).</p>
+
+  <!-- ================= FLOW 1 ================= -->
+  <div class="block">
+    <div class="block-head">
+      <p class="block-title">Alur 1 — Catat Transaksi via Teks</p>
+      <p class="block-desc">Dari dashboard sampai transaksi tersimpan, target &lt; 10 detik.</p>
+    </div>
+    <div class="flow-card">
+      <div class="flow">
+        <div class="fbox start"><div class="flabel"><span class="fnum" style="background:#fff;color:var(--navy);">1</span>Dashboard</div><div class="fsub">Tap tombol tambah (FAB)</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">2</span>Pilih Mode Input</div><div class="fsub">Teks / Suara / Foto</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">3</span>Ketik Kalimat</div><div class="fsub">"makan siang 25rb"</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox decision"><div class="flabel"><span class="fnum">4</span>AI Parsing</div><div class="fsub">Nominal + kategori otomatis</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">5</span>Preview & Konfirmasi</div><div class="fsub">User cek, edit jika perlu</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox end"><div class="flabel"><span class="fnum" style="background:var(--navy);">6</span>Tersimpan</div><div class="fsub">"Kecatat! 💪" → balik ke dashboard</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FLOW 2 ================= -->
+  <div class="block">
+    <div class="block-head">
+      <p class="block-title">Alur 2 — Scan Struk (Foto)</p>
+      <p class="block-desc">Input via kamera/galeri, AI membaca struk sebelum user konfirmasi.</p>
+    </div>
+    <div class="flow-card">
+      <div class="flow">
+        <div class="fbox start"><div class="flabel"><span class="fnum" style="background:#fff;color:var(--navy);">1</span>Pilih Mode Foto</div><div class="fsub">Dari layar tambah transaksi</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">2</span>Foto / Upload Struk</div><div class="fsub">Kamera langsung atau galeri</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox decision"><div class="flabel"><span class="fnum">3</span>AI Baca Struk</div><div class="fsub">Ekstrak total & item</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">4</span>Konfirmasi / Koreksi</div><div class="fsub">User cek hasil scan</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox end"><div class="flabel"><span class="fnum" style="background:var(--navy);">5</span>Tersimpan</div><div class="fsub">Tag "via foto struk"</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FLOW 3 ================= -->
+  <div class="block">
+    <div class="block-head">
+      <p class="block-title">Alur 3 — Tanya Rapi AI</p>
+      <p class="block-desc">Chat companion menjawab berdasarkan data transaksi user.</p>
+    </div>
+    <div class="flow-card">
+      <div class="flow">
+        <div class="fbox start"><div class="flabel"><span class="fnum" style="background:#fff;color:var(--navy);">1</span>Buka Tab Rapi AI</div><div class="fsub">Dari bottom navigation</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">2</span>Ketik Pertanyaan</div><div class="fsub">"boros di mana bulan ini?"</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox decision"><div class="flabel"><span class="fnum">3</span>AI Ambil Konteks</div><div class="fsub">Baca data transaksi user</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox step"><div class="flabel"><span class="fnum">4</span>Jawaban Santai</div><div class="fsub">Actionable, bahasa gaul</div></div>
+        <div class="arrow-h"><svg viewBox="0 0 34 14"><line x1="0" y1="7" x2="28" y2="7" stroke="#9AA0AC" stroke-width="1.5"/><polygon points="28,3 34,7 28,11" fill="#9AA0AC"/></svg></div>
+        <div class="fbox end"><div class="flabel"><span class="fnum" style="background:var(--navy);">5</span>Lanjut Follow-up</div><div class="fsub">↻ tetap dalam sesi chat</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WIREFRAMES ================= -->
+  <div class="block">
+    <div class="block-head">
+      <p class="block-title">Wireframe Layar Utama (Low-Fidelity)</p>
+      <p class="block-desc">Struktur & hirarki konten 4 layar inti MVP — belum termasuk styling final.</p>
+    </div>
+
+    <div class="wf-row">
+
+      <!-- SCREEN 1: DASHBOARD -->
+      <div class="wf-col">
+        <div class="device"><div class="wf-screen">
+          <div class="wf-box wf-solid" style="height:28px;justify-content:space-between;padding:0 10px;">
+            <span>Halo, Dinda</span><div class="wf-circle" style="width:20px;height:20px;"></div>
+          </div>
+          <div class="wf-box" style="height:80px;flex-direction:column;align-items:flex-start;padding:10px;">
+            <div class="wf-text-line" style="width:60px;margin-bottom:8px;"></div>
+            <div class="wf-text-line" style="width:100px;height:12px;margin-bottom:10px;"></div>
+            <div style="display:flex;gap:6px;width:100%;">
+              <div class="wf-box wf-solid" style="flex:1;height:26px;">Masuk</div>
+              <div class="wf-box wf-solid" style="flex:1;height:26px;">Keluar</div>
+            </div>
+          </div>
+          <div class="wf-text-line" style="width:80px;margin:4px 0;"></div>
+          <div class="wf-box wf-solid" style="height:34px;justify-content:flex-start;padding:0 8px;">Transaksi 1</div>
+          <div class="wf-box wf-solid" style="height:34px;justify-content:flex-start;padding:0 8px;">Transaksi 2</div>
+          <div class="wf-box wf-solid" style="height:34px;justify-content:flex-start;padding:0 8px;">Transaksi 3</div>
+          <div style="flex:1;"></div>
+          <div class="wf-box wf-solid" style="height:30px;">Home · Laporan · [+] · AI · Profil</div>
+        </div></div>
+        <p class="wf-caption"><span class="wf-num">A</span>Dashboard</p>
+      </div>
+
+      <!-- SCREEN 2: TAMBAH TRANSAKSI -->
+      <div class="wf-col">
+        <div class="device"><div class="wf-screen">
+          <div class="wf-box wf-solid" style="height:24px;">Tambah Transaksi</div>
+          <div style="display:flex;gap:6px;">
+            <div class="wf-box wf-solid" style="flex:1;height:26px;font-weight:700;">Teks</div>
+            <div class="wf-box" style="flex:1;height:26px;">Suara</div>
+            <div class="wf-box" style="flex:1;height:26px;">Foto</div>
+          </div>
+          <div class="wf-box" style="height:60px;">"ketik transaksi di sini..."</div>
+          <div class="wf-text-line" style="width:50px;margin:6px 0 2px;"></div>
+          <div class="wf-box wf-solid" style="height:70px;flex-direction:column;padding:8px;align-items:flex-start;">
+            <div class="wf-text-line" style="width:70%;margin-bottom:6px;"></div>
+            <div class="wf-text-line" style="width:40%;margin-bottom:6px;"></div>
+            <div class="wf-text-line" style="width:55%;"></div>
+          </div>
+          <div style="flex:1;"></div>
+          <div class="wf-box wf-solid" style="height:32px;font-weight:700;">Simpan Transaksi</div>
+        </div></div>
+        <p class="wf-caption"><span class="wf-num">B</span>Tambah Transaksi</p>
+      </div>
+
+      <!-- SCREEN 3: LAPORAN -->
+      <div class="wf-col">
+        <div class="device"><div class="wf-screen">
+          <div class="wf-box wf-solid" style="height:24px;">Laporan</div>
+          <div style="display:flex;gap:6px;">
+            <div class="wf-box wf-solid" style="flex:1;height:22px;font-weight:700;">Mingguan</div>
+            <div class="wf-box" style="flex:1;height:22px;">Bulanan</div>
+          </div>
+          <div class="wf-box wf-circle" style="height:120px;width:120px;align-self:center;border-radius:50%;">Donut Chart</div>
+          <div class="wf-text-line" style="width:90%;margin:8px 0 2px;"></div>
+          <div class="wf-text-line" style="width:60%;"></div>
+          <div class="wf-box" style="height:60px;margin-top:6px;">Bar Chart Tren 6 Bulan</div>
+          <div style="flex:1;"></div>
+          <div class="wf-box wf-solid" style="height:30px;">Home · Laporan · [+] · AI · Profil</div>
+        </div></div>
+        <p class="wf-caption"><span class="wf-num">C</span>Laporan</p>
+      </div>
+
+      <!-- SCREEN 4: RAPI AI CHAT -->
+      <div class="wf-col">
+        <div class="device"><div class="wf-screen">
+          <div class="wf-box wf-solid" style="height:24px;">Rapi AI</div>
+          <div class="wf-box wf-solid" style="height:36px;align-self:flex-start;width:70%;justify-content:flex-start;padding:0 8px;">Halo! Ada yang mau ditanya?</div>
+          <div class="wf-box wf-solid" style="height:36px;align-self:flex-end;width:70%;justify-content:flex-start;padding:0 8px;background:#EFF3FE;">Boros di mana bulan ini?</div>
+          <div class="wf-box wf-solid" style="height:50px;align-self:flex-start;width:80%;justify-content:flex-start;padding:0 8px;">Pengeluaran makanan naik 20%...</div>
+          <div style="flex:1;"></div>
+          <div class="wf-box wf-solid" style="height:32px;justify-content:space-between;padding:0 10px;">"ketik pertanyaan..." <span>➤</span></div>
+        </div></div>
+        <p class="wf-caption"><span class="wf-num">D</span>Rapi AI Chat</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
