@@ -1,16 +1,24 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
+import AddTransaction from '@/pages/AddTransaction'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
+import Onboarding from '@/pages/Onboarding'
 import Transactions from '@/pages/Transactions'
+import { useUserStore } from '@/store/userStore'
 
 export default function App() {
+  const onboarded = useUserStore((s) => s.onboarded)
+
+  if (!onboarded) return <Onboarding />
+
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transaksi" element={<Transactions />} />
+          <Route path="/tambah" element={<AddTransaction />} />
           <Route
             path="/laporan"
             element={
@@ -48,17 +56,6 @@ export default function App() {
                 title="Investasi"
                 emoji="📈"
                 message="Detail portofolio investasimu lagi dihitung. Bentar lagi jadi! 🚀"
-                showBack
-              />
-            }
-          />
-          <Route
-            path="/tambah"
-            element={
-              <ComingSoon
-                title="Tambah Transaksi"
-                emoji="✍️"
-                message="Form catat transaksi (ketik, ngomong, atau foto struk) hadir di update berikutnya. Yuk siap-siap #RapiinAja! 🎉"
                 showBack
               />
             }

@@ -1,3 +1,6 @@
+import { format, isToday, isYesterday } from 'date-fns'
+import { id as localeId } from 'date-fns/locale'
+
 // Format Rupiah — selalu IDR (pola wajib CLAUDE.md).
 // Nominal ≥ 1 jt dipadatkan jadi "Rp X,X jt" sesuai UI kit (koma desimal id-ID).
 export const formatRupiah = (amount: number): string => {
@@ -27,3 +30,11 @@ export const formatRupiahSigned = (
   amount: number,
   type: 'income' | 'expense',
 ): string => `${type === 'income' ? '+' : '-'}${formatRupiahCompact(Math.abs(amount))}`
+
+// Label hari untuk pengelompokan list transaksi.
+export const formatDayLabel = (isoDate: string): string => {
+  const d = new Date(isoDate)
+  if (isToday(d)) return 'Hari Ini'
+  if (isYesterday(d)) return 'Kemarin'
+  return format(d, 'd MMMM yyyy', { locale: localeId })
+}
