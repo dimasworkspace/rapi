@@ -83,19 +83,25 @@ export function parseAmount(text: string): { amount: number | null; matched: str
   return { amount: null, matched: '' }
 }
 
+const escapeRegex = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+// Match per kata utuh — biar "tas" nggak ke-match di dalam "investasi"
 const findCategory = (
   text: string,
   keywordMap: Record<string, string[]>,
 ): string | null => {
   for (const [categoryId, keywords] of Object.entries(keywordMap)) {
-    if (keywords.some((kw) => text.includes(kw))) return categoryId
+    if (keywords.some((kw) => new RegExp(`\\b${escapeRegex(kw)}\\b`).test(text))) {
+      return categoryId
+    }
   }
   return null
 }
 
 const buildNote = (text: string, matchedAmount: string): string => {
-  const cleaned = text
-    .replace(matchedAmount, '')
+  const cleaned = (
+    matchedAmount ? text.replace(new RegExp(escapeRegex(matchedAmount), 'i'), '') : text
+  )
     .replace(/\s+/g, ' ')
     .trim()
   if (!cleaned) return ''

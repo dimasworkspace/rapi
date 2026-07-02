@@ -21,7 +21,7 @@ export function TransactionItem({ transaction: tx }: TransactionItemProps) {
     <div className="flex items-center gap-3 rounded-rapi-lg bg-white p-3.5 shadow-rapi-card transition-all hover:shadow-rapi-elevated">
       <div
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-rapi-md text-base',
+          'flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md text-lg',
           isIncome ? 'bg-rapi-income-soft' : 'bg-rapi-expense-soft',
           tx.type === 'transfer' && 'bg-rapi-savings-soft',
         )}

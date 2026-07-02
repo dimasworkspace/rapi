@@ -33,6 +33,20 @@ export default {
         'rapi-elevated': '0 10px 30px rgba(17,24,53,0.14)',
         'rapi-fab': '0 8px 22px rgba(2,72,193,0.35)',
       },
+      keyframes: {
+        'rapi-fade-up': {
+          from: { opacity: '0', transform: 'translateY(10px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'rapi-pulse': {
+          '0%, 100%': { boxShadow: '0 8px 22px rgba(2,72,193,0.35)' },
+          '50%': { boxShadow: '0 8px 34px rgba(2,72,193,0.6)' },
+        },
+      },
+      animation: {
+        'rapi-fade-up': 'rapi-fade-up 0.4s ease both',
+        'rapi-pulse': 'rapi-pulse 2.4s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

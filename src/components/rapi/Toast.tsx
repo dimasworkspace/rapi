@@ -16,7 +16,7 @@ export function Toast() {
 
   return (
     <div className="pointer-events-none fixed bottom-24 left-1/2 z-50 w-full max-w-md -translate-x-1/2 px-5">
-      <div className="mx-auto w-fit max-w-full rounded-full bg-rapi-navy px-5 py-3 text-center text-sm font-bold text-white shadow-rapi-elevated">
+      <div className="mx-auto w-fit max-w-full animate-rapi-fade-up rounded-full bg-rapi-navy px-5 py-3 text-center text-sm font-bold text-white shadow-rapi-elevated">
         {toast}
       </div>
     </div>
