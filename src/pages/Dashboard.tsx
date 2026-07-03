@@ -58,18 +58,14 @@ export default function Dashboard() {
 
   return (
     <PageWrapper className="px-0">
-      {/* ===== Navy canvas — zona hero terintegrasi ===== */}
-      <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-rapi-navy to-[#1E2A55] px-5 pb-14 pt-7 text-white">
+      {/* ===== Navy canvas hero — turun dari atas, berhenti tepat di atas quick-input ===== */}
+      <header className="relative animate-rapi-slide-down overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-rapi-navy to-[#1E2A55] px-5 pb-6 pt-8 text-white">
         <div
           aria-hidden
           className="absolute -right-12 -top-16 h-48 w-48 rounded-full bg-rapi-yellow/25 blur-2xl"
         />
         <div aria-hidden className="absolute -right-4 top-16 h-3 w-3 rounded-full bg-rapi-yellow/70" />
         <div aria-hidden className="absolute right-14 top-8 h-2 w-2 rounded-full bg-rapi-yellow/50" />
-        <div
-          aria-hidden
-          className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full bg-rapi-blue/40 blur-2xl"
-        />
 
         <div className="relative flex items-center justify-between">
           <div>
@@ -88,55 +84,71 @@ export default function Dashboard() {
           {formatRupiah(animatedBalance)}
         </p>
 
-        <div className="relative mt-4 flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
-            <ArrowUp size={12} className="text-emerald-300" strokeWidth={3} />
-            {formatRupiah(monthIncome)}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
-            <ArrowDown size={12} className="text-red-300" strokeWidth={3} />
-            {formatRupiah(monthExpense)}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-rapi-yellow px-3 py-1.5 text-xs font-bold text-rapi-navy">
-            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={15} fallback={todayCount > 0 ? '🔥' : '⚡'} />
-            {todayCount > 0 ? `${todayCount} kecatat hari ini` : 'Gas #RapiinAja!'}
-          </span>
-        </div>
+        {/* 3 card stat — Pemasukan (hijau glass) · Insight (kuning) · Pengeluaran (merah glass) */}
+        <div className="relative mt-5 grid grid-cols-3 gap-2.5">
+          <div className="rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-3 backdrop-blur-sm">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/20">
+              <ArrowUp size={13} className="text-emerald-300" strokeWidth={3} />
+            </span>
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
+              Pemasukan
+            </p>
+            <p className="mt-0.5 text-[13px] font-bold text-white">{formatRupiah(monthIncome)}</p>
+          </div>
 
-        {/* Quick input — menyatu di dalam hero, bukan kartu terpisah */}
+          <div className="flex flex-col items-center justify-center rounded-rapi-md bg-rapi-yellow p-3 text-center text-rapi-navy">
+            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={26} fallback={todayCount > 0 ? '🔥' : '⚡'} />
+            <p className="mt-1 text-lg font-bold leading-none">{todayCount}</p>
+            <p className="mt-0.5 text-[10px] font-bold leading-tight">
+              {todayCount > 0 ? 'hari ini' : 'catat yuk!'}
+            </p>
+          </div>
+
+          <div className="rounded-rapi-md border border-red-300/25 bg-red-400/10 p-3 backdrop-blur-sm">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-400/20">
+              <ArrowDown size={13} className="text-red-300" strokeWidth={3} />
+            </span>
+            <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
+              Pengeluaran
+            </p>
+            <p className="mt-0.5 text-[13px] font-bold text-white">{formatRupiah(monthExpense)}</p>
+          </div>
+        </div>
+      </header>
+
+      <div className="px-5">
+        {/* Quick input — card sendiri di bawah navy */}
         <button
           type="button"
           onClick={() => navigate('/tambah')}
-          className="relative mt-6 flex w-full items-center gap-3 rounded-rapi-lg border border-white/15 bg-white/10 p-3.5 text-left backdrop-blur-sm transition-colors hover:bg-white/15"
+          className="rapi-glass mt-4 flex w-full items-center gap-3 rounded-rapi-lg p-3.5 text-left transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
             <Icon3D name="sparkles" size={22} fallback="✨" />
           </span>
-          <span className="flex-1 truncate text-sm text-white/60">
-            Ketik aja: <span className="font-bold text-white">"makan 25rb"</span> — sisanya Rapi
+          <span className="flex-1 truncate text-sm text-rapi-gray-600">
+            Ketik aja: <span className="font-bold text-rapi-navy">"makan 25rb"</span> — sisanya Rapi
             yang beresin
           </span>
-          <span className="flex shrink-0 items-center gap-2 text-white/40">
+          <span className="flex shrink-0 items-center gap-2 text-rapi-gray-300">
             <Mic size={16} />
             <Camera size={16} />
           </span>
         </button>
-      </header>
 
-      <div className="px-5">
-        {/* ===== Tile 2 kolom — seragam putih, mecah ritme full-width ===== */}
+        {/* Tile 2 kolom — Rapi AI & Laporan (Investasi kini di bottom nav) */}
         <div className="mt-5 grid grid-cols-2 gap-3">
           <RapiCard
             role="button"
             tabIndex={0}
-            onClick={() => navigate('/investasi')}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/investasi')}
+            onClick={() => navigate('/ai')}
+            onKeyDown={(e) => e.key === 'Enter' && navigate('/ai')}
             className="cursor-pointer"
           >
-            <Icon3D name="invest" size={30} fallback="📈" />
-            <p className="mt-2 text-sm font-bold">Investasi</p>
+            <Icon3D name="robot" size={30} fallback="🤖" />
+            <p className="mt-2 text-sm font-bold">Rapi AI</p>
             <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
-              Profit/loss kehitung otomatis
+              Tanya soal keuanganmu
             </p>
           </RapiCard>
           <RapiCard
@@ -154,7 +166,7 @@ export default function Dashboard() {
           </RapiCard>
         </div>
 
-        {/* ===== Transaksi terbaru — satu container, bukan kartu bertumpuk ===== */}
+        {/* Transaksi terbaru — satu container ber-divider */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-gray-600">
             Transaksi Terbaru

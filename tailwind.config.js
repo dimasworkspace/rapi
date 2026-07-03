@@ -42,10 +42,15 @@ export default {
           '0%, 100%': { boxShadow: '0 8px 22px rgba(2,72,193,0.35)' },
           '50%': { boxShadow: '0 8px 34px rgba(2,72,193,0.6)' },
         },
+        'rapi-slide-down': {
+          from: { opacity: '0', transform: 'translateY(-100%)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
         'rapi-fade-up': 'rapi-fade-up 0.4s ease both',
         'rapi-pulse': 'rapi-pulse 2.4s ease-in-out infinite',
+        'rapi-slide-down': 'rapi-slide-down 0.55s cubic-bezier(0.22,1,0.36,1) both',
       },
     },
   },

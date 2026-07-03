@@ -1,4 +1,4 @@
-import { Home, PieChart, Bot, User, Plus } from 'lucide-react'
+import { Home, PieChart, TrendingUp, User, Plus } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 
@@ -8,7 +8,7 @@ const LEFT_ITEMS = [
 ]
 
 const RIGHT_ITEMS = [
-  { to: '/ai', label: 'Rapi AI', icon: Bot },
+  { to: '/investasi', label: 'Investasi', icon: TrendingUp },
   { to: '/profil', label: 'Profil', icon: User },
 ]
 
