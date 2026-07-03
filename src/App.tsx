@@ -3,6 +3,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
 import Onboarding from '@/pages/Onboarding'
+import Reports from '@/pages/Reports'
 import Transactions from '@/pages/Transactions'
 import { useUserStore } from '@/store/userStore'
 
@@ -17,17 +18,7 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transaksi" element={<Transactions />} />
-          <Route
-            path="/laporan"
-            element={
-              <ComingSoon
-                title="Laporan"
-                emoji="📊"
-                icon="report"
-                message="Bentar ya, grafik donat & tren pengeluaranmu lagi dirapiin. Nyusul segera! ✨"
-              />
-            }
-          />
+          <Route path="/laporan" element={<Reports />} />
           <Route
             path="/ai"
             element={
