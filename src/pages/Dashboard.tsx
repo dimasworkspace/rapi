@@ -91,7 +91,7 @@ export default function Dashboard() {
   return (
     <PageWrapper className="px-0" animate={false}>
       {/* ===== Navy canvas hero — navy diam nutup atas, konten yang turun ===== */}
-      <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] px-5 pb-6 pt-9 text-white">
+      <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] px-5 pb-7 pt-8 text-white">
         <div
           aria-hidden
           className="absolute -bottom-16 right-0 h-56 w-56 rounded-full bg-rapi-blue/40 blur-3xl"
@@ -103,17 +103,17 @@ export default function Dashboard() {
 
         <div className="relative animate-rapi-slide-down text-center">
           <p className="text-xs text-white/60">{getGreeting()}</p>
-          <p className="mt-0.5 text-xl font-bold">Halo, {name}</p>
+          <p className="mt-1 text-xl font-bold">Halo, {name}</p>
 
-          <p className="mt-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
+          <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
             Total Saldo
           </p>
-          <p className="mt-1 text-[40px] font-bold leading-none tracking-tight">
+          <p className="mt-1.5 text-[40px] font-bold leading-none tracking-tight">
             {formatRupiah(animatedBalance)}
           </p>
 
           {/* 3 card stat glass — semua bisa diklik */}
-          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+          <div className="mt-6 grid grid-cols-3 gap-2 text-center">
             <button
               type="button"
               onClick={() => navigate('/laporan?tipe=pemasukan')}
@@ -153,19 +153,13 @@ export default function Dashboard() {
       </header>
 
       <div className="px-5">
-        {/* Rangkuman keuangan mingguan — diupdate otomatis, tap untuk detail */}
+        {/* Rangkuman keuangan mingguan — kuning gradasi glass, diupdate otomatis */}
         <button
           type="button"
           onClick={() => navigate('/laporan')}
-          className="rapi-glass mt-5 w-full rounded-rapi-lg p-4 text-left transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="mt-5 w-full rounded-rapi-lg border border-white/50 bg-gradient-to-br from-rapi-yellow/90 to-[#F4C21A]/60 p-4 text-left shadow-rapi-card backdrop-blur-xl transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          <div className="flex items-center justify-between">
-            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-rapi-blue">
-              Rangkuman Minggu Ini
-            </p>
-            <ChevronRight size={15} className="text-rapi-gray-300" />
-          </div>
-          <p className="mt-1.5 text-sm leading-relaxed text-rapi-navy">{weeklySummary}</p>
+          <p className="text-[15px] font-semibold leading-snug text-rapi-navy">{weeklySummary}</p>
         </button>
 
         {/* Transaksi terbaru — heading & link navy */}
