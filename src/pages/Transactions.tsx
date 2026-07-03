@@ -1,5 +1,4 @@
 import { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -8,10 +7,11 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatDayLabel } from '@/lib/formatters'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
+import { useUiStore } from '@/store/uiStore'
 import type { Transaction } from '@/types'
 
 export default function Transactions() {
-  const navigate = useNavigate()
+  const openAdd = useUiStore((s) => s.openAdd)
   const transactions = useTransactionStore((s) => s.transactions)
 
   const groups = useMemo(() => {
@@ -38,7 +38,7 @@ export default function Transactions() {
           <p className="text-sm leading-relaxed text-rapi-gray-600">
             Belum ada catatan nih. Yuk mulai #RapiinAja!
           </p>
-          <RapiButton variant="accent" onClick={() => navigate('/tambah')}>
+          <RapiButton variant="accent" onClick={openAdd}>
             Catat Transaksi Pertamamu ✍️
           </RapiButton>
         </RapiCard>

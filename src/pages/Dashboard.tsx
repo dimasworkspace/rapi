@@ -10,6 +10,7 @@ import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatRupiah } from '@/lib/formatters'
 import { useCountUp } from '@/lib/useCountUp'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
+import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
 
 const getGreeting = (): string => {
@@ -44,6 +45,7 @@ const buildWeeklySummary = (
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const openAdd = useUiStore((s) => s.openAdd)
   const profile = useUserStore((s) => s.profile)
   const transactions = useTransactionStore((s) => s.transactions)
   const name = profile?.name ?? 'Kamu'
@@ -183,7 +185,7 @@ export default function Dashboard() {
             <p className="text-sm leading-relaxed text-rapi-gray-600">
               Belum ada catatan nih. Yuk mulai #RapiinAja!
             </p>
-            <RapiButton variant="accent" onClick={() => navigate('/tambah')}>
+            <RapiButton variant="accent" onClick={openAdd}>
               Catat Transaksi Pertamamu ✍️
             </RapiButton>
           </RapiCard>

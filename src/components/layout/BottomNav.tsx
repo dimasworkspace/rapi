@@ -1,6 +1,7 @@
 import { Home, PieChart, TrendingUp, User, Plus } from 'lucide-react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { cn } from '@/lib/utils'
+import { useUiStore } from '@/store/uiStore'
 
 const LEFT_ITEMS = [
   { to: '/', label: 'Home', icon: Home },
@@ -42,7 +43,7 @@ function NavItem({ to, label, icon: Icon }: (typeof LEFT_ITEMS)[number]) {
 
 /** Floating pill nav — FAB Blue di tengah, sesuai wireframe (Home · Laporan · [+] · AI · Profil). */
 export function BottomNav() {
-  const navigate = useNavigate()
+  const openAdd = useUiStore((s) => s.openAdd)
 
   return (
     <div className="fixed bottom-0 left-1/2 z-30 w-full max-w-md -translate-x-1/2 px-4 pb-[max(env(safe-area-inset-bottom),12px)]">
@@ -53,7 +54,7 @@ export function BottomNav() {
 
         <button
           type="button"
-          onClick={() => navigate('/tambah')}
+          onClick={openAdd}
           aria-label="Tambah transaksi"
           className={cn(
             'mx-1 -mt-8 flex h-14 w-14 shrink-0 items-center justify-center',

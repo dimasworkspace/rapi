@@ -1,6 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
-import AddTransaction from '@/pages/AddTransaction'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
 import Onboarding from '@/pages/Onboarding'
@@ -18,7 +17,6 @@ export default function App() {
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transaksi" element={<Transactions />} />
-          <Route path="/tambah" element={<AddTransaction />} />
           <Route
             path="/laporan"
             element={
