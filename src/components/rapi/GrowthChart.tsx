@@ -47,7 +47,7 @@ export function GrowthChart({ data }: { data: GrowthPoint[] }) {
       </svg>
       <div className="mt-2 flex justify-between">
         {data.map((d, i) => (
-          <span key={i} className="flex-1 text-center text-[10px] font-semibold text-rapi-gray-600">
+          <span key={i} className="flex-1 text-center text-[11px] font-medium text-rapi-gray-600">
             {d.label}
           </span>
         ))}

@@ -85,7 +85,7 @@ export default function Reports() {
       <TopBar title="Laporan" />
 
       {/* Toggle periode */}
-      <div className="flex rounded-rapi-md bg-rapi-gray-100 p-1">
+      <div className="flex rounded-rapi-md bg-white/50 p-1 backdrop-blur">
         {(
           [
             { id: 'week', label: 'Mingguan' },
@@ -97,7 +97,7 @@ export default function Reports() {
             type="button"
             onClick={() => setPeriod(id)}
             className={cn(
-              'flex-1 rounded-[7px] py-2 text-xs font-semibold transition-colors',
+              'flex-1 rounded-[7px] py-2 text-[13px] font-semibold tracking-tight transition-colors',
               period === id ? 'bg-rapi-blue text-white shadow-rapi-card' : 'text-rapi-gray-600',
             )}
           >
@@ -109,7 +109,7 @@ export default function Reports() {
       {!hasData ? (
         <RapiCard className="mt-5 flex flex-col items-center gap-3 px-6 py-12 text-center">
           <Icon3D name="report" size={52} fallback="📊" />
-          <p className="text-sm leading-relaxed text-rapi-gray-600">
+          <p className="text-[13px] leading-relaxed text-rapi-gray-600">
             Belum ada data {periodLabel} nih. Yuk catat transaksimu dulu! 🎉
           </p>
           <RapiButton variant="accent" onClick={openAdd}>
@@ -118,11 +118,14 @@ export default function Reports() {
         </RapiCard>
       ) : (
         <>
-          {/* Donut tunggal: Pemasukan vs Pengeluaran + selisih di tengah */}
-          <RapiCard className="mt-4">
-            <h2 className="mb-3 text-sm font-semibold">Pemasukan vs Pengeluaran</h2>
-            <div className="flex items-center gap-4">
+          {/* Donut tunggal — center, glass bulat di belakang (tanpa card) */}
+          <section className="mt-7 flex flex-col items-center">
+            <h2 className="text-[13px] font-semibold tracking-tight">Pemasukan vs Pengeluaran</h2>
+            <div className="relative mt-4 flex h-52 w-52 items-center justify-center">
+              <div className="rapi-glass absolute inset-0 rounded-full" aria-hidden />
               <DonutChart
+                size={168}
+                stroke={22}
                 slices={[
                   { label: 'Pemasukan', value: periodIncome, color: INCOME_GREEN },
                   { label: 'Pengeluaran', value: periodExpense, color: EXPENSE_RED },
@@ -131,46 +134,44 @@ export default function Reports() {
                 centerMain={netStr}
                 centerColor={net >= 0 ? INCOME_GREEN : EXPENSE_RED}
               />
-              <div className="flex min-w-0 flex-1 flex-col gap-3">
-                <div>
-                  <p className="flex items-center gap-1.5 text-xs font-medium text-rapi-gray-600">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: INCOME_GREEN }} />
-                    Pemasukan
-                  </p>
-                  <p className="mt-0.5 text-sm font-bold text-rapi-navy">
-                    {formatRupiah(periodIncome)}
-                  </p>
-                </div>
-                <div>
-                  <p className="flex items-center gap-1.5 text-xs font-medium text-rapi-gray-600">
-                    <span className="h-2.5 w-2.5 rounded-full" style={{ background: EXPENSE_RED }} />
-                    Pengeluaran
-                  </p>
-                  <p className="mt-0.5 text-sm font-bold text-rapi-navy">
-                    {formatRupiah(periodExpense)}
-                  </p>
-                </div>
+            </div>
+            <div className="mt-5 flex items-start justify-center gap-8">
+              <div className="text-center">
+                <p className="flex items-center justify-center gap-1.5 text-[13px] font-medium text-rapi-gray-600">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: INCOME_GREEN }} />
+                  Pemasukan
+                </p>
+                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy">
+                  {formatRupiah(periodIncome)}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="flex items-center justify-center gap-1.5 text-[13px] font-medium text-rapi-gray-600">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: EXPENSE_RED }} />
+                  Pengeluaran
+                </p>
+                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy">
+                  {formatRupiah(periodExpense)}
+                </p>
               </div>
             </div>
-          </RapiCard>
+          </section>
 
           {/* Insight otomatis */}
           {insight && (
-            <div className="mt-4 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-white shadow-rapi-card">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-white/70">
-                Insight Rapi
-              </p>
-              <p className="mt-1.5 text-sm font-medium leading-relaxed">{insight}</p>
+            <div className="mt-6 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-white shadow-rapi-card">
+              <p className="text-[13px] font-semibold tracking-tight text-white/70">Insight Rapi</p>
+              <p className="mt-1 text-[13px] font-medium leading-relaxed tracking-tight">{insight}</p>
             </div>
           )}
 
           {/* Pertumbuhan keuangan — saldo kumulatif, bisa digeser per bulan */}
           <RapiCard className="mt-4">
             <div className="mb-1 flex items-center justify-between">
-              <h2 className="text-sm font-semibold">Pertumbuhan Keuangan</h2>
+              <h2 className="text-[13px] font-semibold tracking-tight">Pertumbuhan Keuangan</h2>
               <span
                 className={cn(
-                  'rounded-full px-2 py-0.5 text-[11px] font-semibold',
+                  'rounded-full px-2 py-0.5 text-[13px] font-semibold',
                   growthDelta >= 0
                     ? 'bg-rapi-income-soft text-rapi-income'
                     : 'bg-rapi-expense-soft text-rapi-expense',
@@ -189,7 +190,7 @@ export default function Reports() {
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="text-[11px] font-medium text-rapi-gray-600">
+              <span className="text-[13px] font-medium text-rapi-gray-600">
                 {growth[0].label} – {growth[growth.length - 1].label}
               </span>
               <button

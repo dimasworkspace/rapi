@@ -53,12 +53,12 @@ export function DonutChart({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         {centerTop && (
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-rapi-gray-600">
+          <span className="text-[11px] font-medium tracking-tight text-rapi-gray-600">
             {centerTop}
           </span>
         )}
         <span
-          className="text-base font-bold"
+          className="text-sm font-bold tracking-tight"
           style={{ color: centerColor ?? '#111835' }}
         >
           {centerMain}
