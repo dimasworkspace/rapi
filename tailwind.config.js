@@ -43,7 +43,7 @@ export default {
           '50%': { boxShadow: '0 8px 34px rgba(2,72,193,0.6)' },
         },
         'rapi-slide-down': {
-          from: { opacity: '0', transform: 'translateY(-100%)' },
+          from: { opacity: '0', transform: 'translateY(-40px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
       },
