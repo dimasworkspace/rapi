@@ -16,7 +16,7 @@ const MODES = [
   { id: 'photo', label: 'Foto', icon: Camera, ready: false },
 ] as const
 
-/** Form isi transaksi — dipakai di dalam sheet. State fresh tiap sheet dibuka. */
+/** Form isi transaksi — state fresh tiap sheet dibuka. */
 function AddTransactionForm() {
   const categories = useCategoryStore((s) => s.categories)
   const addTransaction = useTransactionStore((s) => s.addTransaction)
@@ -63,115 +63,97 @@ function AddTransactionForm() {
   return (
     <>
       {/* ===== HERO: mode input + tulis transaksi ===== */}
-      <div className="rounded-rapi-lg border border-white/70 bg-white/70 p-3.5 shadow-rapi-card backdrop-blur-md">
-        <div className="grid grid-cols-3 gap-2">
-          {MODES.map(({ id, label, icon: Icon, ready }) => (
-            <button
-              key={id}
-              type="button"
-              disabled={!ready}
-              className={cn(
-                'flex min-h-10 items-center justify-center gap-1.5 rounded-rapi-md text-xs font-bold transition-colors',
-                ready
-                  ? 'bg-rapi-blue text-white shadow-rapi-card'
-                  : 'border border-dashed border-rapi-blue/30 text-rapi-gray-600',
-              )}
-            >
-              <Icon size={15} />
-              {label}
-              {!ready && <span className="text-[9px] font-normal opacity-70">nyusul</span>}
-            </button>
-          ))}
-        </div>
-
-        <label htmlFor="tx-input" className="sr-only">
-          Tulis transaksi
-        </label>
-        <textarea
-          id="tx-input"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder={'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt" · "grab 18rb"'}
-          rows={3}
-          autoFocus
-          className="mt-3 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/80 px-3.5 py-3 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
-        />
-
-        {input.trim() && (
-          <div
-            className={cn(
-              'mt-2 inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold',
-              parsed.confidence === 'high' && 'bg-rapi-income-soft text-rapi-income',
-              parsed.confidence === 'medium' && 'bg-rapi-warning-soft text-[#946800]',
-              parsed.confidence === 'low' && 'bg-rapi-gray-100 text-rapi-gray-600',
-            )}
-          >
-            {parsed.confidence === 'high' && 'Rapi ngerti! ✨'}
-            {parsed.confidence === 'medium' && 'Cek kategorinya ya 👀'}
-            {parsed.confidence === 'low' && 'Lengkapi nominalnya ya'}
-          </div>
-        )}
-      </div>
-
-      {/* ===== Detail: jenis, nominal, kategori ===== */}
-      <div className="mt-4 flex gap-2">
-        {(
-          [
-            { id: 'expense', label: '↓ Pengeluaran' },
-            { id: 'income', label: '↑ Pemasukan' },
-          ] as const
-        ).map(({ id, label }) => (
+      <div className="grid grid-cols-3 gap-2">
+        {MODES.map(({ id, label, icon: Icon, ready }) => (
           <button
             key={id}
             type="button"
-            onClick={() => {
-              setManualType(id)
-              setManualCategory(null)
-            }}
+            disabled={!ready}
             className={cn(
-              'min-h-10 flex-1 rounded-rapi-md text-xs font-bold transition-colors',
-              type === id
-                ? id === 'expense'
-                  ? 'bg-rapi-expense-soft text-rapi-expense'
-                  : 'bg-rapi-income-soft text-rapi-income'
-                : 'bg-white/60 text-rapi-gray-600',
+              'flex min-h-9 items-center justify-center gap-1.5 rounded-rapi-md text-xs font-bold transition-colors',
+              ready
+                ? 'bg-rapi-blue text-white shadow-rapi-card'
+                : 'border border-dashed border-rapi-blue/30 text-rapi-gray-600',
             )}
           >
+            <Icon size={14} />
             {label}
+            {!ready && <span className="text-[9px] font-normal opacity-70">nyusul</span>}
           </button>
         ))}
       </div>
 
-      <label htmlFor="tx-amount" className="mb-1.5 mt-4 block text-xs font-bold text-rapi-gray-600">
-        Nominal
+      <label htmlFor="tx-input" className="sr-only">
+        Tulis transaksi
       </label>
-      <div className="flex items-center rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 transition-colors focus-within:border-rapi-blue">
-        <span className="pl-4 text-sm font-bold text-rapi-gray-600">Rp</span>
-        <input
-          id="tx-amount"
-          value={amount ? new Intl.NumberFormat('id-ID').format(amount) : ''}
-          onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
-          placeholder="0"
-          inputMode="numeric"
-          className="w-full bg-transparent px-2 py-3 text-sm font-bold outline-none"
-        />
+      <textarea
+        id="tx-input"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder={'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt"'}
+        rows={2}
+        autoFocus
+        className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
+      />
+
+      {/* ===== Auto-detect compact: jenis · nominal · kategori ===== */}
+      <div className="mt-2.5 flex items-center gap-2">
+        <div className="flex flex-1 rounded-rapi-md bg-white/50 p-1">
+          {(
+            [
+              { id: 'expense', label: 'Keluar' },
+              { id: 'income', label: 'Masuk' },
+            ] as const
+          ).map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => {
+                setManualType(id)
+                setManualCategory(null)
+              }}
+              className={cn(
+                'flex-1 rounded-[7px] py-1.5 text-xs font-bold transition-colors',
+                type === id
+                  ? id === 'expense'
+                    ? 'bg-rapi-expense-soft text-rapi-expense'
+                    : 'bg-rapi-income-soft text-rapi-income'
+                  : 'text-rapi-gray-600',
+              )}
+            >
+              {id === 'expense' ? '↓ ' : '↑ '}
+              {label}
+            </button>
+          ))}
+        </div>
+        <div className="flex w-36 items-center rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/60 transition-colors focus-within:border-rapi-blue">
+          <span className="pl-2.5 text-xs font-bold text-rapi-gray-600">Rp</span>
+          <input
+            aria-label="Nominal"
+            value={amount ? new Intl.NumberFormat('id-ID').format(amount) : ''}
+            onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
+            placeholder="0"
+            inputMode="numeric"
+            className="w-full bg-transparent px-1.5 py-2 text-sm font-bold outline-none"
+          />
+        </div>
       </div>
 
-      <p className="mb-1.5 mt-4 text-xs font-bold text-rapi-gray-600">Kategori</p>
-      <div className="grid grid-cols-4 gap-2">
+      {/* Kategori — otomatis kepilih, geser buat ganti */}
+      <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
         {typeCategories.map((cat) => (
           <button
             key={cat.id}
             type="button"
             onClick={() => setManualCategory(cat.id)}
             className={cn(
-              'flex min-h-[64px] flex-col items-center justify-center gap-1 rounded-rapi-md p-1.5 text-[10px] font-bold transition-colors',
+              'flex min-w-[62px] shrink-0 flex-col items-center gap-1 rounded-rapi-md px-2 py-2 text-[10px] font-bold transition-colors',
               activeCategory === cat.id
                 ? 'bg-rapi-blue text-white shadow-rapi-card'
-                : 'border border-white/70 bg-white/55 text-rapi-gray-600',
+                : 'border border-white/60 bg-white/45 text-rapi-gray-600',
             )}
           >
-            <Icon3D name={cat.id} size={22} fallback={cat.emoji} />
+            <Icon3D name={cat.id} size={20} fallback={cat.emoji} />
             <span className="w-full truncate text-center leading-tight">{cat.name}</span>
           </button>
         ))}
@@ -181,7 +163,7 @@ function AddTransactionForm() {
         variant="blue"
         onClick={handleSave}
         disabled={!canSave}
-        className="mt-5 w-full text-base"
+        className="mt-3 w-full text-base"
       >
         {canSave ? `Simpan ${formatRupiah(amount)} ✅` : 'Simpan Transaksi'}
       </RapiButton>
@@ -189,12 +171,11 @@ function AddTransactionForm() {
   )
 }
 
-/** Bottom sheet setengah layar yang meluncur dari FAB. */
+/** Card melayang transparan yang meluncur dari FAB. */
 export function AddTransactionSheet() {
   const open = useUiStore((s) => s.addOpen)
   const closeAdd = useUiStore((s) => s.closeAdd)
 
-  // Tutup dengan tombol Escape
   useEffect(() => {
     if (!open) return
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeAdd()
@@ -206,36 +187,29 @@ export function AddTransactionSheet() {
 
   return (
     <div className="fixed inset-0 z-40">
-      {/* Backdrop */}
+      {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
       <button
         type="button"
         aria-label="Tutup"
         onClick={closeAdd}
-        className="absolute inset-0 animate-rapi-fade-in bg-rapi-navy/40 backdrop-blur-[2px]"
+        className="absolute inset-0 animate-rapi-fade-in bg-rapi-navy/20"
       />
 
-      {/* Sheet — biru glass premium, meluncur dari bawah (FAB) */}
-      <div className="absolute bottom-0 left-1/2 flex max-h-[88vh] w-full max-w-md -translate-x-1/2 animate-rapi-sheet-up flex-col overflow-hidden rounded-t-rapi-xl border-t border-white/40 bg-gradient-to-b from-[#E8F0FF]/95 to-[#F8FAFF]/95 backdrop-blur-2xl">
-        {/* Ambient biru biar glass-nya hidup */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -top-10 right-0 h-40 w-40 rounded-full bg-rapi-blue/15 blur-3xl"
-        />
-
-        <div className="relative flex items-center justify-between px-5 pt-4">
-          <div className="mx-auto absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-rapi-navy/15" />
-          <h2 className="text-base font-bold text-rapi-navy">Tambah Transaksi</h2>
+      {/* Card melayang — biru glass transparan, meluncur dari bawah (FAB) */}
+      <div className="absolute inset-x-3 bottom-3 mx-auto flex max-h-[78vh] max-w-[27rem] animate-rapi-sheet-up flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/55 shadow-rapi-elevated backdrop-blur-2xl">
+        <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
+          <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Transaksi</h2>
           <button
             type="button"
             onClick={closeAdd}
             aria-label="Tutup"
-            className="-mr-2 flex h-9 w-9 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
+            className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
           >
-            <X size={18} />
+            <X size={17} />
           </button>
         </div>
 
-        <div className="relative overflow-y-auto px-5 pb-[max(env(safe-area-inset-bottom),20px)] pt-3">
+        <div className="overflow-y-auto px-4 pb-4 pt-1">
           <AddTransactionForm />
         </div>
       </div>
