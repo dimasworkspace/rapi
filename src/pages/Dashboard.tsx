@@ -153,13 +153,13 @@ export default function Dashboard() {
       </header>
 
       <div className="px-5">
-        {/* Rangkuman keuangan mingguan — kuning gradasi glass, diupdate otomatis */}
+        {/* Rangkuman keuangan mingguan — biru (senada button & FAB), diupdate otomatis */}
         <button
           type="button"
           onClick={() => navigate('/laporan')}
-          className="mt-5 w-full rounded-rapi-lg border border-white/50 bg-gradient-to-br from-rapi-yellow/90 to-[#F4C21A]/60 p-4 text-left shadow-rapi-card backdrop-blur-xl transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          <p className="text-[15px] font-semibold leading-snug text-rapi-navy">{weeklySummary}</p>
+          <p className="text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
         </button>
 
         {/* Transaksi terbaru — heading & link navy */}
