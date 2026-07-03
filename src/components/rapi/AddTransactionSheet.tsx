@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Camera, Keyboard, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
@@ -157,67 +158,60 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   )
 }
 
-/** Modal di tengah layar — biru glass transparan, pop-in dari FAB. */
+/** Modal di tengah layar — biru glass transparan, pop-in dari FAB (Framer Motion). */
 export function AddTransactionSheet() {
   const open = useUiStore((s) => s.addOpen)
   const closeAdd = useUiStore((s) => s.closeAdd)
-  const [closing, setClosing] = useState(false)
-
-  // Tutup dengan animasi keluar dulu, baru unmount.
-  const handleClose = () => {
-    setClosing(true)
-    setTimeout(() => {
-      setClosing(false)
-      closeAdd()
-    }, 200)
-  }
 
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && handleClose()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeAdd()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
-
-  if (!open) return null
+  }, [open, closeAdd])
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
-      {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
-      <button
-        type="button"
-        aria-label="Tutup"
-        onClick={handleClose}
-        className={cn(
-          'absolute inset-0 bg-rapi-navy/20',
-          closing ? 'animate-rapi-fade-out' : 'animate-rapi-fade-in',
-        )}
-      />
-
-      {/* Modal — biru glass transparan, pop-in/out */}
-      <div
-        className={cn(
-          'relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl',
-          closing ? 'animate-rapi-pop-out' : 'animate-rapi-pop-in',
-        )}
-      >
-        <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
-          <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Transaksi</h2>
-          <button
+    <AnimatePresence>
+      {open && (
+        <motion.div key="add-sheet" className="fixed inset-0 z-40 flex items-center justify-center p-4">
+          {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
+          <motion.button
             type="button"
-            onClick={handleClose}
             aria-label="Tutup"
-            className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
-          >
-            <X size={17} />
-          </button>
-        </div>
+            onClick={closeAdd}
+            className="absolute inset-0 bg-rapi-navy/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          />
 
-        <div className="overflow-y-auto px-4 pb-4 pt-1">
-          <AddTransactionForm onClose={handleClose} />
-        </div>
-      </div>
-    </div>
+          {/* Modal — biru glass transparan, spring pop-in/out */}
+          <motion.div
+            className="relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl"
+            initial={{ opacity: 0, scale: 0.92, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: 12 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+          >
+            <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
+              <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Transaksi</h2>
+              <button
+                type="button"
+                onClick={closeAdd}
+                aria-label="Tutup"
+                className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
+              >
+                <X size={17} />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto px-4 pb-4 pt-1">
+              <AddTransactionForm onClose={closeAdd} />
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   )
 }

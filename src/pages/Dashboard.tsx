@@ -91,7 +91,7 @@ export default function Dashboard() {
   const animatedBalance = useCountUp(balance)
 
   return (
-    <PageWrapper className="px-0" animate={false}>
+    <PageWrapper className="px-0">
       {/* ===== Navy canvas hero — navy diam nutup atas, konten yang turun ===== */}
       <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] px-5 pb-7 pt-8 text-white">
         <div
