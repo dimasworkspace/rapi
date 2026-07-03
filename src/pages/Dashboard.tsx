@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, Camera, ChevronRight, Mic } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronRight } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -58,11 +58,15 @@ export default function Dashboard() {
 
   return (
     <PageWrapper className="px-0">
-      {/* ===== Navy canvas hero — turun dari atas, berhenti tepat di atas quick-input ===== */}
-      <header className="relative animate-rapi-slide-down overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-rapi-navy to-[#1E2A55] px-5 pb-6 pt-8 text-white">
+      {/* ===== Navy canvas hero — gradient biru lebih terasa, turun dari atas ===== */}
+      <header className="relative animate-rapi-slide-down overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] px-5 pb-6 pt-8 text-white">
         <div
           aria-hidden
-          className="absolute -right-12 -top-16 h-48 w-48 rounded-full bg-rapi-yellow/25 blur-2xl"
+          className="absolute -bottom-16 right-0 h-56 w-56 rounded-full bg-rapi-blue/40 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="absolute -right-12 -top-16 h-44 w-44 rounded-full bg-rapi-yellow/20 blur-2xl"
         />
         <div aria-hidden className="absolute -right-4 top-16 h-3 w-3 rounded-full bg-rapi-yellow/70" />
         <div aria-hidden className="absolute right-14 top-8 h-2 w-2 rounded-full bg-rapi-yellow/50" />
@@ -84,95 +88,68 @@ export default function Dashboard() {
           {formatRupiah(animatedBalance)}
         </p>
 
-        {/* 3 card stat — Pemasukan (hijau glass) · Insight (kuning) · Pengeluaran (merah glass) */}
-        <div className="relative mt-5 grid grid-cols-3 gap-2.5">
-          <div className="rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-3 backdrop-blur-sm">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/20">
-              <ArrowUp size={13} className="text-emerald-300" strokeWidth={3} />
-            </span>
-            <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
-              Pemasukan
+        {/* 3 card stat — semua bisa diklik. Pemasukan hijau · streak putih · Pengeluaran merah */}
+        <div className="relative mt-5 grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() => navigate('/laporan?tipe=pemasukan')}
+            className="rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-2.5 text-left backdrop-blur-sm transition-colors hover:bg-emerald-400/20"
+          >
+            <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
+              <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" />
+              Masuk
             </p>
-            <p className="mt-0.5 text-[13px] font-bold text-white">{formatRupiah(monthIncome)}</p>
-          </div>
+            <p className="mt-1 text-xs font-bold text-white">{formatRupiah(monthIncome)}</p>
+          </button>
 
-          <div className="flex flex-col items-center justify-center rounded-rapi-md bg-rapi-yellow p-3 text-center text-rapi-navy">
-            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={26} fallback={todayCount > 0 ? '🔥' : '⚡'} />
-            <p className="mt-1 text-lg font-bold leading-none">{todayCount}</p>
-            <p className="mt-0.5 text-[10px] font-bold leading-tight">
-              {todayCount > 0 ? 'hari ini' : 'catat yuk!'}
-            </p>
-          </div>
+          <button
+            type="button"
+            onClick={() => navigate('/transaksi')}
+            className="flex flex-col items-center justify-center rounded-rapi-md bg-white px-2 py-2 text-center text-rapi-navy transition-transform hover:-translate-y-0.5"
+          >
+            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={20} fallback={todayCount > 0 ? '🔥' : '⚡'} />
+            <p className="mt-0.5 text-sm font-bold leading-none">{todayCount}</p>
+            <p className="text-[9px] font-bold text-rapi-gray-600">hari ini</p>
+          </button>
 
-          <div className="rounded-rapi-md border border-red-300/25 bg-red-400/10 p-3 backdrop-blur-sm">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-red-400/20">
-              <ArrowDown size={13} className="text-red-300" strokeWidth={3} />
-            </span>
-            <p className="mt-2 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
-              Pengeluaran
+          <button
+            type="button"
+            onClick={() => navigate('/laporan?tipe=pengeluaran')}
+            className="rounded-rapi-md border border-red-300/25 bg-red-400/10 p-2.5 text-left backdrop-blur-sm transition-colors hover:bg-red-400/20"
+          >
+            <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
+              <ArrowDown size={11} strokeWidth={3} className="text-red-300" />
+              Keluar
             </p>
-            <p className="mt-0.5 text-[13px] font-bold text-white">{formatRupiah(monthExpense)}</p>
-          </div>
+            <p className="mt-1 text-xs font-bold text-white">{formatRupiah(monthExpense)}</p>
+          </button>
         </div>
       </header>
 
       <div className="px-5">
-        {/* Quick input — card sendiri di bawah navy */}
+        {/* Rapi AI — satu card kompak, bisa diklik */}
         <button
           type="button"
-          onClick={() => navigate('/tambah')}
-          className="rapi-glass mt-4 flex w-full items-center gap-3 rounded-rapi-lg p-3.5 text-left transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          onClick={() => navigate('/ai')}
+          className="rapi-glass mt-5 flex w-full items-center gap-3 rounded-rapi-lg p-3.5 text-left transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
-            <Icon3D name="sparkles" size={22} fallback="✨" />
+          <Icon3D name="robot" size={34} fallback="🤖" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-bold text-rapi-navy">Rapi AI</span>
+            <span className="block truncate text-[11px] text-rapi-gray-600">
+              Tanya apa aja soal keuanganmu
+            </span>
           </span>
-          <span className="flex-1 truncate text-sm text-rapi-gray-600">
-            Ketik aja: <span className="font-bold text-rapi-navy">"makan 25rb"</span> — sisanya Rapi
-            yang beresin
-          </span>
-          <span className="flex shrink-0 items-center gap-2 text-rapi-gray-300">
-            <Mic size={16} />
-            <Camera size={16} />
-          </span>
+          <ChevronRight size={18} className="shrink-0 text-rapi-gray-300" />
         </button>
 
-        {/* Tile 2 kolom — Rapi AI & Laporan (Investasi kini di bottom nav) */}
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <RapiCard
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/ai')}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/ai')}
-            className="cursor-pointer"
-          >
-            <Icon3D name="robot" size={30} fallback="🤖" />
-            <p className="mt-2 text-sm font-bold">Rapi AI</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
-              Tanya soal keuanganmu
-            </p>
-          </RapiCard>
-          <RapiCard
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/laporan')}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/laporan')}
-            className="cursor-pointer"
-          >
-            <Icon3D name="report" size={30} fallback="📊" />
-            <p className="mt-2 text-sm font-bold">Laporan</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
-              Ringkasan & tren bulananmu
-            </p>
-          </RapiCard>
-        </div>
-
-        {/* Transaksi terbaru — satu container ber-divider */}
+        {/* Transaksi terbaru — heading & link navy */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-gray-600">
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy">
             Transaksi Terbaru
           </h2>
           {transactions.length > 0 && (
-            <Link to="/transaksi" className="flex items-center text-xs font-bold text-rapi-blue">
+            <Link to="/transaksi" className="flex items-center text-xs font-bold text-rapi-navy">
               Lihat semua
               <ChevronRight size={14} />
             </Link>
