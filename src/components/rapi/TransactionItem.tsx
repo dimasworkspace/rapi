@@ -29,14 +29,8 @@ export function TransactionItem({ transaction: tx, variant = 'card' }: Transacti
           : 'px-4 py-3 transition-colors hover:bg-white/50',
       )}
     >
-      <div
-        className={cn(
-          'flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md',
-          isIncome ? 'bg-rapi-income-soft' : 'bg-rapi-expense-soft',
-          tx.type === 'transfer' && 'bg-rapi-savings-soft',
-        )}
-      >
-        <Icon3D name={tx.category} size={26} fallback={category?.emoji ?? '💸'} />
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center">
+        <Icon3D name={tx.category} size={30} fallback={category?.emoji ?? '💸'} />
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold">{tx.note || category?.name || 'Transaksi'}</p>

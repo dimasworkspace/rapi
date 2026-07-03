@@ -102,42 +102,40 @@ export default function Dashboard() {
             {todayCount > 0 ? `${todayCount} kecatat hari ini` : 'Gas #RapiinAja!'}
           </span>
         </div>
+
+        {/* Quick input — menyatu di dalam hero, bukan kartu terpisah */}
+        <button
+          type="button"
+          onClick={() => navigate('/tambah')}
+          className="relative mt-6 flex w-full items-center gap-3 rounded-rapi-lg border border-white/15 bg-white/10 p-3.5 text-left backdrop-blur-sm transition-colors hover:bg-white/15"
+        >
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
+            <Icon3D name="sparkles" size={22} fallback="✨" />
+          </span>
+          <span className="flex-1 truncate text-sm text-white/60">
+            Ketik aja: <span className="font-bold text-white">"makan 25rb"</span> — sisanya Rapi
+            yang beresin
+          </span>
+          <span className="flex shrink-0 items-center gap-2 text-white/40">
+            <Mic size={16} />
+            <Camera size={16} />
+          </span>
+        </button>
       </header>
 
-      {/* ===== Quick input — mengambang menembus batas navy ===== */}
-      <button
-        type="button"
-        onClick={() => navigate('/tambah')}
-        className="relative z-10 -mt-7 mx-5 flex items-center gap-3 rounded-rapi-lg border border-white/60 bg-white/65 p-3.5 text-left shadow-rapi-elevated backdrop-blur-xl transition-transform hover:-translate-y-0.5 active:translate-y-0"
-      >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
-          <Icon3D name="sparkles" size={22} fallback="✨" />
-        </span>
-        <span className="flex-1 truncate text-sm text-rapi-gray-600">
-          Ketik aja: <span className="font-bold text-rapi-navy">"makan 25rb"</span> — sisanya Rapi
-          yang beresin
-        </span>
-        <span className="flex shrink-0 items-center gap-2 text-rapi-gray-300">
-          <Mic size={16} />
-          <Camera size={16} />
-        </span>
-      </button>
-
       <div className="px-5">
-        {/* ===== Tile 2 kolom — mecah ritme full-width ===== */}
+        {/* ===== Tile 2 kolom — seragam putih, mecah ritme full-width ===== */}
         <div className="mt-5 grid grid-cols-2 gap-3">
           <RapiCard
-            variant="blue"
             role="button"
             tabIndex={0}
             onClick={() => navigate('/investasi')}
             onKeyDown={(e) => e.key === 'Enter' && navigate('/investasi')}
-            className="relative cursor-pointer overflow-hidden"
+            className="cursor-pointer"
           >
-            <div aria-hidden className="absolute -bottom-8 -right-6 h-20 w-20 rounded-full bg-white/10" />
             <Icon3D name="invest" size={30} fallback="📈" />
             <p className="mt-2 text-sm font-bold">Investasi</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-white/70">
+            <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
               Profit/loss kehitung otomatis
             </p>
           </RapiCard>
@@ -148,9 +146,7 @@ export default function Dashboard() {
             onKeyDown={(e) => e.key === 'Enter' && navigate('/laporan')}
             className="cursor-pointer"
           >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rapi-warning-soft">
-              <Icon3D name="report" size={24} fallback="📊" />
-            </span>
+            <Icon3D name="report" size={30} fallback="📊" />
             <p className="mt-2 text-sm font-bold">Laporan</p>
             <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
               Ringkasan & tren bulananmu
