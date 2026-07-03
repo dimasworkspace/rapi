@@ -54,6 +54,18 @@ export default {
           from: { opacity: '0' },
           to: { opacity: '1' },
         },
+        'rapi-fade-out': {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
+        },
+        'rapi-pop-in': {
+          from: { opacity: '0', transform: 'scale(0.94) translateY(12px)' },
+          to: { opacity: '1', transform: 'scale(1) translateY(0)' },
+        },
+        'rapi-pop-out': {
+          from: { opacity: '1', transform: 'scale(1) translateY(0)' },
+          to: { opacity: '0', transform: 'scale(0.94) translateY(12px)' },
+        },
       },
       animation: {
         'rapi-fade-up': 'rapi-fade-up 0.4s ease both',
@@ -61,6 +73,9 @@ export default {
         'rapi-slide-down': 'rapi-slide-down 0.55s cubic-bezier(0.22,1,0.36,1) both',
         'rapi-sheet-up': 'rapi-sheet-up 0.36s cubic-bezier(0.22,1,0.36,1) both',
         'rapi-fade-in': 'rapi-fade-in 0.25s ease both',
+        'rapi-fade-out': 'rapi-fade-out 0.2s ease both',
+        'rapi-pop-in': 'rapi-pop-in 0.3s cubic-bezier(0.22,1,0.36,1) both',
+        'rapi-pop-out': 'rapi-pop-out 0.2s ease both',
       },
     },
   },

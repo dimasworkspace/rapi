@@ -17,24 +17,21 @@ const MODES = [
 ] as const
 
 /** Form isi transaksi — state fresh tiap sheet dibuka. */
-function AddTransactionForm() {
+function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const categories = useCategoryStore((s) => s.categories)
   const addTransaction = useTransactionStore((s) => s.addTransaction)
   const showToast = useUiStore((s) => s.showToast)
-  const closeAdd = useUiStore((s) => s.closeAdd)
 
   const [input, setInput] = useState('')
   const [manualType, setManualType] = useState<TransactionType | null>(null)
   const [manualCategory, setManualCategory] = useState<string | null>(null)
-  const [manualAmount, setManualAmount] = useState<string | null>(null)
 
   const parsed = useMemo(() => parseTransaction(input), [input])
 
   const type: TransactionType = manualType ?? parsed.type
   const category =
     manualCategory ?? (categories.some((c) => c.id === parsed.category) ? parsed.category : '')
-  const amountDigits = manualAmount ?? (parsed.amount !== null ? String(parsed.amount) : '')
-  const amount = amountDigits ? parseInt(amountDigits, 10) : 0
+  const amount = parsed.amount ?? 0
 
   const typeCategories = categories.filter((c) =>
     type === 'income' ? c.type === 'income' : c.type === 'expense',
@@ -57,7 +54,7 @@ function AddTransactionForm() {
       aiParsed: false,
     })
     showToast('Kecatat! Keuanganmu makin rapi 💪')
-    closeAdd()
+    onClose()
   }
 
   return (
@@ -96,64 +93,53 @@ function AddTransactionForm() {
         className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
       />
 
-      {/* ===== Auto-detect compact: jenis · nominal · kategori ===== */}
-      <div className="mt-2.5 flex items-center gap-2">
-        <div className="flex flex-1 rounded-rapi-md bg-white/50 p-1">
-          {(
-            [
-              { id: 'expense', label: 'Keluar' },
-              { id: 'income', label: 'Masuk' },
-            ] as const
-          ).map(({ id, label }) => (
-            <button
-              key={id}
-              type="button"
-              onClick={() => {
-                setManualType(id)
-                setManualCategory(null)
-              }}
-              className={cn(
-                'flex-1 rounded-[7px] py-1.5 text-xs font-bold transition-colors',
-                type === id
-                  ? id === 'expense'
-                    ? 'bg-rapi-expense-soft text-rapi-expense'
-                    : 'bg-rapi-income-soft text-rapi-income'
-                  : 'text-rapi-gray-600',
-              )}
-            >
-              {id === 'expense' ? '↓ ' : '↑ '}
-              {label}
-            </button>
-          ))}
-        </div>
-        <div className="flex w-36 items-center rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/60 transition-colors focus-within:border-rapi-blue">
-          <span className="pl-2.5 text-xs font-bold text-rapi-gray-600">Rp</span>
-          <input
-            aria-label="Nominal"
-            value={amount ? new Intl.NumberFormat('id-ID').format(amount) : ''}
-            onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
-            placeholder="0"
-            inputMode="numeric"
-            className="w-full bg-transparent px-1.5 py-2 text-sm font-bold outline-none"
-          />
-        </div>
+      {/* Jenis — fokus pilihan Keluar / Masuk */}
+      <div className="mt-3 flex rounded-rapi-md bg-white/50 p-1">
+        {(
+          [
+            { id: 'expense', label: '↓ Pengeluaran' },
+            { id: 'income', label: '↑ Pemasukan' },
+          ] as const
+        ).map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => {
+              setManualType(id)
+              setManualCategory(null)
+            }}
+            className={cn(
+              'flex-1 rounded-[7px] py-2 text-xs font-bold transition-colors',
+              type === id
+                ? id === 'expense'
+                  ? 'bg-rapi-expense-soft text-rapi-expense'
+                  : 'bg-rapi-income-soft text-rapi-income'
+                : 'text-rapi-gray-600',
+            )}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {/* Kategori — otomatis kepilih, geser buat ganti */}
-      <div className="mt-2.5 flex gap-2 overflow-x-auto pb-1">
+      {/* Kategori — grid rapi & center, otomatis kepilih dari parser */}
+      <p className="mb-2 mt-3 text-center text-[11px] font-bold uppercase tracking-wide text-rapi-gray-600">
+        Kategori
+      </p>
+      <div className="grid grid-cols-4 gap-2">
         {typeCategories.map((cat) => (
           <button
             key={cat.id}
             type="button"
             onClick={() => setManualCategory(cat.id)}
             className={cn(
-              'flex min-w-[62px] shrink-0 flex-col items-center gap-1 rounded-rapi-md px-2 py-2 text-[10px] font-bold transition-colors',
+              'flex min-h-[62px] flex-col items-center justify-center gap-1 rounded-rapi-md px-1 py-2 text-[10px] font-bold transition-colors',
               activeCategory === cat.id
                 ? 'bg-rapi-blue text-white shadow-rapi-card'
                 : 'border border-white/60 bg-white/45 text-rapi-gray-600',
             )}
           >
-            <Icon3D name={cat.id} size={20} fallback={cat.emoji} />
+            <Icon3D name={cat.id} size={22} fallback={cat.emoji} />
             <span className="w-full truncate text-center leading-tight">{cat.name}</span>
           </button>
         ))}
@@ -163,7 +149,7 @@ function AddTransactionForm() {
         variant="blue"
         onClick={handleSave}
         disabled={!canSave}
-        className="mt-3 w-full text-base"
+        className="mt-4 w-full text-base active:scale-[0.98]"
       >
         {canSave ? `Simpan ${formatRupiah(amount)} ✅` : 'Simpan Transaksi'}
       </RapiButton>
@@ -171,37 +157,56 @@ function AddTransactionForm() {
   )
 }
 
-/** Card melayang transparan yang meluncur dari FAB. */
+/** Modal di tengah layar — biru glass transparan, pop-in dari FAB. */
 export function AddTransactionSheet() {
   const open = useUiStore((s) => s.addOpen)
   const closeAdd = useUiStore((s) => s.closeAdd)
+  const [closing, setClosing] = useState(false)
+
+  // Tutup dengan animasi keluar dulu, baru unmount.
+  const handleClose = () => {
+    setClosing(true)
+    setTimeout(() => {
+      setClosing(false)
+      closeAdd()
+    }, 200)
+  }
 
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && closeAdd()
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && handleClose()
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [open, closeAdd])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
 
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-40">
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4">
       {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
       <button
         type="button"
         aria-label="Tutup"
-        onClick={closeAdd}
-        className="absolute inset-0 animate-rapi-fade-in bg-rapi-navy/20"
+        onClick={handleClose}
+        className={cn(
+          'absolute inset-0 bg-rapi-navy/20',
+          closing ? 'animate-rapi-fade-out' : 'animate-rapi-fade-in',
+        )}
       />
 
-      {/* Card melayang — biru glass transparan, meluncur dari bawah (FAB) */}
-      <div className="absolute inset-x-3 bottom-3 mx-auto flex max-h-[78vh] max-w-[27rem] animate-rapi-sheet-up flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/55 shadow-rapi-elevated backdrop-blur-2xl">
+      {/* Modal — biru glass transparan, pop-in/out */}
+      <div
+        className={cn(
+          'relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl',
+          closing ? 'animate-rapi-pop-out' : 'animate-rapi-pop-in',
+        )}
+      >
         <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
           <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Transaksi</h2>
           <button
             type="button"
-            onClick={closeAdd}
+            onClick={handleClose}
             aria-label="Tutup"
             className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
           >
@@ -210,7 +215,7 @@ export function AddTransactionSheet() {
         </div>
 
         <div className="overflow-y-auto px-4 pb-4 pt-1">
-          <AddTransactionForm />
+          <AddTransactionForm onClose={handleClose} />
         </div>
       </div>
     </div>
