@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { format, isSameMonth, isSameWeek, subMonths } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
@@ -9,7 +10,7 @@ import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { TrendChart, type TrendPoint } from '@/components/rapi/TrendChart'
-import { colorForIndex } from '@/lib/colors'
+import { colorForFlow } from '@/lib/colors'
 import { formatRupiah } from '@/lib/formatters'
 import { cn } from '@/lib/utils'
 import { useCategoryStore } from '@/store/categoryStore'
@@ -27,6 +28,8 @@ export default function Reports() {
 
   const [period, setPeriod] = useState<Period>('month')
   const [flow, setFlow] = useState<Flow>(params.get('tipe') === 'pemasukan' ? 'income' : 'expense')
+  // Geser jendela tren: 0 = 6 bulan berakhir di bulan ini
+  const [monthOffset, setMonthOffset] = useState(0)
 
   const { periodIncome, periodExpense, slices, trend, hasData } = useMemo(() => {
     const now = new Date()
@@ -58,13 +61,15 @@ export default function Reports() {
           label: cat?.name ?? 'Lainnya',
           emoji: cat?.emoji ?? '💸',
           value,
-          color: colorForIndex(i),
+          color: colorForFlow(flow, i),
         }
       })
 
+    // Jendela tren 6 bulan yang bisa digeser (monthOffset)
+    const trendEnd = subMonths(now, monthOffset)
     const trend: TrendPoint[] = []
     for (let i = 5; i >= 0; i--) {
-      const m = subMonths(now, i)
+      const m = subMonths(trendEnd, i)
       let mi = 0
       let me = 0
       for (const tx of transactions) {
@@ -76,7 +81,7 @@ export default function Reports() {
     }
 
     return { periodIncome: inc, periodExpense: exp, slices, trend, hasData: count > 0 }
-  }, [transactions, categories, period, flow])
+  }, [transactions, categories, period, flow, monthOffset])
 
   const flowTotal = flow === 'expense' ? periodExpense : periodIncome
   const periodLabel = period === 'week' ? 'minggu ini' : 'bulan ini'
@@ -222,10 +227,10 @@ export default function Reports() {
             </div>
           )}
 
-          {/* Tren 6 bulan */}
+          {/* Tren 6 bulan — bisa digeser per bulan */}
           <RapiCard className="mt-4">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-sm font-bold">Tren 6 Bulan</h2>
+            <div className="mb-1 flex items-center justify-between">
+              <h2 className="text-sm font-bold">Tren Bulanan</h2>
               <div className="flex items-center gap-3 text-[10px] font-bold text-rapi-gray-600">
                 <span className="flex items-center gap-1">
                   <span className="h-2 w-2 rounded-full bg-rapi-income" />
@@ -236,6 +241,28 @@ export default function Reports() {
                   Keluar
                 </span>
               </div>
+            </div>
+            <div className="mb-3 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => setMonthOffset((o) => o + 1)}
+                aria-label="Bulan sebelumnya"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="text-[11px] font-bold text-rapi-gray-600">
+                {trend[0].label} – {trend[trend.length - 1].label}
+              </span>
+              <button
+                type="button"
+                onClick={() => setMonthOffset((o) => Math.max(0, o - 1))}
+                disabled={monthOffset === 0}
+                aria-label="Bulan berikutnya"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 disabled:opacity-30"
+              >
+                <ChevronRight size={16} />
+              </button>
             </div>
             <TrendChart data={trend} />
           </RapiCard>

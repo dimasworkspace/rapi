@@ -106,8 +106,11 @@ Panduan pemakaian: Off-White dominan sebagai background, Navy untuk teks & eleme
 
 ### Tipografi
 ```css
-/* SELALU gunakan Sulphur Point. Fallback: Poppins */
-@import url('https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@300;400;700&display=swap');
+/* Font UI Rapi: Plus Jakarta Sans (fallback: Poppins).
+   Keputusan product owner 3 Jul 2026 — gantikan Sulphur Point untuk UI
+   karena lebih solid/terbaca di ukuran kecil, tetap geometris & modern,
+   dan buatan Indonesia (pas dengan target pasar). */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap');
 
 /* Skala tipe */
 /* H1: 32px Bold      — halaman utama, hero */
@@ -115,6 +118,7 @@ Panduan pemakaian: Off-White dominan sebagai background, Navy untuk teks & eleme
 /* Body: 16px Regular — konten utama */
 /* Caption: 12px Regular — label, timestamp */
 ```
+> Catatan: wordmark logo "rapi" tetap custom lettering (bukan Plus Jakarta Sans). Sulphur Point boleh tetap dipakai untuk materi brand/marketing bila diinginkan, tapi UI produk pakai Plus Jakarta Sans.
 Catatan: wordmark logo "rapi" adalah custom lettering geometris — bukan diketik ulang pakai Sulphur Point.
 
 ### Spacing, Radius & Shadow
@@ -149,7 +153,7 @@ module.exports = {
           gray: { 600: '#5B6478', 300: '#D8DCE6', 100: '#F1F3F8' },
         },
       },
-      fontFamily: { sulphur: ['Sulphur Point', 'sans-serif'] },
+      fontFamily: { sans: ['Plus Jakarta Sans', 'Poppins', 'sans-serif'] },
       borderRadius: {
         'rapi-sm': '8px', 'rapi-md': '12px', 'rapi-lg': '16px', 'rapi-xl': '24px',
       },

@@ -19,8 +19,8 @@ export default {
         },
       },
       fontFamily: {
-        sulphur: ['Sulphur Point', 'Poppins', 'sans-serif'],
-        sans: ['Sulphur Point', 'Poppins', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Poppins', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'Poppins', 'sans-serif'],
       },
       borderRadius: {
         'rapi-sm': '8px',

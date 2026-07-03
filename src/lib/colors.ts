@@ -1,15 +1,31 @@
-// Palet segmen chart — keluarga biru–navy Rapi biar cohesive & on-brand
-// (bukan warna acak di luar guidelines). Dipakai untuk donut kategori.
-export const CATEGORY_COLORS = [
-  '#0248C1', // rapi-blue
-  '#1E5BD6',
-  '#4F86E8',
-  '#7FA6EE',
-  '#A9C4F5',
-  '#2D3A66',
-  '#111835', // navy
-  '#5B6478', // gray-600
+// Palet segmen donut — mengikuti warna semantik Rapi:
+// pemasukan = keluarga HIJAU, pengeluaran = keluarga MERAH.
+// Gradasi shade biar antar kategori tetap kebedain, tapi tetap on-brand.
+
+const EXPENSE_COLORS = [
+  '#EF4444',
+  '#DC2626',
+  '#F87171',
+  '#B91C1C',
+  '#FCA5A5',
+  '#991B1B',
+  '#F4B0B0',
+  '#5B6478',
 ]
 
-export const colorForIndex = (i: number): string =>
-  CATEGORY_COLORS[i % CATEGORY_COLORS.length]
+const INCOME_COLORS = [
+  '#16A34A',
+  '#15803D',
+  '#22C55E',
+  '#107A38',
+  '#4ADE80',
+  '#0E5A2B',
+  '#9EE7BC',
+  '#5B6478',
+]
+
+/** Warna segmen ke-i sesuai arus dana (income → hijau, expense → merah). */
+export const colorForFlow = (flow: 'income' | 'expense', i: number): string => {
+  const palette = flow === 'income' ? INCOME_COLORS : EXPENSE_COLORS
+  return palette[i % palette.length]
+}
