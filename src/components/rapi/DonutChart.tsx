@@ -10,6 +10,7 @@ interface DonutChartProps {
   stroke?: number
   centerTop?: string
   centerMain?: string
+  centerColor?: string
 }
 
 /** Donut chart SVG murni — tanpa lib eksternal, on-brand. */
@@ -19,6 +20,7 @@ export function DonutChart({
   stroke = 24,
   centerTop,
   centerMain,
+  centerColor,
 }: DonutChartProps) {
   const total = slices.reduce((s, x) => s + x.value, 0)
   const r = (size - stroke) / 2
@@ -51,11 +53,16 @@ export function DonutChart({
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         {centerTop && (
-          <span className="text-[10px] font-bold uppercase tracking-wide text-rapi-gray-600">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-rapi-gray-600">
             {centerTop}
           </span>
         )}
-        <span className="text-base font-bold text-rapi-navy">{centerMain}</span>
+        <span
+          className="text-base font-bold"
+          style={{ color: centerColor ?? '#111835' }}
+        >
+          {centerMain}
+        </span>
       </div>
     </div>
   )
