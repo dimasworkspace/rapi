@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { formatRupiah } from '@/lib/formatters'
+import { FADE, SPRING_POP, TWEEN_EXIT } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useInvestmentStore } from '@/store/investmentStore'
 import { useUiStore } from '@/store/uiStore'
@@ -74,14 +75,13 @@ export function AddInvestmentSheet({ open, onClose }: AddInvestmentSheetProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={FADE}
           />
           <motion.div
             className="relative flex max-h-[88vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl"
             initial={{ opacity: 0, scale: 0.92, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.94, y: 12 }}
-            transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+            animate={{ opacity: 1, scale: 1, y: 0, transition: SPRING_POP }}
+            exit={{ opacity: 0, scale: 0.95, y: 10, transition: TWEEN_EXIT }}
           >
             <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
               <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Aset</h2>

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SPRING_SOFT, TWEEN_EXIT } from '@/lib/motion'
 import { useUiStore } from '@/store/uiStore'
 
 /** Toast — pill navy muncul di atas bottom nav dengan spring, auto-hilang. */
@@ -19,10 +20,11 @@ export function Toast() {
         {toast && (
           <motion.div
             key={toast}
+            role="status"
+            aria-live="polite"
             initial={{ opacity: 0, y: 16, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 340, damping: 24 }}
+            animate={{ opacity: 1, y: 0, scale: 1, transition: SPRING_SOFT }}
+            exit={{ opacity: 0, y: 10, scale: 0.95, transition: TWEEN_EXIT }}
             className="mx-auto w-fit max-w-full rounded-full bg-rapi-navy px-5 py-3 text-center text-sm font-bold text-white shadow-rapi-elevated"
           >
             {toast}

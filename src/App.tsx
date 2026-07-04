@@ -1,3 +1,4 @@
+import { MotionConfig } from 'framer-motion'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import ComingSoon from '@/pages/ComingSoon'
@@ -15,7 +16,8 @@ export default function App() {
   if (!onboarded) return <Onboarding />
 
   return (
-    <BrowserRouter>
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
@@ -48,6 +50,7 @@ export default function App() {
           />
         </Route>
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </MotionConfig>
   )
 }

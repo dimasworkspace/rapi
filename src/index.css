@@ -49,9 +49,36 @@
     min-height: 100dvh;
   }
 
-  /* Target sentuh nyaman di mobile */
+  /* Target sentuh nyaman di mobile + hilangkan delay tap 300ms */
   button,
-  a {
+  a,
+  input,
+  select,
+  textarea {
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Focus ring konsisten untuk navigasi keyboard (aturan focus-states) */
+  :focus-visible {
+    outline: 2px solid var(--rapi-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Angka nominal stabil — nggak goyang saat count-up (aturan number-tabular) */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hormati preferensi kurangi gerakan (aturan reduced-motion) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

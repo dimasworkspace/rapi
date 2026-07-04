@@ -110,7 +110,7 @@ export default function Dashboard() {
           <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
             Total Saldo
           </p>
-          <p className="mt-1.5 text-[40px] font-bold leading-none tracking-tight">
+          <p className="tabular-nums mt-1.5 text-[40px] font-bold leading-none tracking-tight">
             {formatRupiah(animatedBalance)}
           </p>
 
@@ -119,7 +119,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/laporan?tipe=pemasukan')}
-              className="flex flex-col items-center rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-2.5 backdrop-blur-sm transition-colors hover:bg-emerald-400/20"
+              className="flex flex-col items-center rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-emerald-400/20 active:scale-[0.97]"
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
                 <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" />
@@ -131,7 +131,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/transaksi')}
-              className="flex flex-col items-center justify-center rounded-rapi-md border border-white/25 bg-white/15 px-2 py-2 backdrop-blur-sm transition-colors hover:bg-white/25"
+              className="flex flex-col items-center justify-center rounded-rapi-md border border-white/25 bg-white/15 px-2 py-2 backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.97]"
             >
               <p className="text-lg font-bold leading-none">{todayCount}</p>
               <p className="mt-1 text-[9px] font-bold uppercase tracking-wide text-white/70">
@@ -142,7 +142,7 @@ export default function Dashboard() {
             <button
               type="button"
               onClick={() => navigate('/laporan?tipe=pengeluaran')}
-              className="flex flex-col items-center rounded-rapi-md border border-red-300/25 bg-red-400/10 p-2.5 backdrop-blur-sm transition-colors hover:bg-red-400/20"
+              className="flex flex-col items-center rounded-rapi-md border border-red-300/25 bg-red-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-red-400/20 active:scale-[0.97]"
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
                 <ArrowDown size={11} strokeWidth={3} className="text-red-300" />
@@ -159,7 +159,7 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => navigate('/laporan')}
-          className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
           <p className="text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
         </button>

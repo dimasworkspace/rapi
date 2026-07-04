@@ -1,9 +1,12 @@
+import { motion } from 'framer-motion'
+
 export interface GrowthPoint {
   label: string
   value: number
 }
 
-/** Grafik garis pertumbuhan keuangan (saldo kumulatif per bulan) — SVG murni. */
+/** Grafik garis pertumbuhan keuangan (saldo kumulatif per bulan) — SVG murni,
+ *  garis "menggambar dirinya" saat muncul (hormat prefers-reduced-motion via MotionConfig). */
 export function GrowthChart({ data }: { data: GrowthPoint[] }) {
   const W = 320
   const H = 132
@@ -32,17 +35,37 @@ export function GrowthChart({ data }: { data: GrowthPoint[] }) {
             <stop offset="100%" stopColor="#0248C1" stopOpacity="0" />
           </linearGradient>
         </defs>
-        <path d={area} fill="url(#rapi-growth-fill)" />
-        <path
+        <motion.path
+          d={area}
+          fill="url(#rapi-growth-fill)"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        />
+        <motion.path
           d={line}
           fill="none"
           stroke="#0248C1"
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: 1 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         />
         {pts.map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="3.5" fill="#fff" stroke="#0248C1" strokeWidth="2" />
+          <motion.circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r="3.5"
+            fill="#fff"
+            stroke="#0248C1"
+            strokeWidth="2"
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.25, delay: 0.1 + (i / Math.max(1, pts.length - 1)) * 0.7 }}
+          />
         ))}
       </svg>
       <div className="mt-2 flex justify-between">

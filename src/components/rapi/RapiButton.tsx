@@ -31,7 +31,7 @@ export function RapiButton({
       type={type}
       className={cn(
         'inline-flex items-center justify-center gap-2 font-bold transition-all',
-        'hover:-translate-y-px active:translate-y-0 disabled:pointer-events-none disabled:opacity-50',
+        'hover:-translate-y-px active:translate-y-0 active:scale-[0.97] disabled:pointer-events-none disabled:opacity-50',
         VARIANTS[variant],
         SIZES[size],
         className,
