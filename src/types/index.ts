@@ -61,3 +61,17 @@ export interface InvestmentAsset {
   currentPrice: number // harga sekarang per unit
   updatedAt: string // ISO string
 }
+
+export interface AssetTypeMeta {
+  id: AssetType
+  label: string
+  emoji: string
+}
+
+export const ASSET_TYPES: AssetTypeMeta[] = [
+  { id: 'saham', label: 'Saham', emoji: '📈' },
+  { id: 'reksadana', label: 'Reksa Dana', emoji: '🏦' },
+  { id: 'kripto', label: 'Kripto', emoji: '🪙' },
+  { id: 'emas', label: 'Emas', emoji: '💎' },
+  { id: 'deposito', label: 'Deposito', emoji: '💸' },
+]

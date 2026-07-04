@@ -10,4 +10,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    // Hormatin env PORT (dipakai harness preview saat autoPort aktif),
+    // fallback ke 5173 buat `npm run dev` biasa.
+    port: process.env.PORT ? Number(process.env.PORT) : 5173,
+  },
 })

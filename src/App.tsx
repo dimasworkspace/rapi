@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
+import Investments from '@/pages/Investments'
 import Onboarding from '@/pages/Onboarding'
 import Reports from '@/pages/Reports'
 import Transactions from '@/pages/Transactions'
@@ -41,18 +42,7 @@ export default function App() {
               />
             }
           />
-          <Route
-            path="/investasi"
-            element={
-              <ComingSoon
-                title="Investasi"
-                emoji="📈"
-                icon="invest"
-                message="Detail portofolio investasimu lagi dihitung. Bentar lagi jadi! 🚀"
-                showBack
-              />
-            }
-          />
+          <Route path="/investasi" element={<Investments />} />
           <Route
             path="*"
             element={
