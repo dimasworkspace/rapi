@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Eye, EyeOff, Plus, Sparkles, Trash2 } from 'lucide-react'
+import { ChevronDown, Eye, EyeOff, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -128,23 +128,24 @@ export default function Settings() {
             </span>
           </div>
 
-          {/* Pilih provider */}
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {AI_PROVIDERS.map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => setProvider(p.id)}
-                className={cn(
-                  'rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors',
-                  aiProvider === p.id
-                    ? 'bg-rapi-blue text-white shadow-rapi-card'
-                    : 'bg-rapi-gray-100 text-rapi-gray-600',
-                )}
-              >
-                {p.label}
-              </button>
-            ))}
+          {/* Pilih provider — dropdown biar hemat tempat */}
+          <div className="relative mt-2">
+            <select
+              value={aiProvider}
+              onChange={(e) => setProvider(e.target.value as typeof aiProvider)}
+              aria-label="Provider AI"
+              className="w-full appearance-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 py-2.5 pl-3 pr-9 text-[13px] font-semibold text-rapi-navy outline-none transition-colors focus:border-rapi-blue"
+            >
+              {AI_PROVIDERS.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              size={16}
+              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-rapi-gray-600"
+            />
           </div>
 
           {/* API key */}
