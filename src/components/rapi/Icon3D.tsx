@@ -32,6 +32,7 @@ const ICON_PATHS: Record<string, string> = {
   rocket: 'Rocket/3D/rocket_3d.png',
   party: 'Party popper/3D/party_popper_3d.png',
   // Tipe aset investasi
+  investasi: 'Chart increasing/3D/chart_increasing_3d.png',
   saham: 'Chart increasing/3D/chart_increasing_3d.png',
   reksadana: 'Bank/3D/bank_3d.png',
   kripto: 'Coin/3D/coin_3d.png',

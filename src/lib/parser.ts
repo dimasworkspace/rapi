@@ -1,4 +1,4 @@
-import type { TransactionType } from '@/types'
+import type { AssetType, TransactionType } from '@/types'
 
 // Parser lokal Rapi — mengubah kalimat santai jadi transaksi terstruktur.
 // Contoh: "makan siang 25rb" → { type: expense, amount: 25000, category: makanan }
@@ -106,6 +106,56 @@ const buildNote = (text: string, matchedAmount: string): string => {
     .trim()
   if (!cleaned) return ''
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+}
+
+// ===== Deteksi investasi — "beli bitcoin 50jt" langsung masuk tab Investasi =====
+
+const ASSET_KEYWORDS: Record<AssetType, string[]> = {
+  kripto: ['bitcoin', 'btc', 'ethereum', 'eth', 'kripto', 'crypto', 'solana', 'doge', 'usdt', 'bnb'],
+  saham: ['saham', 'stock'],
+  emas: ['emas', 'antam', 'gold'],
+  reksadana: ['reksadana', 'reksa dana', 'bibit'],
+  deposito: ['deposito'],
+}
+
+const INVESTMENT_TRIGGERS = ['beli', 'invest', 'investasi', 'nabung', 'top up', 'topup', 'dca']
+
+export interface ParsedInvestment {
+  matched: boolean
+  assetType: AssetType
+  name: string
+  amount: number | null
+}
+
+const matchAssetType = (text: string): AssetType | null => {
+  for (const [type, keywords] of Object.entries(ASSET_KEYWORDS) as [AssetType, string[]][]) {
+    for (const kw of keywords) {
+      // Kata pendek (btc/eth) match utuh; kata panjang boleh prefix
+      // biar typo kayak "bitcoint" tetap kena.
+      const pattern =
+        kw.length <= 4 ? `\\b${escapeRegex(kw)}\\b` : `\\b${escapeRegex(kw)}`
+      if (new RegExp(pattern).test(text)) return type
+    }
+  }
+  return null
+}
+
+/** Deteksi niat investasi dari kalimat. Nama aset = kalimat minus nominal & kata pemicu. */
+export function parseInvestment(input: string): ParsedInvestment {
+  const text = input.toLowerCase().trim()
+  const assetType = matchAssetType(text)
+  if (!assetType) return { matched: false, assetType: 'saham', name: '', amount: null }
+
+  const { amount, matched } = parseAmount(text)
+  let name = input.trim()
+  if (matched) name = name.replace(new RegExp(escapeRegex(matched), 'i'), '')
+  for (const trigger of INVESTMENT_TRIGGERS) {
+    name = name.replace(new RegExp(`\\b${escapeRegex(trigger)}\\b`, 'gi'), '')
+  }
+  name = name.replace(/\s+/g, ' ').trim()
+  name = name ? name.charAt(0).toUpperCase() + name.slice(1) : ''
+
+  return { matched: true, assetType, name, amount }
 }
 
 /** Parse kalimat transaksi jadi struktur — jantung fitur input cepat Rapi. */

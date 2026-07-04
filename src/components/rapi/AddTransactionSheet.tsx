@@ -4,12 +4,13 @@ import { Camera, Keyboard, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { formatRupiah } from '@/lib/formatters'
-import { parseTransaction } from '@/lib/parser'
+import { parseInvestment, parseTransaction } from '@/lib/parser'
 import { cn } from '@/lib/utils'
 import { useCategoryStore } from '@/store/categoryStore'
+import { useInvestmentStore } from '@/store/investmentStore'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
-import type { TransactionType } from '@/types'
+import { ASSET_TYPES, type TransactionType } from '@/types'
 
 const MODES = [
   { id: 'text', label: 'Teks', icon: Keyboard, ready: true },
@@ -21,13 +22,20 @@ const MODES = [
 function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const categories = useCategoryStore((s) => s.categories)
   const addTransaction = useTransactionStore((s) => s.addTransaction)
+  const addAsset = useInvestmentStore((s) => s.addAsset)
   const showToast = useUiStore((s) => s.showToast)
 
   const [input, setInput] = useState('')
   const [manualType, setManualType] = useState<TransactionType | null>(null)
   const [manualCategory, setManualCategory] = useState<string | null>(null)
+  // User bisa nolak deteksi investasi → catat sebagai transaksi biasa
+  const [forceNormal, setForceNormal] = useState(false)
 
   const parsed = useMemo(() => parseTransaction(input), [input])
+  const invest = useMemo(() => parseInvestment(input), [input])
+  const isInvest = invest.matched && !forceNormal
+  const assetMeta = ASSET_TYPES.find((t) => t.id === invest.assetType)
+  const assetName = invest.name || (assetMeta?.label ?? 'Aset')
 
   const type: TransactionType = manualType ?? parsed.type
   const category =
@@ -41,10 +49,32 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     ? category
     : (typeCategories[0]?.id ?? '')
 
-  const canSave = amount > 0 && activeCategory !== ''
+  const canSave = isInvest ? amount > 0 : amount > 0 && activeCategory !== ''
 
   const handleSave = () => {
     if (!canSave) return
+    if (isInvest) {
+      // Masuk ke portofolio + tercatat sebagai pengeluaran kategori Investasi
+      addAsset({
+        type: invest.assetType,
+        name: assetName,
+        units: 1,
+        buyPrice: amount,
+        currentPrice: amount,
+      })
+      addTransaction({
+        type: 'expense',
+        amount,
+        category: 'investasi',
+        note: `Beli ${assetName}`,
+        date: new Date().toISOString(),
+        inputMethod: 'text',
+        aiParsed: false,
+      })
+      showToast('Kecatat & masuk portofolio Investasi 📈')
+      onClose()
+      return
+    }
     addTransaction({
       type,
       amount,
@@ -94,6 +124,30 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
       />
 
+      {isInvest ? (
+        /* Panel investasi — kedetect dari kalimat, masuk otomatis ke tab Investasi */
+        <div className="mt-3 rounded-rapi-md border border-rapi-blue/25 bg-rapi-blue/10 p-3">
+          <div className="flex items-center gap-2.5">
+            <Icon3D name={invest.assetType} size={28} fallback={assetMeta?.emoji ?? '📈'} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[13px] font-semibold text-rapi-navy">
+                {assetName} · {assetMeta?.label}
+              </p>
+              <p className="text-[11px] leading-snug text-rapi-gray-600">
+                Kedetect investasi — otomatis masuk tab Investasi 📈
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForceNormal(true)}
+            className="mt-2 text-[11px] font-semibold text-rapi-blue"
+          >
+            Bukan investasi? Catat sebagai transaksi biasa
+          </button>
+        </div>
+      ) : (
+        <>
       {/* Jenis — fokus pilihan Keluar / Masuk */}
       <div className="mt-3 flex rounded-rapi-md bg-white/50 p-1">
         {(
@@ -145,6 +199,8 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
           </button>
         ))}
       </div>
+        </>
+      )}
 
       <RapiButton
         variant="blue"
@@ -152,7 +208,11 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         disabled={!canSave}
         className="mt-4 w-full text-base active:scale-[0.98]"
       >
-        {canSave ? `Simpan ${formatRupiah(amount)} ✅` : 'Simpan Transaksi'}
+        {canSave
+          ? isInvest
+            ? `Simpan Investasi ${formatRupiah(amount)} 📈`
+            : `Simpan ${formatRupiah(amount)} ✅`
+          : 'Simpan Transaksi'}
       </RapiButton>
     </>
   )

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Eye, EyeOff, Plus, Sparkles, Trash2 } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
@@ -29,6 +30,7 @@ export default function Settings() {
   const showToast = useUiStore((s) => s.showToast)
 
   const [showKey, setShowKey] = useState(false)
+  const [catOpen, setCatOpen] = useState(false)
   const [newCat, setNewCat] = useState({ emoji: '', name: '', type: 'expense' as 'expense' | 'income' })
 
   const name = profile?.name ?? 'Kamu'
@@ -220,12 +222,41 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Kategori */}
+      {/* Kategori — collapsible biar nggak makan tempat */}
       <section className="mt-5">
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Kategori
         </h2>
-        <RapiCard>
+        <RapiCard className="overflow-hidden p-0">
+          <button
+            type="button"
+            onClick={() => setCatOpen((v) => !v)}
+            aria-expanded={catOpen}
+            className="flex w-full items-center justify-between p-4 text-left"
+          >
+            <span className="text-[13px] font-semibold text-rapi-navy">Kelola Kategori</span>
+            <span className="flex items-center gap-2">
+              <span className="rounded-full bg-rapi-gray-100 px-2 py-0.5 text-[10px] font-semibold text-rapi-gray-600">
+                {categories.length}
+              </span>
+              <ChevronDown
+                size={16}
+                className={cn('text-rapi-gray-600 transition-transform', catOpen && 'rotate-180')}
+              />
+            </span>
+          </button>
+
+          <AnimatePresence initial={false}>
+            {catOpen && (
+              <motion.div
+                key="cat-body"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="px-4 pb-4">
           {/* Tambah kategori */}
           <div className="flex gap-2">
             <input
@@ -300,6 +331,10 @@ export default function Settings() {
               </div>
             </div>
           ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </RapiCard>
       </section>
 
