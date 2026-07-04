@@ -5,6 +5,7 @@ import Dashboard from '@/pages/Dashboard'
 import Investments from '@/pages/Investments'
 import Onboarding from '@/pages/Onboarding'
 import Reports from '@/pages/Reports'
+import Settings from '@/pages/Settings'
 import Transactions from '@/pages/Transactions'
 import { useUserStore } from '@/store/userStore'
 
@@ -31,17 +32,7 @@ export default function App() {
               />
             }
           />
-          <Route
-            path="/profil"
-            element={
-              <ComingSoon
-                title="Profil"
-                emoji="⚙️"
-                icon="gear"
-                message="Pengaturan profil & preferensi kamu lagi disiapin. Nyusul segera! 🙌"
-              />
-            }
-          />
+          <Route path="/profil" element={<Settings />} />
           <Route path="/investasi" element={<Investments />} />
           <Route
             path="*"
