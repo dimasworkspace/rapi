@@ -6,7 +6,7 @@ import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { cn } from '@/lib/utils'
-import { useAiStore } from '@/store/aiStore'
+import { AI_PROVIDERS, providerMeta, useAiStore } from '@/store/aiStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
@@ -15,8 +15,14 @@ export default function Settings() {
   const profile = useUserStore((s) => s.profile)
   const updateName = useUserStore((s) => s.updateName)
   const setInitialBalance = useUserStore((s) => s.setInitialBalance)
+  const aiProvider = useAiStore((s) => s.provider)
+  const setProvider = useAiStore((s) => s.setProvider)
   const apiKey = useAiStore((s) => s.apiKey)
   const setApiKey = useAiStore((s) => s.setApiKey)
+  const aiModel = useAiStore((s) => s.model)
+  const setModel = useAiStore((s) => s.setModel)
+  const baseUrl = useAiStore((s) => s.baseUrl)
+  const setBaseUrl = useAiStore((s) => s.setBaseUrl)
   const categories = useCategoryStore((s) => s.categories)
   const addCategory = useCategoryStore((s) => s.addCategory)
   const removeCategory = useCategoryStore((s) => s.removeCategory)
@@ -103,7 +109,7 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Rapi AI — BYOK */}
+      {/* Rapi AI — BYOK multi-provider */}
       <section className="mt-5">
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Rapi AI
@@ -111,7 +117,7 @@ export default function Settings() {
         <RapiCard>
           <div className="flex items-center gap-2">
             <Sparkles size={15} className="text-rapi-blue" />
-            <span className="text-[13px] font-semibold text-rapi-navy">Anthropic API Key</span>
+            <span className="text-[13px] font-semibold text-rapi-navy">Provider AI</span>
             <span
               className={cn(
                 'ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold',
@@ -121,12 +127,37 @@ export default function Settings() {
               {apiKey ? 'Aktif' : 'Belum diisi'}
             </span>
           </div>
-          <div className="mt-2 flex items-center rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 focus-within:border-rapi-blue">
+
+          {/* Pilih provider */}
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {AI_PROVIDERS.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setProvider(p.id)}
+                className={cn(
+                  'rounded-full px-3 py-1.5 text-[12px] font-semibold transition-colors',
+                  aiProvider === p.id
+                    ? 'bg-rapi-blue text-white shadow-rapi-card'
+                    : 'bg-rapi-gray-100 text-rapi-gray-600',
+                )}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+
+          {/* API key */}
+          <label htmlFor="ai-key" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
+            API Key
+          </label>
+          <div className="flex items-center rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 focus-within:border-rapi-blue">
             <input
+              id="ai-key"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               type={showKey ? 'text' : 'password'}
-              placeholder="sk-ant-..."
+              placeholder={providerMeta(aiProvider).keyHint}
               autoComplete="off"
               className="w-full bg-transparent px-3 py-2.5 text-[13px] outline-none"
             />
@@ -139,11 +170,51 @@ export default function Settings() {
               {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="mt-1.5 text-[11px] leading-relaxed text-rapi-gray-600">
-            Pakai API key kamu sendiri buat fitur AI (scan struk, chat). Disimpan di HP kamu aja,
-            nggak dikirim ke mana-mana. Bikin key di{' '}
-            <span className="font-semibold text-rapi-blue">console.anthropic.com</span>. Tanpa key,
-            parser teks tetap jalan penuh.
+
+          {/* Model */}
+          <label htmlFor="ai-model" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
+            Model
+          </label>
+          <input
+            id="ai-model"
+            value={aiModel}
+            onChange={(e) => setModel(e.target.value)}
+            placeholder={providerMeta(aiProvider).defaultModel || 'nama-model'}
+            autoComplete="off"
+            className="w-full rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3 py-2.5 text-[13px] outline-none focus:border-rapi-blue"
+          />
+
+          {/* Base URL — hanya untuk custom / OpenAI-compatible */}
+          {providerMeta(aiProvider).needsBaseUrl && (
+            <>
+              <label htmlFor="ai-url" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
+                Base URL
+              </label>
+              <input
+                id="ai-url"
+                value={baseUrl}
+                onChange={(e) => setBaseUrl(e.target.value)}
+                placeholder="https://api.provider.com/v1"
+                autoComplete="off"
+                className="w-full rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3 py-2.5 text-[13px] outline-none focus:border-rapi-blue"
+              />
+            </>
+          )}
+
+          <p className="mt-2 text-[11px] leading-relaxed text-rapi-gray-600">
+            Pakai API key kamu sendiri buat fitur AI (scan struk, chat) — bebas provider.
+            Disimpan di HP kamu aja, nggak dikirim ke mana-mana.
+            {providerMeta(aiProvider).keyUrl && (
+              <>
+                {' '}
+                Bikin key di{' '}
+                <span className="font-semibold text-rapi-blue">
+                  {providerMeta(aiProvider).keyUrl}
+                </span>
+                .
+              </>
+            )}{' '}
+            Tanpa key, parser teks tetap jalan penuh.
           </p>
         </RapiCard>
       </section>

@@ -10,7 +10,7 @@
 | 2 | **Saldo** | Saldo awal (opsional saat onboarding) + pergerakan dari transaksi. | `saldo = saldoAwal + Σpemasukan − Σpengeluaran`. Saldo awal bisa diedit di Settings. |
 | 3 | **Bottom nav & Investasi** | **Revisi 3 Jul 2026:** Investasi jadi tab bottom nav (gantikan Rapi AI). Nav: Home · Laporan · [+] · **Investasi** · Profil. Rapi AI diakses via tile di Dashboard (belum di nav). | Route `/investasi` masuk nav, `/ai` diakses dari kartu Dashboard. |
 | 4 | **Kategori default** | 12 kategori beremoji (lihat di bawah), user bisa tambah/edit di Settings. | Kategori jadi data di store, bukan hardcode di komponen. |
-| 5 | **AI = BYOK** | User memasukkan Anthropic API key **miliknya sendiri** lewat Settings. Tanpa key: parser lokal tetap jalan penuh. | Key disimpan di LocalStorage user (tidak pernah dikirim ke server kita). Semua fitur AI harus punya fallback non-AI. |
+| 5 | **AI = BYOK multi-provider** | User pilih provider (Anthropic/OpenAI/Google Gemini/OpenRouter/custom OpenAI-compatible) + API key + model **miliknya sendiri** lewat Settings. Tanpa key: parser lokal tetap jalan penuh. *(Revisi 4 Jul 2026: dari Anthropic-only jadi bebas provider.)* | Config (provider, key, model, baseUrl) disimpan di LocalStorage user (`aiStore`, tidak pernah dikirim ke server kita). Semua fitur AI harus punya fallback non-AI. |
 | 6 | **Timeline** | Normal, 3–4 minggu ke MVP. | Prioritas sesuai fase di bawah. |
 | 7 | **Deploy** | Vercel, dari repo GitHub `dimasworkspace/rapi`. | — |
 
