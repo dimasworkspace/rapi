@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Camera, Keyboard, Mic, X } from 'lucide-react'
+import { Camera, Keyboard, Loader2, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
+import { aiReady, parseReceiptWithAi, RapiAiError } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
 import { FADE, SPRING_POP, TWEEN_EXIT } from '@/lib/motion'
 import { parseInvestment, parseTransaction } from '@/lib/parser'
@@ -11,19 +12,33 @@ import { useCategoryStore } from '@/store/categoryStore'
 import { useInvestmentStore } from '@/store/investmentStore'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
-import { ASSET_TYPES, type TransactionType } from '@/types'
+import { ASSET_TYPES, type InputMethod, type TransactionType } from '@/types'
 
 const MODES = [
-  { id: 'text', label: 'Teks', icon: Keyboard, ready: true },
-  { id: 'voice', label: 'Suara', icon: Mic, ready: false },
-  { id: 'photo', label: 'Foto', icon: Camera, ready: false },
+  { id: 'text', label: 'Teks', icon: Keyboard },
+  { id: 'voice', label: 'Suara', icon: Mic },
+  { id: 'photo', label: 'Foto', icon: Camera },
 ] as const
+
+const getSpeechRecognition = (): SpeechRecognitionConstructor | undefined =>
+  window.SpeechRecognition ?? window.webkitSpeechRecognition
+
+/** Baca file gambar jadi base64 murni (tanpa prefix data URL). */
+const fileToBase64 = (file: File): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result).split(',')[1] ?? '')
+    reader.onerror = () => reject(new Error('read failed'))
+    reader.readAsDataURL(file)
+  })
 
 /** Form isi transaksi — state fresh tiap sheet dibuka. */
 function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const categories = useCategoryStore((s) => s.categories)
   const addTransaction = useTransactionStore((s) => s.addTransaction)
+  const removeTransaction = useTransactionStore((s) => s.removeTransaction)
   const addAsset = useInvestmentStore((s) => s.addAsset)
+  const removeAsset = useInvestmentStore((s) => s.removeAsset)
   const showToast = useUiStore((s) => s.showToast)
 
   const [input, setInput] = useState('')
@@ -31,6 +46,91 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const [manualCategory, setManualCategory] = useState<string | null>(null)
   // User bisa nolak deteksi investasi → catat sebagai transaksi biasa
   const [forceNormal, setForceNormal] = useState(false)
+
+  // ===== Mode input: voice (Web Speech API) & photo (AI vision) =====
+  const [listening, setListening] = useState(false)
+  const [scanning, setScanning] = useState(false)
+  const [inputMethod, setInputMethod] = useState<InputMethod>('text')
+  const [wasAiParsed, setWasAiParsed] = useState(false)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const voiceSupported = getSpeechRecognition() !== undefined
+
+  // Matikan mic kalau form ditutup di tengah jalan
+  useEffect(() => () => recognitionRef.current?.abort(), [])
+
+  const toggleVoice = () => {
+    if (listening) {
+      recognitionRef.current?.stop()
+      return
+    }
+    const Recognition = getSpeechRecognition()
+    if (!Recognition) {
+      showToast('Browser ini belum bisa input suara. Coba Chrome ya 😊')
+      return
+    }
+    const rec = new Recognition()
+    rec.lang = 'id-ID'
+    rec.continuous = false
+    rec.interimResults = true
+    rec.onresult = (e) => {
+      let transcript = ''
+      for (let i = 0; i < e.results.length; i++) transcript += e.results[i][0].transcript
+      setInput(transcript)
+      setInputMethod('voice')
+    }
+    rec.onerror = (e) => {
+      setListening(false)
+      if (e.error === 'not-allowed') {
+        showToast('Izinin akses mikrofonnya dulu ya 🎙️')
+      } else if (e.error !== 'aborted') {
+        showToast('Suaranya nggak kedengeran nih. Coba lagi ya 😊')
+      }
+    }
+    rec.onend = () => setListening(false)
+    recognitionRef.current = rec
+    rec.start()
+    setListening(true)
+  }
+
+  const handlePhotoClick = () => {
+    if (!aiReady()) {
+      showToast('Scan struk butuh API key — isi dulu di Profil ya 🔑')
+      return
+    }
+    fileRef.current?.click()
+  }
+
+  const handlePhoto = async (file: File | undefined) => {
+    if (!file) return
+    setScanning(true)
+    try {
+      const base64 = await fileToBase64(file)
+      const result = await parseReceiptWithAi(
+        base64,
+        file.type || 'image/jpeg',
+        categories.map((c) => c.id),
+      )
+      if (!result.amount) {
+        showToast('Struknya susah kebaca nih. Coba foto ulang yang lebih jelas ya 📸')
+        return
+      }
+      // Prefill form — user tinggal cek & simpan
+      setInput(`${result.note || 'Belanja'} ${result.amount}`)
+      setManualType(result.type)
+      if (result.category) setManualCategory(result.category)
+      setInputMethod('photo')
+      setWasAiParsed(true)
+      showToast('Struk kebaca! Cek dulu terus simpan ya ✨')
+    } catch (e) {
+      showToast(
+        e instanceof RapiAiError ? e.message : 'Oops, ada yang salah nih. Coba lagi ya 😊',
+      )
+    } finally {
+      setScanning(false)
+      if (fileRef.current) fileRef.current.value = ''
+    }
+  }
 
   const parsed = useMemo(() => parseTransaction(input), [input])
   const invest = useMemo(() => parseInvestment(input), [input])
@@ -56,36 +156,39 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     if (!canSave) return
     if (isInvest) {
       // Masuk ke portofolio + tercatat sebagai pengeluaran kategori Investasi
-      addAsset({
+      const assetId = addAsset({
         type: invest.assetType,
         name: assetName,
         units: 1,
         buyPrice: amount,
         currentPrice: amount,
       })
-      addTransaction({
+      const txId = addTransaction({
         type: 'expense',
         amount,
         category: 'investasi',
         note: `Beli ${assetName}`,
         date: new Date().toISOString(),
-        inputMethod: 'text',
-        aiParsed: false,
+        inputMethod,
+        aiParsed: wasAiParsed,
       })
-      showToast('Kecatat & masuk portofolio Investasi 📈')
+      showToast('Kecatat & masuk portofolio Investasi 📈', () => {
+        removeAsset(assetId)
+        removeTransaction(txId)
+      })
       onClose()
       return
     }
-    addTransaction({
+    const txId = addTransaction({
       type,
       amount,
       category: activeCategory,
       note: parsed.note,
       date: new Date().toISOString(),
-      inputMethod: 'text',
-      aiParsed: false,
+      inputMethod,
+      aiParsed: wasAiParsed,
     })
-    showToast('Kecatat! Keuanganmu makin rapi 💪')
+    showToast('Kecatat! Keuanganmu makin rapi 💪', () => removeTransaction(txId))
     onClose()
   }
 
@@ -93,24 +196,52 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     <>
       {/* ===== HERO: mode input + tulis transaksi ===== */}
       <div className="grid grid-cols-3 gap-2">
-        {MODES.map(({ id, label, icon: Icon, ready }) => (
-          <button
-            key={id}
-            type="button"
-            disabled={!ready}
-            className={cn(
-              'flex min-h-9 items-center justify-center gap-1.5 rounded-rapi-md text-xs font-bold transition-colors',
-              ready
-                ? 'bg-rapi-blue text-white shadow-rapi-card'
-                : 'border border-dashed border-rapi-blue/30 text-rapi-gray-600',
-            )}
-          >
-            <Icon size={14} />
-            {label}
-            {!ready && <span className="text-[9px] font-normal opacity-70">nyusul</span>}
-          </button>
-        ))}
+        {MODES.map(({ id, label, icon: Icon }) => {
+          const active =
+            id === 'text' ? !listening && !scanning : id === 'voice' ? listening : scanning
+          const disabled = (id === 'voice' && !voiceSupported) || (id === 'photo' && scanning)
+          return (
+            <button
+              key={id}
+              type="button"
+              disabled={disabled}
+              onClick={id === 'voice' ? toggleVoice : id === 'photo' ? handlePhotoClick : undefined}
+              className={cn(
+                'flex min-h-9 items-center justify-center gap-1.5 rounded-rapi-md text-xs font-bold transition-colors',
+                active
+                  ? id === 'voice'
+                    ? 'animate-rapi-pulse bg-rapi-expense text-white'
+                    : 'bg-rapi-blue text-white shadow-rapi-card'
+                  : 'border border-rapi-blue/30 bg-white/50 text-rapi-blue hover:bg-rapi-blue/10',
+                disabled && 'opacity-50',
+              )}
+            >
+              {id === 'photo' && scanning ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Icon size={14} />
+              )}
+              {id === 'voice' && listening
+                ? 'Dengerin…'
+                : id === 'photo' && scanning
+                  ? 'Baca…'
+                  : label}
+            </button>
+          )
+        })}
       </div>
+
+      {/* Input file tersembunyi — kamera/galeri untuk scan struk */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        aria-hidden
+        tabIndex={-1}
+        onChange={(e) => handlePhoto(e.target.files?.[0])}
+      />
 
       <label htmlFor="tx-input" className="sr-only">
         Tulis transaksi
@@ -119,11 +250,48 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         id="tx-input"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder={'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt"'}
+        placeholder={
+          listening
+            ? "Ngomong aja santai: 'makan siang dua puluh lima ribu' 🎙️"
+            : 'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt"'
+        }
         rows={2}
         autoFocus
         className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
       />
+
+      {/* Contoh cepat — sekali klik langsung keisi (belajar format tanpa mikir) */}
+      {input.trim() === '' && !listening && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {['makan siang 25rb', 'gaji 3jt', 'bensin 20rb'].map((ex) => (
+            <button
+              key={ex}
+              type="button"
+              onClick={() => setInput(ex)}
+              className="rounded-full border border-rapi-blue/25 bg-white/60 px-2.5 py-1 text-[11px] font-semibold text-rapi-blue transition-all hover:bg-rapi-blue hover:text-white active:scale-95"
+            >
+              {ex}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Preview hasil parsing — user yakin dulu sebelum simpan */}
+      {input.trim() !== '' && !isInvest && (
+        <p
+          className={cn(
+            'mt-1.5 px-0.5 text-[11px] font-semibold',
+            amount > 0 ? 'text-rapi-income' : 'text-rapi-gray-600',
+          )}
+          aria-live="polite"
+        >
+          {amount > 0
+            ? `Kebaca: ${formatRupiah(amount)} · ${
+                categories.find((c) => c.id === activeCategory)?.name ?? 'Lainnya'
+              } · ${type === 'income' ? 'Pemasukan' : 'Pengeluaran'}`
+            : 'Nominalnya belum kebaca — tulis angkanya ya, contoh: 25rb 😊'}
+        </p>
+      )}
 
       {isInvest ? (
         /* Panel investasi — kedetect dari kalimat, masuk otomatis ke tab Investasi */

@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { motion } from 'framer-motion'
 import { Plus, Trash2 } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
@@ -7,6 +8,7 @@ import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { formatRupiah } from '@/lib/formatters'
+import { useCountUp } from '@/lib/useCountUp'
 import { cn } from '@/lib/utils'
 import { assetStats, useInvestmentStore } from '@/store/investmentStore'
 import { ASSET_TYPES } from '@/types'
@@ -39,6 +41,8 @@ export default function Investments() {
     }
   }, [assets])
 
+  const animatedTotal = useCountUp(totalValue)
+
   return (
     <PageWrapper>
       <TopBar title="Investasi" />
@@ -55,17 +59,25 @@ export default function Investments() {
         </RapiCard>
       ) : (
         <>
-          {/* Ringkasan portofolio — navy hero mini */}
-          <div className="relative mt-1 overflow-hidden rounded-rapi-xl bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] p-5 text-white shadow-rapi-elevated">
-            <p className="text-[11px] font-medium uppercase tracking-wide text-white/60">
+          {/* Ringkasan portofolio — navy hero mini, senada hero dashboard */}
+          <div className="animate-rapi-slide-down relative mt-1 overflow-hidden rounded-rapi-xl bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] p-5 text-white shadow-rapi-elevated">
+            <div
+              aria-hidden
+              className="absolute -bottom-14 right-0 h-40 w-40 rounded-full bg-rapi-blue/40 blur-3xl"
+            />
+            <div
+              aria-hidden
+              className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-rapi-yellow/20 blur-2xl"
+            />
+            <p className="relative text-[11px] font-medium uppercase tracking-wide text-white/60">
               Total Nilai Portofolio
             </p>
-            <p className="mt-1 text-[30px] font-bold leading-none tracking-tight">
-              {formatRupiah(totalValue)}
+            <p className="tabular-nums relative mt-1 text-[30px] font-bold leading-none tracking-tight">
+              {formatRupiah(animatedTotal)}
             </p>
-            <div className="mt-3 flex items-center gap-2">
+            <div className="relative mt-3 flex items-center gap-2">
               <span
-                className="rounded-full px-2.5 py-1 text-[13px] font-semibold"
+                className="tabular-nums rounded-full px-2.5 py-1 text-[13px] font-semibold"
                 style={{
                   background: totalPL >= 0 ? 'rgba(22,163,74,0.22)' : 'rgba(239,68,68,0.22)',
                   color: totalPL >= 0 ? '#86EFAC' : '#FCA5A5',
@@ -79,7 +91,7 @@ export default function Investments() {
           </div>
 
           {/* Pertumbuhan tiap aset — bar diverging dari titik nol */}
-          <RapiCard className="mt-4">
+          <RapiCard className="animate-rapi-fade-up mt-4" style={{ animationDelay: '120ms' }}>
             <h2 className="mb-3 text-[13px] font-semibold tracking-tight">Pertumbuhan Aset</h2>
             <div className="flex flex-col gap-3.5">
               {rows.map(({ asset, plPct }) => {
@@ -94,7 +106,7 @@ export default function Investments() {
                       </span>
                       <span
                         className={cn(
-                          'text-[13px] font-semibold',
+                          'tabular-nums text-[13px] font-semibold',
                           up ? 'text-rapi-income' : 'text-rapi-expense',
                         )}
                       >
@@ -102,13 +114,18 @@ export default function Investments() {
                         {Math.abs(plPct).toFixed(1).replace('.', ',')}%
                       </span>
                     </div>
-                    {/* Track dengan titik nol di tengah */}
+                    {/* Track dengan titik nol di tengah — bar tumbuh dari nol (scaleX, hemat layout) */}
                     <div className="relative h-2 rounded-full bg-rapi-gray-100">
                       <div className="absolute left-1/2 top-1/2 h-3 w-px -translate-x-1/2 -translate-y-1/2 bg-rapi-gray-300" />
-                      <div
+                      <motion.div
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.6, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
                         className={cn(
                           'absolute top-0 h-2',
-                          up ? 'left-1/2 rounded-r-full bg-rapi-income' : 'rounded-l-full bg-rapi-expense',
+                          up
+                            ? 'left-1/2 origin-left rounded-r-full bg-rapi-income'
+                            : 'origin-right rounded-l-full bg-rapi-expense',
                         )}
                         style={up ? { width: `${w}%` } : { right: '50%', width: `${w}%` }}
                       />
@@ -120,7 +137,10 @@ export default function Investments() {
           </RapiCard>
 
           {/* Daftar aset */}
-          <div className="mb-2.5 mt-6 flex items-center justify-between">
+          <div
+            className="animate-rapi-fade-up mb-2.5 mt-6 flex items-center justify-between"
+            style={{ animationDelay: '200ms' }}
+          >
             <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-navy">
               Daftar Aset
             </h2>
@@ -134,11 +154,18 @@ export default function Investments() {
             </button>
           </div>
 
-          <div className="rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
-            {rows.map(({ asset, value, plPct }) => {
+          <div
+            className="animate-rapi-fade-up rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1"
+            style={{ animationDelay: '240ms' }}
+          >
+            {rows.map(({ asset, value, plPct }, i) => {
               const up = plPct >= 0
               return (
-                <div key={asset.id} className="flex items-center gap-3 px-4 py-3">
+                <div
+                  key={asset.id}
+                  className="animate-rapi-fade-up flex items-center gap-3 px-4 py-3"
+                  style={{ animationDelay: `${280 + Math.min(i, 8) * 50}ms` }}
+                >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center">
                     <Icon3D name={asset.type} size={30} fallback={typeMeta(asset.type)?.emoji ?? '📈'} />
                   </div>
@@ -149,10 +176,12 @@ export default function Investments() {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[13px] font-semibold text-rapi-navy">{formatRupiah(value)}</p>
+                    <p className="tabular-nums text-[13px] font-semibold text-rapi-navy">
+                      {formatRupiah(value)}
+                    </p>
                     <p
                       className={cn(
-                        'text-[11px] font-semibold',
+                        'tabular-nums text-[11px] font-semibold',
                         up ? 'text-rapi-income' : 'text-rapi-expense',
                       )}
                     >

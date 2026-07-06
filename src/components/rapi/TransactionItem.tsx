@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import type { Transaction } from '@/types'
 import { DEFAULT_CATEGORIES } from '@/types'
@@ -14,9 +15,15 @@ interface TransactionItemProps {
   transaction: Transaction
   /** 'card' berdiri sendiri; 'row' untuk di dalam container ber-divider. */
   variant?: 'card' | 'row'
+  /** Kalau diisi, muncul tombol hapus (dipasangkan dengan toast undo). */
+  onDelete?: () => void
 }
 
-export function TransactionItem({ transaction: tx, variant = 'card' }: TransactionItemProps) {
+export function TransactionItem({
+  transaction: tx,
+  variant = 'card',
+  onDelete,
+}: TransactionItemProps) {
   const category = DEFAULT_CATEGORIES.find((c) => c.id === tx.category)
   const isIncome = tx.type === 'income'
 
@@ -40,12 +47,22 @@ export function TransactionItem({ transaction: tx, variant = 'card' }: Transacti
       </div>
       <p
         className={cn(
-          'whitespace-nowrap text-sm font-bold',
+          'tabular-nums whitespace-nowrap text-sm font-bold',
           isIncome ? 'text-rapi-income' : 'text-rapi-expense',
         )}
       >
         {formatRupiahSigned(tx.amount, isIncome ? 'income' : 'expense')}
       </p>
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label={`Hapus ${tx.note || 'transaksi'}`}
+          className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
+        >
+          <Trash2 size={15} />
+        </button>
+      )}
     </div>
   )
 }

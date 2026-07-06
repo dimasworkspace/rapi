@@ -4,7 +4,8 @@ import type { Transaction } from '@/types'
 
 interface TransactionState {
   transactions: Transaction[]
-  addTransaction: (tx: Omit<Transaction, 'id'>) => void
+  /** Mengembalikan id transaksi baru — dipakai buat undo. */
+  addTransaction: (tx: Omit<Transaction, 'id'>) => string
   updateTransaction: (id: string, patch: Partial<Omit<Transaction, 'id'>>) => void
   removeTransaction: (id: string) => void
 }
@@ -13,10 +14,11 @@ export const useTransactionStore = create<TransactionState>()(
   persist(
     (set) => ({
       transactions: [],
-      addTransaction: (tx) =>
-        set((s) => ({
-          transactions: [{ ...tx, id: crypto.randomUUID() }, ...s.transactions],
-        })),
+      addTransaction: (tx) => {
+        const id = crypto.randomUUID()
+        set((s) => ({ transactions: [{ ...tx, id }, ...s.transactions] }))
+        return id
+      },
       updateTransaction: (id, patch) =>
         set((s) => ({
           transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...patch } : t)),

@@ -6,6 +6,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
+import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { AI_PROVIDERS, providerMeta, useAiStore } from '@/store/aiStore'
 import { useCategoryStore } from '@/store/categoryStore'
@@ -67,7 +68,7 @@ export default function Settings() {
       <TopBar title="Profil" />
 
       {/* Kartu profil */}
-      <RapiCard className="flex items-center gap-3.5">
+      <RapiCard className="animate-rapi-fade-up flex items-center gap-3.5">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-rapi-yellow text-xl font-bold text-rapi-navy">
           {name.charAt(0).toUpperCase()}
         </div>
@@ -86,7 +87,7 @@ export default function Settings() {
       </RapiCard>
 
       {/* Keuangan */}
-      <section className="mt-5">
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '70ms' }}>
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Keuangan
         </h2>
@@ -112,7 +113,7 @@ export default function Settings() {
       </section>
 
       {/* Rapi AI — BYOK multi-provider */}
-      <section className="mt-5">
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '140ms' }}>
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Rapi AI
         </h2>
@@ -223,7 +224,7 @@ export default function Settings() {
       </section>
 
       {/* Kategori — collapsible biar nggak makan tempat */}
-      <section className="mt-5">
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '210ms' }}>
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Kategori
         </h2>
@@ -287,11 +288,20 @@ export default function Settings() {
                   type="button"
                   onClick={() => setNewCat((c) => ({ ...c, type: id }))}
                   className={cn(
-                    'flex-1 rounded-[7px] py-1.5 text-[12px] font-semibold transition-colors',
-                    newCat.type === id ? 'bg-white text-rapi-navy shadow-rapi-card' : 'text-rapi-gray-600',
+                    'relative flex-1 rounded-[7px] py-1.5 text-[12px] font-semibold transition-colors',
+                    newCat.type === id ? 'text-rapi-navy' : 'text-rapi-gray-600 hover:text-rapi-navy',
                   )}
                 >
-                  {label}
+                  {/* Thumb meluncur antar pilihan (aturan state-transition) */}
+                  {newCat.type === id && (
+                    <motion.span
+                      layoutId="rapi-cattype-thumb"
+                      transition={SPRING_POP}
+                      aria-hidden
+                      className="absolute inset-0 rounded-[7px] bg-white shadow-rapi-card"
+                    />
+                  )}
+                  <span className="relative">{label}</span>
                 </button>
               ))}
             </div>
@@ -339,7 +349,7 @@ export default function Settings() {
       </section>
 
       {/* Lainnya */}
-      <section className="mt-5">
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '280ms' }}>
         <h2 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-gray-600">
           Lainnya
         </h2>

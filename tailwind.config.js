@@ -46,11 +46,18 @@ export default {
           from: { opacity: '0', transform: 'translateY(-40px)' },
           to: { opacity: '1', transform: 'translateY(0)' },
         },
+        'rapi-wiggle': {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-12deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-6deg)' },
+        },
       },
       animation: {
         'rapi-fade-up': 'rapi-fade-up 0.4s ease both',
         'rapi-pulse': 'rapi-pulse 2.4s ease-in-out infinite',
         'rapi-slide-down': 'rapi-slide-down 0.55s cubic-bezier(0.22,1,0.36,1) both',
+        'rapi-wiggle': 'rapi-wiggle 1.1s ease-in-out 0.5s 2 both',
       },
     },
   },

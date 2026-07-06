@@ -32,18 +32,21 @@ export default function Onboarding() {
           aria-hidden
           className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-rapi-blue/30"
         />
-        <span className="relative">
-          <Icon3D name="wave" size={64} fallback="👋" />
-        </span>
-        <h1 className="relative mt-4 text-3xl font-bold">Halo! Aku Rapi</h1>
-        <p className="relative mt-2 max-w-xs text-sm leading-relaxed text-white/75">
-          Teman kamu buat catat keuangan tanpa ribet — ketik, ngomong, atau foto struk,
-          langsung rapi. ✨
-        </p>
+        <div className="animate-rapi-slide-down relative flex flex-col items-center">
+          {/* Tangan dadah beneran dadah 👋 */}
+          <span className="animate-rapi-wiggle inline-block">
+            <Icon3D name="wave" size={64} fallback="👋" />
+          </span>
+          <h1 className="mt-4 text-3xl font-bold">Halo! Aku Rapi</h1>
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/75">
+            Teman kamu buat catat keuangan tanpa ribet — ketik, ngomong, atau foto struk,
+            langsung rapi. ✨
+          </p>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-5 px-6 py-8">
-        <div>
+        <div className="animate-rapi-fade-up" style={{ animationDelay: '150ms' }}>
           <label htmlFor="ob-name" className="mb-1.5 block text-xs font-bold text-rapi-gray-600">
             Panggil kamu siapa?
           </label>
@@ -59,7 +62,7 @@ export default function Onboarding() {
           />
         </div>
 
-        <div>
+        <div className="animate-rapi-fade-up" style={{ animationDelay: '230ms' }}>
           <label
             htmlFor="ob-balance"
             className="mb-1.5 block text-xs font-bold text-rapi-gray-600"
@@ -87,7 +90,8 @@ export default function Onboarding() {
           variant="accent"
           onClick={handleStart}
           disabled={!name.trim()}
-          className="mt-auto w-full text-base"
+          className="animate-rapi-fade-up mt-auto w-full text-base"
+          style={{ animationDelay: '310ms' }}
         >
           Mulai #RapiinAja 🚀
         </RapiButton>

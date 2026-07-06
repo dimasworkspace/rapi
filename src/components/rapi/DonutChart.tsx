@@ -1,3 +1,5 @@
+import { motion } from 'framer-motion'
+
 export interface DonutSlice {
   label: string
   value: number
@@ -35,7 +37,8 @@ export function DonutChart({
           slices.map((s, i) => {
             const len = (s.value / total) * c
             const el = (
-              <circle
+              // Slice "menggambar diri" dari titik mulainya masing-masing
+              <motion.circle
                 key={i}
                 cx={size / 2}
                 cy={size / 2}
@@ -43,15 +46,22 @@ export function DonutChart({
                 fill="none"
                 stroke={s.color}
                 strokeWidth={stroke}
-                strokeDasharray={`${len} ${c - len}`}
                 strokeDashoffset={-acc}
+                initial={{ strokeDasharray: `0 ${c}`, opacity: 0 }}
+                animate={{ strokeDasharray: `${len} ${c - len}`, opacity: 1 }}
+                transition={{ duration: 0.7, delay: 0.15 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               />
             )
             acc += len
             return el
           })}
       </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, delay: 0.4, ease: 'easeOut' }}
+        className="absolute inset-0 flex flex-col items-center justify-center text-center"
+      >
         {centerTop && (
           <span className="text-[11px] font-medium tracking-tight text-rapi-gray-600">
             {centerTop}
@@ -63,7 +73,7 @@ export function DonutChart({
         >
           {centerMain}
         </span>
-      </div>
+      </motion.div>
     </div>
   )
 }

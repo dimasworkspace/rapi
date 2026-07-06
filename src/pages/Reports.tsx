@@ -1,15 +1,17 @@
 import { useMemo, useState } from 'react'
 import { endOfMonth, format, isSameMonth, isSameWeek, subMonths } from 'date-fns'
 import { id as localeId } from 'date-fns/locale'
+import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { DonutChart } from '@/components/rapi/DonutChart'
 import { GrowthChart, type GrowthPoint } from '@/components/rapi/GrowthChart'
-import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
+import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { formatRupiah } from '@/lib/formatters'
+import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
@@ -97,18 +99,27 @@ export default function Reports() {
             type="button"
             onClick={() => setPeriod(id)}
             className={cn(
-              'flex-1 rounded-[7px] py-2 text-[13px] font-semibold tracking-tight transition-colors',
-              period === id ? 'bg-rapi-blue text-white shadow-rapi-card' : 'text-rapi-gray-600',
+              'relative flex-1 rounded-[7px] py-2 text-[13px] font-semibold tracking-tight transition-colors',
+              period === id ? 'text-white' : 'text-rapi-gray-600 hover:text-rapi-navy',
             )}
           >
-            {label}
+            {/* Thumb meluncur antar pilihan (aturan state-transition, jangan snap) */}
+            {period === id && (
+              <motion.span
+                layoutId="rapi-period-thumb"
+                transition={SPRING_POP}
+                aria-hidden
+                className="absolute inset-0 rounded-[7px] bg-rapi-blue shadow-rapi-card"
+              />
+            )}
+            <span className="relative">{label}</span>
           </button>
         ))}
       </div>
 
       {!hasData ? (
         <RapiCard className="mt-5 flex flex-col items-center gap-3 px-6 py-12 text-center">
-          <Icon3D name="report" size={52} fallback="📊" />
+          <RapiMascot size={110} />
           <p className="text-[13px] leading-relaxed text-rapi-gray-600">
             Belum ada data {periodLabel} nih. Yuk catat transaksimu dulu! 🎉
           </p>
@@ -160,7 +171,9 @@ export default function Reports() {
           {/* Insight otomatis */}
           {insight && (
             <div className="mt-6 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-white shadow-rapi-card">
-              <p className="text-[13px] font-semibold tracking-tight text-white/70">Insight Rapi</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
+                Insight Rapi
+              </p>
               <p className="mt-1 text-[13px] font-medium leading-relaxed tracking-tight">{insight}</p>
             </div>
           )}

@@ -1,6 +1,7 @@
 import { MotionConfig } from 'framer-motion'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
+import AIChat from '@/pages/AIChat'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
 import Investments from '@/pages/Investments'
@@ -23,17 +24,7 @@ export default function App() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/transaksi" element={<Transactions />} />
           <Route path="/laporan" element={<Reports />} />
-          <Route
-            path="/ai"
-            element={
-              <ComingSoon
-                title="Rapi AI"
-                emoji="🤖"
-                icon="robot"
-                message="Rapi AI bentar lagi siap nemenin kamu ngobrolin keuangan. Sabar ya! 😉"
-              />
-            }
-          />
+          <Route path="/ai" element={<AIChat />} />
           <Route path="/profil" element={<Settings />} />
           <Route path="/investasi" element={<Investments />} />
           <Route

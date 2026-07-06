@@ -4,7 +4,8 @@ import type { InvestmentAsset } from '@/types'
 
 interface InvestmentState {
   assets: InvestmentAsset[]
-  addAsset: (asset: Omit<InvestmentAsset, 'id' | 'updatedAt'>) => void
+  /** Mengembalikan id aset baru — dipakai buat undo. */
+  addAsset: (asset: Omit<InvestmentAsset, 'id' | 'updatedAt'>) => string
   updateAsset: (id: string, patch: Partial<Omit<InvestmentAsset, 'id'>>) => void
   removeAsset: (id: string) => void
 }
@@ -13,13 +14,13 @@ export const useInvestmentStore = create<InvestmentState>()(
   persist(
     (set) => ({
       assets: [],
-      addAsset: (asset) =>
+      addAsset: (asset) => {
+        const id = crypto.randomUUID()
         set((s) => ({
-          assets: [
-            { ...asset, id: crypto.randomUUID(), updatedAt: new Date().toISOString() },
-            ...s.assets,
-          ],
-        })),
+          assets: [{ ...asset, id, updatedAt: new Date().toISOString() }, ...s.assets],
+        }))
+        return id
+      },
       updateAsset: (id, patch) =>
         set((s) => ({
           assets: s.assets.map((a) =>
