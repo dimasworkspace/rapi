@@ -8,42 +8,29 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatRupiah } from '@/lib/formatters'
+import { type Dict, useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
 
-const getGreeting = (): string => {
-  const h = new Date().getHours()
-  if (h < 11) return 'Selamat pagi 👋'
-  if (h < 15) return 'Selamat siang ☀️'
-  if (h < 18) return 'Selamat sore 🌤️'
-  return 'Selamat malam 🌙'
-}
-
 // Rangkuman keuangan mingguan (7 hari terakhir) — diupdate otomatis dari data.
 const buildWeeklySummary = (
+  t: Dict,
   name: string,
   count: number,
   income: number,
   expense: number,
 ): string => {
-  if (count === 0) {
-    return `Minggu ini belum ada catatan, ${name}. Yuk mulai catat biar keuanganmu makin rapi minggu ini.`
-  }
-  const base = `Minggu ini kamu catat ${count} transaksi — pemasukan ${formatRupiah(
-    income,
-  )}, pengeluaran ${formatRupiah(expense)}.`
-  if (income >= expense && income > 0) {
-    return `Bagus, ${name}! ${base} Pemasukanmu masih lebih gede, pertahankan ya.`
-  }
-  if (expense > income && income > 0) {
-    return `${base} Pengeluaran lagi lebih tinggi dari pemasukan, coba lebih hemat minggu depan ya, ${name}.`
-  }
-  return `${base} Tetap semangat catat tiap hari ya, ${name}.`
+  if (count === 0) return t.weekly.empty(name)
+  const base = t.weekly.base(count, income, expense)
+  if (income >= expense && income > 0) return t.weekly.good(name, base)
+  if (expense > income && income > 0) return t.weekly.warn(name, base)
+  return t.weekly.neutral(name, base)
 }
 
 export default function Dashboard() {
+  const t = useT()
   const navigate = useNavigate()
   const openAdd = useUiStore((s) => s.openAdd)
   const profile = useUserStore((s) => s.profile)
@@ -86,9 +73,9 @@ export default function Dashboard() {
       monthExpense: outMonth,
       recent: sortByDateDesc(transactions).slice(0, 5),
       todayCount: today,
-      weeklySummary: buildWeeklySummary(name, weekCount, weekIncome, weekExpense),
+      weeklySummary: buildWeeklySummary(t, name, weekCount, weekIncome, weekExpense),
     }
-  }, [transactions, profile, name])
+  }, [transactions, profile, name, t])
 
   const animatedBalance = useCountUp(balance)
 
@@ -108,18 +95,18 @@ export default function Dashboard() {
         {/* Pintu masuk Rapi AI — kanan atas hero */}
         <Link
           to="/ai"
-          aria-label="Ngobrol sama Rapi AI"
+          aria-label={t.dashboard.aiLabel}
           className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/30 active:scale-90"
         >
           <MessageCircle size={18} />
         </Link>
 
         <div className="relative animate-rapi-slide-down text-center">
-          <p className="text-xs text-white/60">{getGreeting()}</p>
-          <p className="mt-1 text-xl font-bold">Halo, {name}</p>
+          <p className="text-xs text-white/60">{t.greeting(new Date().getHours())}</p>
+          <p className="mt-1 text-xl font-bold">{t.dashboard.hello(name)}</p>
 
           <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
-            Total Saldo
+            {t.dashboard.totalBalance}
           </p>
           <p className="tabular-nums mt-1.5 text-[40px] font-bold leading-none tracking-tight">
             {formatRupiah(animatedBalance)}
@@ -135,7 +122,7 @@ export default function Dashboard() {
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
                 <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" />
-                Masuk
+                {t.dashboard.in}
               </p>
               <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthIncome)}</p>
             </button>
@@ -148,7 +135,7 @@ export default function Dashboard() {
             >
               <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
               <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
-                Hari Ini
+                {t.dashboard.today}
               </p>
             </button>
 
@@ -160,7 +147,7 @@ export default function Dashboard() {
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
                 <ArrowDown size={11} strokeWidth={3} className="text-red-300" />
-                Keluar
+                {t.dashboard.out}
               </p>
               <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthExpense)}</p>
             </button>
@@ -176,7 +163,7 @@ export default function Dashboard() {
           className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
           <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
-            Rangkuman Minggu Ini
+            {t.dashboard.weekTitle}
           </p>
           <p className="mt-1.5 text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
         </button>
@@ -184,16 +171,14 @@ export default function Dashboard() {
         {/* Hint fitur — sekali tampil, bisa ditutup (kenalin suara/foto/AI) */}
         {!hintSeen && (
           <div className="rapi-glass animate-rapi-fade-up mt-3 flex items-start gap-3 rounded-rapi-lg p-3.5">
-            <p className="flex-1 text-[13px] leading-relaxed text-rapi-navy">
-              <span className="font-bold">Psst, biar makin cepat:</span> catat transaksi bisa
-              pakai 🎙️ suara atau 📸 foto struk (dari tombol <span className="font-bold">+</span>),
-              dan ada 💬 Rapi AI buat ngobrolin keuanganmu!
+            <p className="flex-1 text-[13px] leading-relaxed text-rapi-navy dark:text-rapi-dark-ink">
+              <span className="font-bold">{t.dashboard.hintBold}</span> {t.dashboard.hintRest}
             </p>
             <button
               type="button"
               onClick={dismissHint}
-              aria-label="Tutup hint"
-              className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100"
+              aria-label={t.common.close}
+              className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
             >
               <X size={15} />
             </button>
@@ -202,12 +187,15 @@ export default function Dashboard() {
 
         {/* Transaksi terbaru — heading & link navy */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy">
-            Transaksi Terbaru
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy dark:text-rapi-dark-ink">
+            {t.dashboard.recent}
           </h2>
           {transactions.length > 0 && (
-            <Link to="/transaksi" className="flex items-center text-xs font-bold text-rapi-navy">
-              Lihat semua
+            <Link
+              to="/transaksi"
+              className="flex items-center text-xs font-bold text-rapi-navy dark:text-rapi-dark-ink"
+            >
+              {t.common.seeAll}
               <ChevronRight size={14} />
             </Link>
           )}
@@ -216,11 +204,9 @@ export default function Dashboard() {
         {recent.length === 0 ? (
           <RapiCard className="flex flex-col items-center gap-3 px-6 py-10 text-center">
             <RapiMascot size={110} />
-            <p className="text-sm leading-relaxed text-rapi-gray-600">
-              Belum ada catatan nih. Yuk mulai #RapiinAja!
-            </p>
+            <p className="text-sm leading-relaxed text-rapi-gray-600">{t.dashboard.emptyTitle}</p>
             <RapiButton variant="accent" onClick={openAdd}>
-              Catat Transaksi Pertamamu ✍️
+              {t.dashboard.emptyCta}
             </RapiButton>
           </RapiCard>
         ) : (

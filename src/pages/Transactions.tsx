@@ -6,11 +6,13 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatDayLabel } from '@/lib/formatters'
+import { useT } from '@/lib/i18n'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import type { Transaction } from '@/types'
 
 export default function Transactions() {
+  const t = useT()
   const openAdd = useUiStore((s) => s.openAdd)
   const showToast = useUiStore((s) => s.showToast)
   const transactions = useTransactionStore((s) => s.transactions)
@@ -21,7 +23,7 @@ export default function Transactions() {
   const handleDelete = (tx: Transaction) => {
     removeTransaction(tx.id)
     const { id: _id, ...rest } = tx
-    showToast('Transaksi kehapus 🗑️', () => addTransaction(rest))
+    showToast(t.transactions.deleted, () => addTransaction(rest))
   }
 
   const groups = useMemo(() => {
@@ -38,16 +40,14 @@ export default function Transactions() {
 
   return (
     <PageWrapper>
-      <TopBar title="Transaksi" showBack />
+      <TopBar title={t.transactions.title} showBack />
 
       {groups.length === 0 ? (
         <RapiCard className="mt-4 flex flex-col items-center gap-3 px-6 py-10 text-center">
           <RapiMascot size={110} />
-          <p className="text-sm leading-relaxed text-rapi-gray-600">
-            Belum ada catatan nih. Yuk mulai #RapiinAja!
-          </p>
+          <p className="text-sm leading-relaxed text-rapi-gray-600">{t.transactions.empty}</p>
           <RapiButton variant="accent" onClick={openAdd}>
-            Catat Transaksi Pertamamu ✍️
+            {t.transactions.emptyCta}
           </RapiButton>
         </RapiCard>
       ) : (

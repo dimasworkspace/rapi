@@ -11,6 +11,7 @@ import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { formatRupiah } from '@/lib/formatters'
+import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useTransactionStore } from '@/store/transactionStore'
@@ -23,6 +24,7 @@ const INCOME_GREEN = '#16A34A'
 const EXPENSE_RED = '#EF4444'
 
 export default function Reports() {
+  const t = useT()
   const transactions = useTransactionStore((s) => s.transactions)
   const profile = useUserStore((s) => s.profile)
   const openAdd = useUiStore((s) => s.openAdd)
@@ -67,31 +69,26 @@ export default function Reports() {
 
   const net = periodIncome - periodExpense
   const netStr = `${net < 0 ? '-' : ''}${formatRupiah(Math.abs(net))}`
-  const periodLabel = period === 'week' ? 'minggu ini' : 'bulan ini'
+  const periodLabel = period === 'week' ? t.reports.periodWeek : t.reports.periodMonth
   const growthDelta = growth[growth.length - 1].value - growth[0].value
 
   const insight = useMemo(() => {
     if (!hasData) return null
-    if (periodIncome >= periodExpense) {
-      return `Keren! ${periodLabel} pemasukanmu ${formatRupiah(
-        periodIncome,
-      )}, lebih gede dari pengeluaran ${formatRupiah(periodExpense)}. Keuanganmu lagi tumbuh sehat 🌱`
-    }
-    return `Hati-hati ya, ${periodLabel} pengeluaranmu ${formatRupiah(
-      periodExpense,
-    )} lebih besar dari pemasukan ${formatRupiah(periodIncome)}. Yuk rem dikit biar tetap rapi 💪`
-  }, [hasData, periodIncome, periodExpense, periodLabel])
+    return periodIncome >= periodExpense
+      ? t.reports.insightGood(periodLabel, periodIncome, periodExpense)
+      : t.reports.insightWarn(periodLabel, periodIncome, periodExpense)
+  }, [hasData, periodIncome, periodExpense, periodLabel, t])
 
   return (
     <PageWrapper>
-      <TopBar title="Laporan" />
+      <TopBar title={t.reports.title} />
 
       {/* Toggle periode */}
-      <div className="flex rounded-rapi-md bg-white/50 p-1 backdrop-blur">
+      <div className="flex rounded-rapi-md bg-white/50 p-1 backdrop-blur dark:bg-white/5">
         {(
           [
-            { id: 'week', label: 'Mingguan' },
-            { id: 'month', label: 'Bulanan' },
+            { id: 'week', label: t.reports.weekly },
+            { id: 'month', label: t.reports.monthly },
           ] as const
         ).map(({ id, label }) => (
           <button
@@ -100,7 +97,7 @@ export default function Reports() {
             onClick={() => setPeriod(id)}
             className={cn(
               'relative flex-1 rounded-[7px] py-2 text-[13px] font-semibold tracking-tight transition-colors',
-              period === id ? 'text-white' : 'text-rapi-gray-600 hover:text-rapi-navy',
+              period === id ? 'text-white' : 'text-rapi-gray-600 hover:text-rapi-navy dark:hover:text-rapi-dark-ink',
             )}
           >
             {/* Thumb meluncur antar pilihan (aturan state-transition, jangan snap) */}
@@ -121,27 +118,29 @@ export default function Reports() {
         <RapiCard className="mt-5 flex flex-col items-center gap-3 px-6 py-12 text-center">
           <RapiMascot size={110} />
           <p className="text-[13px] leading-relaxed text-rapi-gray-600">
-            Belum ada data {periodLabel} nih. Yuk catat transaksimu dulu! 🎉
+            {t.reports.emptyData(periodLabel)}
           </p>
           <RapiButton variant="accent" onClick={openAdd}>
-            Catat Transaksi ✍️
+            {t.reports.catchTx}
           </RapiButton>
         </RapiCard>
       ) : (
         <>
           {/* Donut tunggal — center, glass bulat di belakang (tanpa card) */}
           <section className="mt-7 flex flex-col items-center">
-            <h2 className="text-[13px] font-semibold tracking-tight">Pemasukan vs Pengeluaran</h2>
+            <h2 className="text-[13px] font-semibold tracking-tight dark:text-rapi-dark-ink">
+              {t.reports.incomeVsExpense}
+            </h2>
             <div className="relative mt-4 flex h-52 w-52 items-center justify-center">
               <div className="rapi-glass absolute inset-0 rounded-full" aria-hidden />
               <DonutChart
                 size={168}
                 stroke={22}
                 slices={[
-                  { label: 'Pemasukan', value: periodIncome, color: INCOME_GREEN },
-                  { label: 'Pengeluaran', value: periodExpense, color: EXPENSE_RED },
+                  { label: t.common.income, value: periodIncome, color: INCOME_GREEN },
+                  { label: t.common.expense, value: periodExpense, color: EXPENSE_RED },
                 ]}
-                centerTop="Selisih"
+                centerTop={t.reports.difference}
                 centerMain={netStr}
                 centerColor={net >= 0 ? INCOME_GREEN : EXPENSE_RED}
               />
@@ -150,18 +149,18 @@ export default function Reports() {
               <div className="text-center">
                 <p className="flex items-center justify-center gap-1.5 text-[13px] font-medium text-rapi-gray-600">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: INCOME_GREEN }} />
-                  Pemasukan
+                  {t.common.income}
                 </p>
-                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy">
+                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
                   {formatRupiah(periodIncome)}
                 </p>
               </div>
               <div className="text-center">
                 <p className="flex items-center justify-center gap-1.5 text-[13px] font-medium text-rapi-gray-600">
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: EXPENSE_RED }} />
-                  Pengeluaran
+                  {t.common.expense}
                 </p>
-                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy">
+                <p className="mt-0.5 text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
                   {formatRupiah(periodExpense)}
                 </p>
               </div>
@@ -172,7 +171,7 @@ export default function Reports() {
           {insight && (
             <div className="mt-6 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-white shadow-rapi-card">
               <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
-                Insight Rapi
+                {t.reports.insightLabel}
               </p>
               <p className="mt-1 text-[13px] font-medium leading-relaxed tracking-tight">{insight}</p>
             </div>
@@ -181,7 +180,9 @@ export default function Reports() {
           {/* Pertumbuhan keuangan — saldo kumulatif, bisa digeser per bulan */}
           <RapiCard className="mt-4">
             <div className="mb-1 flex items-center justify-between">
-              <h2 className="text-[13px] font-semibold tracking-tight">Pertumbuhan Keuangan</h2>
+              <h2 className="text-[13px] font-semibold tracking-tight dark:text-rapi-dark-ink">
+                {t.reports.growth}
+              </h2>
               <span
                 className={cn(
                   'rounded-full px-2 py-0.5 text-[13px] font-semibold',
@@ -199,7 +200,7 @@ export default function Reports() {
                 type="button"
                 onClick={() => setMonthOffset((o) => o + 1)}
                 aria-label="Bulan sebelumnya"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -211,7 +212,7 @@ export default function Reports() {
                 onClick={() => setMonthOffset((o) => Math.max(0, o - 1))}
                 disabled={monthOffset === 0}
                 aria-label="Bulan berikutnya"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 disabled:opacity-30"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 disabled:opacity-30 dark:hover:bg-white/10"
               >
                 <ChevronRight size={16} />
               </button>

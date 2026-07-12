@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -16,6 +17,11 @@ export default {
           'savings-soft': '#E7EEFC',
           'warning-soft': '#FEF7DA',
           gray: { 600: '#5B6478', 300: '#D8DCE6', 100: '#F1F3F8' },
+          // Netral khusus dark mode — surface & teks
+          dark: '#0B1020', // background app gelap
+          'dark-surface': '#161C30', // kartu di dark mode
+          'dark-ink': '#EAECF3', // teks utama di dark mode
+          'dark-muted': '#9AA3BB', // teks sekunder di dark mode
         },
       },
       fontFamily: {

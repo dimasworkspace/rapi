@@ -7,22 +7,18 @@ import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { chatWithAi, RapiAiError } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
+import { useT } from '@/lib/i18n'
 import { SPRING_SOFT } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAiStore } from '@/store/aiStore'
+import { type Lang, useSettingsStore } from '@/store/settingsStore'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUserStore } from '@/store/userStore'
 import { DEFAULT_CATEGORIES } from '@/types'
 
-const SUGGESTIONS = [
-  'Gimana keuanganku bulan ini?',
-  'Pengeluaran terbesar aku apa?',
-  'Kasih tips hemat dong 💡',
-  'Aku boros nggak sih?',
-]
-
 /** Bangun system prompt: personality Rapi AI + konteks keuangan user yang sebenarnya. */
 const buildSystemPrompt = (
+  lang: Lang,
   name: string,
   balance: number,
   monthIncome: number,
@@ -38,6 +34,9 @@ const buildSystemPrompt = (
     'Gunakan emoji sesekali untuk bikin suasana lebih fun.',
     'Jawaban selalu berbasis data transaksi user di bawah ini, bukan generic.',
     'Jawab ringkas (2-5 kalimat) kecuali diminta detail. Jangan pakai heading markdown.',
+    lang === 'en'
+      ? 'IMPORTANT: Reply in English (the user set the app to English). Keep the same friendly, casual tone.'
+      : 'Balas dalam Bahasa Indonesia yang santai.',
     '',
     `=== Data keuangan ${name} (real, dari aplikasi) ===`,
     `Total saldo: ${formatRupiah(balance)}`,
@@ -63,6 +62,8 @@ function TypingDots() {
 }
 
 export default function AIChat() {
+  const t = useT()
+  const lang = useSettingsStore((s) => s.lang)
   const profile = useUserStore((s) => s.profile)
   const transactions = useTransactionStore((s) => s.transactions)
   const apiKey = useAiStore((s) => s.apiKey)
@@ -103,8 +104,8 @@ export default function AIChat() {
           tx.note ? ` (${tx.note})` : ''
         }`
       })
-    return buildSystemPrompt(name, initial + income - expense, inMonth, outMonth, recentLines)
-  }, [transactions, profile, name])
+    return buildSystemPrompt(lang, name, initial + income - expense, inMonth, outMonth, recentLines)
+  }, [transactions, profile, name, lang])
 
   // Auto-scroll ke pesan terbaru
   useEffect(() => {
@@ -126,7 +127,7 @@ export default function AIChat() {
       const reply = await chatWithAi(systemPrompt, history)
       addChat('assistant', reply)
     } catch (e) {
-      setError(e instanceof RapiAiError ? e.message : 'Oops, ada yang salah nih. Coba lagi ya 😊')
+      setError(e instanceof RapiAiError ? e.message : t.ai.genericError)
     } finally {
       setLoading(false)
     }
@@ -135,14 +136,14 @@ export default function AIChat() {
   return (
     <main className="flex min-h-[calc(100dvh-7rem)] flex-col px-5 pb-2">
       <div className="flex items-center justify-between">
-        <TopBar title="Rapi AI" />
+        <TopBar title={t.ai.title} />
         {chat.length > 0 && (
           <button
             type="button"
             onClick={() => {
-              if (confirm('Hapus semua obrolan sama Rapi AI?')) clearChat()
+              if (confirm(t.ai.clearConfirm)) clearChat()
             }}
-            aria-label="Hapus obrolan"
+            aria-label={t.common.delete}
             className="flex h-9 w-9 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
           >
             <Trash2 size={16} />
@@ -154,15 +155,14 @@ export default function AIChat() {
         /* Belum ada API key — arahkan ke Profil dengan ramah */
         <div className="rapi-glass animate-rapi-fade-up mt-4 flex flex-col items-center gap-3 rounded-rapi-lg px-6 py-12 text-center">
           <RapiMascot size={120} />
-          <p className="mt-1 text-sm font-bold text-rapi-navy">Rapi AI siap nemenin kamu!</p>
-          <p className="text-[13px] leading-relaxed text-rapi-gray-600">
-            Tinggal isi API key kamu di Profil (bebas provider — Claude, GPT, Gemini, dll).
-            Key-nya kesimpan di HP kamu aja kok 🔒
+          <p className="mt-1 text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
+            {t.ai.readyTitle}
           </p>
+          <p className="text-[13px] leading-relaxed text-rapi-gray-600">{t.ai.readyDesc}</p>
           <Link to="/profil">
             <RapiButton variant="accent">
               <Settings2 size={15} />
-              Isi API Key di Profil
+              {t.ai.fillKey}
             </RapiButton>
           </Link>
         </div>
@@ -173,19 +173,20 @@ export default function AIChat() {
             {chat.length === 0 && (
               <div className="animate-rapi-fade-up mt-6 flex flex-col items-center gap-3 text-center">
                 <RapiMascot size={132} />
-                <p className="mt-1 text-sm font-bold text-rapi-navy">Halo, {name}! 👋</p>
+                <p className="mt-1 text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
+                  {t.ai.helloName(name)}
+                </p>
                 <p className="max-w-[16rem] text-[13px] leading-relaxed text-rapi-gray-600">
-                  Aku Rapi AI — tanya apa aja soal keuanganmu, aku jawab berdasarkan catatanmu
-                  yang beneran.
+                  {t.ai.intro}
                 </p>
                 <div className="mt-1 flex flex-wrap justify-center gap-1.5">
-                  {SUGGESTIONS.map((s, i) => (
+                  {t.ai.suggestions.map((s, i) => (
                     <button
                       key={s}
                       type="button"
                       onClick={() => send(s)}
                       style={{ animationDelay: `${150 + i * 70}ms` }}
-                      className="animate-rapi-fade-up rounded-full border border-rapi-blue/25 bg-white/70 px-3 py-1.5 text-[12px] font-semibold text-rapi-blue transition-all hover:bg-rapi-blue hover:text-white active:scale-95"
+                      className="animate-rapi-fade-up rounded-full border border-rapi-blue/25 bg-white/70 px-3 py-1.5 text-[12px] font-semibold text-rapi-blue transition-all hover:bg-rapi-blue hover:text-white active:scale-95 dark:bg-white/5"
                     >
                       {s}
                     </button>
@@ -206,7 +207,7 @@ export default function AIChat() {
                     'max-w-[85%] whitespace-pre-wrap rounded-rapi-lg px-3.5 py-2.5 text-[13px] leading-relaxed shadow-rapi-card',
                     m.role === 'user'
                       ? 'rounded-br-md bg-gradient-to-br from-rapi-blue to-[#0334A0] text-white'
-                      : 'rapi-glass rounded-bl-md text-rapi-navy',
+                      : 'rapi-glass rounded-bl-md text-rapi-navy dark:text-rapi-dark-ink',
                   )}
                 >
                   {m.role === 'assistant' && (
@@ -247,15 +248,15 @@ export default function AIChat() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Tanya soal keuanganmu…"
-              aria-label="Pesan untuk Rapi AI"
-              className="min-h-11 w-full rounded-full border border-white/60 bg-white/80 px-4 text-sm outline-none backdrop-blur-xl transition-colors focus:border-rapi-blue"
+              placeholder={t.ai.inputPlaceholder}
+              aria-label={t.ai.title}
+              className="min-h-11 w-full rounded-full border border-white/60 bg-white/80 px-4 text-sm outline-none backdrop-blur-xl transition-colors focus:border-rapi-blue dark:border-white/10 dark:bg-rapi-dark-surface/80 dark:text-rapi-dark-ink"
             />
             <motion.button
               type="submit"
               disabled={!input.trim() || loading}
               whileTap={{ scale: 0.88 }}
-              aria-label="Kirim"
+              aria-label={t.common.save}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-rapi-blue text-white shadow-rapi-fab transition-opacity disabled:opacity-40"
             >
               <ArrowUp size={19} strokeWidth={2.5} />

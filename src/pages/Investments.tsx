@@ -8,14 +8,16 @@ import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { formatRupiah } from '@/lib/formatters'
+import { useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
 import { cn } from '@/lib/utils'
 import { assetStats, useInvestmentStore } from '@/store/investmentStore'
 import { ASSET_TYPES } from '@/types'
 
-const typeMeta = (id: string) => ASSET_TYPES.find((t) => t.id === id)
+const typeMeta = (id: string) => ASSET_TYPES.find((a) => a.id === id)
 
 export default function Investments() {
+  const t = useT()
   const assets = useInvestmentStore((s) => s.assets)
   const removeAsset = useInvestmentStore((s) => s.removeAsset)
   const [addOpen, setAddOpen] = useState(false)
@@ -45,16 +47,14 @@ export default function Investments() {
 
   return (
     <PageWrapper>
-      <TopBar title="Investasi" />
+      <TopBar title={t.investments.title} />
 
       {assets.length === 0 ? (
         <RapiCard className="mt-5 flex flex-col items-center gap-3 px-6 py-12 text-center">
           <Icon3D name="saham" size={52} fallback="📈" />
-          <p className="text-[13px] leading-relaxed text-rapi-gray-600">
-            Belum ada aset nih. Yuk catat investasimu, profit/loss dihitung otomatis! 🚀
-          </p>
+          <p className="text-[13px] leading-relaxed text-rapi-gray-600">{t.investments.empty}</p>
           <RapiButton variant="accent" onClick={() => setAddOpen(true)}>
-            Tambah Aset Pertamamu 📈
+            {t.investments.emptyCta}
           </RapiButton>
         </RapiCard>
       ) : (
@@ -70,7 +70,7 @@ export default function Investments() {
               className="absolute -right-10 -top-12 h-32 w-32 rounded-full bg-rapi-yellow/20 blur-2xl"
             />
             <p className="relative text-[11px] font-medium uppercase tracking-wide text-white/60">
-              Total Nilai Portofolio
+              {t.investments.totalValue}
             </p>
             <p className="tabular-nums relative mt-1 text-[30px] font-bold leading-none tracking-tight">
               {formatRupiah(animatedTotal)}
@@ -86,13 +86,17 @@ export default function Investments() {
                 {totalPL >= 0 ? '↑' : '↓'} {formatRupiah(Math.abs(totalPL))} (
                 {totalPct.toFixed(1).replace('.', ',')}%)
               </span>
-              <span className="text-[11px] text-white/50">modal {formatRupiah(totalModal)}</span>
+              <span className="text-[11px] text-white/50">
+                {t.investments.capital} {formatRupiah(totalModal)}
+              </span>
             </div>
           </div>
 
           {/* Pertumbuhan tiap aset — bar diverging dari titik nol */}
           <RapiCard className="animate-rapi-fade-up mt-4" style={{ animationDelay: '120ms' }}>
-            <h2 className="mb-3 text-[13px] font-semibold tracking-tight">Pertumbuhan Aset</h2>
+            <h2 className="mb-3 text-[13px] font-semibold tracking-tight dark:text-rapi-dark-ink">
+              {t.investments.growth}
+            </h2>
             <div className="flex flex-col gap-3.5">
               {rows.map(({ asset, plPct }) => {
                 const up = plPct >= 0
@@ -100,7 +104,7 @@ export default function Investments() {
                 return (
                   <div key={asset.id}>
                     <div className="mb-1 flex items-center justify-between">
-                      <span className="flex items-center gap-1.5 text-[13px] font-medium text-rapi-navy">
+                      <span className="flex items-center gap-1.5 text-[13px] font-medium text-rapi-navy dark:text-rapi-dark-ink">
                         <Icon3D name={asset.type} size={16} fallback={typeMeta(asset.type)?.emoji ?? '📈'} />
                         {asset.name}
                       </span>
@@ -115,8 +119,8 @@ export default function Investments() {
                       </span>
                     </div>
                     {/* Track dengan titik nol di tengah — bar tumbuh dari nol (scaleX, hemat layout) */}
-                    <div className="relative h-2 rounded-full bg-rapi-gray-100">
-                      <div className="absolute left-1/2 top-1/2 h-3 w-px -translate-x-1/2 -translate-y-1/2 bg-rapi-gray-300" />
+                    <div className="relative h-2 rounded-full bg-rapi-gray-100 dark:bg-white/10">
+                      <div className="absolute left-1/2 top-1/2 h-3 w-px -translate-x-1/2 -translate-y-1/2 bg-rapi-gray-300 dark:bg-white/20" />
                       <motion.div
                         initial={{ scaleX: 0 }}
                         animate={{ scaleX: 1 }}
@@ -141,8 +145,8 @@ export default function Investments() {
             className="animate-rapi-fade-up mb-2.5 mt-6 flex items-center justify-between"
             style={{ animationDelay: '200ms' }}
           >
-            <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-navy">
-              Daftar Aset
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.1em] text-rapi-navy dark:text-rapi-dark-ink">
+              {t.investments.list}
             </h2>
             <button
               type="button"
@@ -150,7 +154,7 @@ export default function Investments() {
               className="flex items-center gap-1 text-[13px] font-semibold text-rapi-blue"
             >
               <Plus size={15} />
-              Tambah
+              {t.common.add}
             </button>
           </div>
 
@@ -170,13 +174,15 @@ export default function Investments() {
                     <Icon3D name={asset.type} size={30} fallback={typeMeta(asset.type)?.emoji ?? '📈'} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-semibold text-rapi-navy">{asset.name}</p>
+                    <p className="truncate text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                      {asset.name}
+                    </p>
                     <p className="mt-0.5 truncate text-[11px] text-rapi-gray-600">
-                      {typeMeta(asset.type)?.label} · {asset.units.toLocaleString('id-ID')} unit
+                      {typeMeta(asset.type)?.label} · {asset.units.toLocaleString('id-ID')} {t.investments.unit}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="tabular-nums text-[13px] font-semibold text-rapi-navy">
+                    <p className="tabular-nums text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
                       {formatRupiah(value)}
                     </p>
                     <p
@@ -191,9 +197,9 @@ export default function Investments() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (confirm(`Hapus aset "${asset.name}"?`)) removeAsset(asset.id)
+                      if (confirm(t.investments.confirmDelete(asset.name))) removeAsset(asset.id)
                     }}
-                    aria-label={`Hapus ${asset.name}`}
+                    aria-label={`${t.common.delete} ${asset.name}`}
                     className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
                   >
                     <Trash2 size={15} />

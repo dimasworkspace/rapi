@@ -35,6 +35,21 @@
   .rapi-glass {
     @apply border border-white/70 bg-gradient-to-b from-white/70 to-white/40 shadow-rapi-card backdrop-blur-xl;
   }
+
+  /* Versi gelap: kaca navy transparan, border tipis biar tetap kebaca */
+  .dark .rapi-glass {
+    @apply border-white/10 from-white/[0.07] to-white/[0.03];
+  }
+}
+
+/* Remap aman khusus dark: teks sekunder abu (selalu di permukaan terang) →
+   muted terang. Warna navy TIDAK diremap global karena juga dipakai sebagai
+   teks gelap di atas tombol/badge kuning. */
+.dark .text-rapi-gray-600 {
+  color: theme('colors.rapi.dark-muted');
+}
+.dark .divide-rapi-gray-300\/40 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(255 255 255 / 0.08);
 }
 
 @layer base {
@@ -47,6 +62,19 @@
     @apply bg-rapi-offwhite font-sans text-rapi-navy;
     margin: 0;
     min-height: 100dvh;
+  }
+
+  /* Dark mode: background app + warna teks default */
+  .dark body {
+    @apply bg-rapi-dark text-rapi-dark-ink;
+  }
+
+  /* Transisi halus saat ganti tema (hormati reduced-motion di bawah) */
+  .dark body,
+  body {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
   }
 
   /* Target sentuh nyaman di mobile + hilangkan delay tap 300ms */

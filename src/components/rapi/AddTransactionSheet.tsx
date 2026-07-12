@@ -5,19 +5,21 @@ import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { aiReady, parseReceiptWithAi, RapiAiError } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
+import { useT } from '@/lib/i18n'
 import { FADE, SPRING_POP, TWEEN_EXIT } from '@/lib/motion'
 import { parseInvestment, parseTransaction } from '@/lib/parser'
 import { cn } from '@/lib/utils'
 import { useCategoryStore } from '@/store/categoryStore'
 import { useInvestmentStore } from '@/store/investmentStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import { ASSET_TYPES, type InputMethod, type TransactionType } from '@/types'
 
 const MODES = [
-  { id: 'text', label: 'Teks', icon: Keyboard },
-  { id: 'voice', label: 'Suara', icon: Mic },
-  { id: 'photo', label: 'Foto', icon: Camera },
+  { id: 'text', icon: Keyboard },
+  { id: 'voice', icon: Mic },
+  { id: 'photo', icon: Camera },
 ] as const
 
 const getSpeechRecognition = (): SpeechRecognitionConstructor | undefined =>
@@ -34,12 +36,20 @@ const fileToBase64 = (file: File): Promise<string> =>
 
 /** Form isi transaksi — state fresh tiap sheet dibuka. */
 function AddTransactionForm({ onClose }: { onClose: () => void }) {
+  const t = useT()
+  const lang = useSettingsStore((s) => s.lang)
   const categories = useCategoryStore((s) => s.categories)
   const addTransaction = useTransactionStore((s) => s.addTransaction)
   const removeTransaction = useTransactionStore((s) => s.removeTransaction)
   const addAsset = useInvestmentStore((s) => s.addAsset)
   const removeAsset = useInvestmentStore((s) => s.removeAsset)
   const showToast = useUiStore((s) => s.showToast)
+
+  const MODE_LABEL: Record<string, string> = {
+    text: t.add.modeText,
+    voice: t.add.modeVoice,
+    photo: t.add.modePhoto,
+  }
 
   const [input, setInput] = useState('')
   const [manualType, setManualType] = useState<TransactionType | null>(null)
@@ -66,11 +76,11 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     }
     const Recognition = getSpeechRecognition()
     if (!Recognition) {
-      showToast('Browser ini belum bisa input suara. Coba Chrome ya 😊')
+      showToast(t.add.voiceUnsupported)
       return
     }
     const rec = new Recognition()
-    rec.lang = 'id-ID'
+    rec.lang = lang === 'en' ? 'en-US' : 'id-ID'
     rec.continuous = false
     rec.interimResults = true
     rec.onresult = (e) => {
@@ -82,9 +92,9 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     rec.onerror = (e) => {
       setListening(false)
       if (e.error === 'not-allowed') {
-        showToast('Izinin akses mikrofonnya dulu ya 🎙️')
+        showToast(t.add.micDenied)
       } else if (e.error !== 'aborted') {
-        showToast('Suaranya nggak kedengeran nih. Coba lagi ya 😊')
+        showToast(t.add.voiceError)
       }
     }
     rec.onend = () => setListening(false)
@@ -95,7 +105,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
 
   const handlePhotoClick = () => {
     if (!aiReady()) {
-      showToast('Scan struk butuh API key — isi dulu di Profil ya 🔑')
+      showToast(t.add.photoNeedsKey)
       return
     }
     fileRef.current?.click()
@@ -112,7 +122,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         categories.map((c) => c.id),
       )
       if (!result.amount) {
-        showToast('Struknya susah kebaca nih. Coba foto ulang yang lebih jelas ya 📸')
+        showToast(t.add.receiptFail)
         return
       }
       // Prefill form — user tinggal cek & simpan
@@ -121,11 +131,9 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
       if (result.category) setManualCategory(result.category)
       setInputMethod('photo')
       setWasAiParsed(true)
-      showToast('Struk kebaca! Cek dulu terus simpan ya ✨')
+      showToast(t.add.receiptOk)
     } catch (e) {
-      showToast(
-        e instanceof RapiAiError ? e.message : 'Oops, ada yang salah nih. Coba lagi ya 😊',
-      )
+      showToast(e instanceof RapiAiError ? e.message : t.ai.genericError)
     } finally {
       setScanning(false)
       if (fileRef.current) fileRef.current.value = ''
@@ -135,7 +143,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const parsed = useMemo(() => parseTransaction(input), [input])
   const invest = useMemo(() => parseInvestment(input), [input])
   const isInvest = invest.matched && !forceNormal
-  const assetMeta = ASSET_TYPES.find((t) => t.id === invest.assetType)
+  const assetMeta = ASSET_TYPES.find((a) => a.id === invest.assetType)
   const assetName = invest.name || (assetMeta?.label ?? 'Aset')
 
   const type: TransactionType = manualType ?? parsed.type
@@ -172,7 +180,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         inputMethod,
         aiParsed: wasAiParsed,
       })
-      showToast('Kecatat & masuk portofolio Investasi 📈', () => {
+      showToast(t.add.savedInvest, () => {
         removeAsset(assetId)
         removeTransaction(txId)
       })
@@ -188,7 +196,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
       inputMethod,
       aiParsed: wasAiParsed,
     })
-    showToast('Kecatat! Keuanganmu makin rapi 💪', () => removeTransaction(txId))
+    showToast(t.add.saved, () => removeTransaction(txId))
     onClose()
   }
 
@@ -196,7 +204,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     <>
       {/* ===== HERO: mode input + tulis transaksi ===== */}
       <div className="grid grid-cols-3 gap-2">
-        {MODES.map(({ id, label, icon: Icon }) => {
+        {MODES.map(({ id, icon: Icon }) => {
           const active =
             id === 'text' ? !listening && !scanning : id === 'voice' ? listening : scanning
           const disabled = (id === 'voice' && !voiceSupported) || (id === 'photo' && scanning)
@@ -212,7 +220,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
                   ? id === 'voice'
                     ? 'animate-rapi-pulse bg-rapi-expense text-white'
                     : 'bg-rapi-blue text-white shadow-rapi-card'
-                  : 'border border-rapi-blue/30 bg-white/50 text-rapi-blue hover:bg-rapi-blue/10',
+                  : 'border border-rapi-blue/30 bg-white/50 text-rapi-blue hover:bg-rapi-blue/10 dark:bg-white/5',
                 disabled && 'opacity-50',
               )}
             >
@@ -222,10 +230,10 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
                 <Icon size={14} />
               )}
               {id === 'voice' && listening
-                ? 'Dengerin…'
+                ? t.add.listening
                 : id === 'photo' && scanning
-                  ? 'Baca…'
-                  : label}
+                  ? t.add.reading
+                  : MODE_LABEL[id]}
             </button>
           )
         })}
@@ -244,20 +252,16 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
       />
 
       <label htmlFor="tx-input" className="sr-only">
-        Tulis transaksi
+        {t.add.title}
       </label>
       <textarea
         id="tx-input"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder={
-          listening
-            ? "Ngomong aja santai: 'makan siang dua puluh lima ribu' 🎙️"
-            : 'Tulis santai aja, contoh:\n"makan siang 25rb" · "gaji 3jt"'
-        }
+        placeholder={listening ? t.add.voicePlaceholder : t.add.placeholder}
         rows={2}
         autoFocus
-        className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue"
+        className="mt-2.5 w-full resize-none rounded-rapi-md border-[1.5px] border-rapi-blue/20 bg-white/70 px-3.5 py-2.5 text-sm leading-relaxed outline-none transition-colors focus:border-rapi-blue dark:border-white/10 dark:bg-white/5 dark:text-rapi-dark-ink"
       />
 
       {/* Contoh cepat — sekali klik langsung keisi (belajar format tanpa mikir) */}
@@ -268,7 +272,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
               key={ex}
               type="button"
               onClick={() => setInput(ex)}
-              className="rounded-full border border-rapi-blue/25 bg-white/60 px-2.5 py-1 text-[11px] font-semibold text-rapi-blue transition-all hover:bg-rapi-blue hover:text-white active:scale-95"
+              className="rounded-full border border-rapi-blue/25 bg-white/60 px-2.5 py-1 text-[11px] font-semibold text-rapi-blue transition-all hover:bg-rapi-blue hover:text-white active:scale-95 dark:bg-white/5"
             >
               {ex}
             </button>
@@ -286,10 +290,12 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
           aria-live="polite"
         >
           {amount > 0
-            ? `Kebaca: ${formatRupiah(amount)} · ${
-                categories.find((c) => c.id === activeCategory)?.name ?? 'Lainnya'
-              } · ${type === 'income' ? 'Pemasukan' : 'Pengeluaran'}`
-            : 'Nominalnya belum kebaca — tulis angkanya ya, contoh: 25rb 😊'}
+            ? t.add.parsed(
+                formatRupiah(amount),
+                categories.find((c) => c.id === activeCategory)?.name ?? t.settings.other,
+                type === 'income' ? t.common.income : t.common.expense,
+              )
+            : t.add.parsedFail}
         </p>
       )}
 
@@ -299,12 +305,10 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
           <div className="flex items-center gap-2.5">
             <Icon3D name={invest.assetType} size={28} fallback={assetMeta?.emoji ?? '📈'} />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[13px] font-semibold text-rapi-navy">
+              <p className="truncate text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
                 {assetName} · {assetMeta?.label}
               </p>
-              <p className="text-[11px] leading-snug text-rapi-gray-600">
-                Kedetect investasi — otomatis masuk tab Investasi 📈
-              </p>
+              <p className="text-[11px] leading-snug text-rapi-gray-600">{t.add.investDetected}</p>
             </div>
           </div>
           <button
@@ -312,17 +316,17 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
             onClick={() => setForceNormal(true)}
             className="mt-2 text-[11px] font-semibold text-rapi-blue"
           >
-            Bukan investasi? Catat sebagai transaksi biasa
+            {t.add.notInvest}
           </button>
         </div>
       ) : (
         <>
       {/* Jenis — fokus pilihan Keluar / Masuk */}
-      <div className="mt-3 flex rounded-rapi-md bg-white/50 p-1">
+      <div className="mt-3 flex rounded-rapi-md bg-white/50 p-1 dark:bg-white/5">
         {(
           [
-            { id: 'expense', label: '↓ Pengeluaran' },
-            { id: 'income', label: '↑ Pemasukan' },
+            { id: 'expense', label: t.add.expenseTab },
+            { id: 'income', label: t.add.incomeTab },
           ] as const
         ).map(({ id, label }) => (
           <button
@@ -336,8 +340,8 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
               'flex-1 rounded-[7px] py-2 text-xs font-bold transition-colors',
               type === id
                 ? id === 'expense'
-                  ? 'bg-rapi-expense-soft text-rapi-expense'
-                  : 'bg-rapi-income-soft text-rapi-income'
+                  ? 'bg-rapi-expense-soft text-rapi-expense dark:bg-rapi-expense/20'
+                  : 'bg-rapi-income-soft text-rapi-income dark:bg-rapi-income/20'
                 : 'text-rapi-gray-600',
             )}
           >
@@ -348,7 +352,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
 
       {/* Kategori — grid rapi & center, otomatis kepilih dari parser */}
       <p className="mb-2 mt-3 text-center text-[11px] font-bold uppercase tracking-wide text-rapi-gray-600">
-        Kategori
+        {t.common.category}
       </p>
       <div className="grid grid-cols-4 gap-2">
         {typeCategories.map((cat) => (
@@ -360,7 +364,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
               'flex min-h-[62px] flex-col items-center justify-center gap-1 rounded-rapi-md px-1 py-2 text-[10px] font-bold transition-colors',
               activeCategory === cat.id
                 ? 'bg-rapi-blue text-white shadow-rapi-card'
-                : 'border border-white/60 bg-white/45 text-rapi-gray-600',
+                : 'border border-white/60 bg-white/45 text-rapi-gray-600 dark:border-white/10 dark:bg-white/5',
             )}
           >
             <Icon3D name={cat.id} size={22} fallback={cat.emoji} />
@@ -379,9 +383,9 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
       >
         {canSave
           ? isInvest
-            ? `Simpan Investasi ${formatRupiah(amount)} 📈`
-            : `Simpan ${formatRupiah(amount)} ✅`
-          : 'Simpan Transaksi'}
+            ? t.add.saveInvest(formatRupiah(amount))
+            : t.add.save(formatRupiah(amount))
+          : t.add.saveDefault}
       </RapiButton>
     </>
   )
@@ -389,6 +393,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
 
 /** Modal di tengah layar — biru glass transparan, pop-in dari FAB (Framer Motion). */
 export function AddTransactionSheet() {
+  const t = useT()
   const open = useUiStore((s) => s.addOpen)
   const closeAdd = useUiStore((s) => s.closeAdd)
 
@@ -406,9 +411,9 @@ export function AddTransactionSheet() {
           {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
           <motion.button
             type="button"
-            aria-label="Tutup"
+            aria-label={t.common.close}
             onClick={closeAdd}
-            className="absolute inset-0 bg-rapi-navy/20"
+            className="absolute inset-0 bg-rapi-navy/20 dark:bg-black/50"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -417,18 +422,20 @@ export function AddTransactionSheet() {
 
           {/* Modal — biru glass transparan; enter spring, exit lebih cepat */}
           <motion.div
-            className="relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl"
+            className="relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl dark:border-white/10 dark:bg-rapi-dark-surface/85"
             initial={{ opacity: 0, scale: 0.92, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0, transition: SPRING_POP }}
             exit={{ opacity: 0, scale: 0.95, y: 10, transition: TWEEN_EXIT }}
           >
             <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
-              <h2 className="text-[15px] font-bold text-rapi-navy">Tambah Transaksi</h2>
+              <h2 className="text-[15px] font-bold text-rapi-navy dark:text-rapi-dark-ink">
+                {t.add.title}
+              </h2>
               <button
                 type="button"
                 onClick={closeAdd}
-                aria-label="Tutup"
-                className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60"
+                aria-label={t.common.close}
+                className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
               >
                 <X size={17} />
               </button>

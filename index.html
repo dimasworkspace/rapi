@@ -16,6 +16,17 @@
       rel="stylesheet"
     />
     <title>Rapi — Catat Keuangan Tanpa Ribet</title>
+    <script>
+      // Terapkan tema & bahasa dari preferensi tersimpan SEBELUM render — cegah kedip
+      try {
+        var s = JSON.parse(localStorage.getItem('rapi-settings') || '{}').state || {}
+        if (s.theme === 'dark') {
+          document.documentElement.classList.add('dark')
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0B1020')
+        }
+        if (s.lang) document.documentElement.setAttribute('lang', s.lang)
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
