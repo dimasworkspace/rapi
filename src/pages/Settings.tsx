@@ -6,6 +6,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
+import { RapiSelect } from '@/components/rapi/RapiSelect'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -220,22 +221,12 @@ export default function Settings() {
             </span>
           </div>
 
-          <div className={cn('relative mt-2', INPUT)}>
-            <select
+          <div className="mt-2">
+            <RapiSelect
               value={aiProvider}
-              onChange={(e) => setProvider(e.target.value as typeof aiProvider)}
-              aria-label={t.settings.aiProvider}
-              className="w-full appearance-none rounded-rapi-md bg-transparent py-2.5 pl-3 pr-9 text-[13px] font-semibold text-rapi-navy outline-none dark:text-rapi-dark-ink [&>option]:text-rapi-navy"
-            >
-              {AI_PROVIDERS.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.label}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              size={16}
-              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-rapi-gray-600"
+              onChange={(v) => setProvider(v as typeof aiProvider)}
+              ariaLabel={t.settings.aiProvider}
+              options={AI_PROVIDERS.map((p) => ({ value: p.id, label: p.label }))}
             />
           </div>
 

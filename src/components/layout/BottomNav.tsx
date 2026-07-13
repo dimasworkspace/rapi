@@ -33,7 +33,7 @@ function NavItem({ to, label, icon: Icon }: NavItemData) {
               layoutId="rapi-nav-pill"
               transition={SPRING_POP}
               aria-hidden
-              className="absolute inset-x-1 inset-y-0.5 rounded-full bg-rapi-blue/10 dark:bg-rapi-blue/40"
+              className="absolute inset-x-1 inset-y-0.5 rounded-full bg-rapi-blue/10 dark:bg-white/10"
             />
           )}
           <Icon

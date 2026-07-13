@@ -118,6 +118,7 @@ const callAnthropic = async (
 // ===== OpenAI-compatible (OpenAI, OpenRouter, custom) =====
 
 const OPENAI_BASE: Record<string, string> = {
+  groq: 'https://api.groq.com/openai/v1',
   openai: 'https://api.openai.com/v1',
   openrouter: 'https://openrouter.ai/api/v1',
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type AiProvider = 'anthropic' | 'openai' | 'google' | 'openrouter' | 'custom'
+export type AiProvider = 'groq' | 'google' | 'anthropic' | 'openai' | 'openrouter' | 'custom'
 
 export interface AiProviderMeta {
   id: AiProvider
@@ -9,12 +9,31 @@ export interface AiProviderMeta {
   defaultModel: string
   keyHint: string
   keyUrl: string
-  /** Butuh base URL manual (OpenAI-compatible: OpenRouter, Groq, LM Studio, dll). */
+  /** Gratis buat dites (free tier / model open-source). */
+  free?: boolean
+  /** Butuh base URL manual (OpenAI-compatible: OpenRouter, LM Studio, dll). */
   needsBaseUrl?: boolean
 }
 
-/** Provider AI yang didukung — BYOK, bebas pilih. */
+/** Provider AI yang didukung — BYOK, bebas pilih.
+ *  Yang gratis (Groq & Gemini) ditaruh paling atas biar gampang dites. */
 export const AI_PROVIDERS: AiProviderMeta[] = [
+  {
+    id: 'groq',
+    label: 'Groq · Llama (gratis)',
+    defaultModel: 'llama-3.3-70b-versatile',
+    keyHint: 'gsk_...',
+    keyUrl: 'console.groq.com/keys',
+    free: true,
+  },
+  {
+    id: 'google',
+    label: 'Google Gemini (gratis)',
+    defaultModel: 'gemini-1.5-flash',
+    keyHint: 'AIza...',
+    keyUrl: 'aistudio.google.com',
+    free: true,
+  },
   {
     id: 'anthropic',
     label: 'Anthropic (Claude)',
@@ -30,16 +49,9 @@ export const AI_PROVIDERS: AiProviderMeta[] = [
     keyUrl: 'platform.openai.com',
   },
   {
-    id: 'google',
-    label: 'Google Gemini',
-    defaultModel: 'gemini-1.5-flash',
-    keyHint: 'AIza...',
-    keyUrl: 'aistudio.google.com',
-  },
-  {
     id: 'openrouter',
     label: 'OpenRouter',
-    defaultModel: 'anthropic/claude-3.5-sonnet',
+    defaultModel: 'meta-llama/llama-3.3-70b-instruct',
     keyHint: 'sk-or-...',
     keyUrl: 'openrouter.ai/keys',
   },
@@ -82,9 +94,9 @@ interface AiState {
 export const useAiStore = create<AiState>()(
   persist(
     (set) => ({
-      provider: 'anthropic',
+      provider: 'groq',
       apiKey: '',
-      model: providerMeta('anthropic').defaultModel,
+      model: providerMeta('groq').defaultModel,
       baseUrl: '',
       chat: [],
       setProvider: (provider) =>
