@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { endOfMonth, format, isSameMonth, isSameWeek, subMonths } from 'date-fns'
-import { id as localeId } from 'date-fns/locale'
+import { enUS as localeEn, id as localeId } from 'date-fns/locale'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
@@ -14,6 +14,7 @@ import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useSettingsStore } from '@/store/settingsStore'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
@@ -25,6 +26,8 @@ const EXPENSE_RED = '#EF4444'
 
 export default function Reports() {
   const t = useT()
+  const lang = useSettingsStore((s) => s.lang)
+  const monthLocale = lang === 'en' ? localeEn : localeId
   const transactions = useTransactionStore((s) => s.transactions)
   const profile = useUserStore((s) => s.profile)
   const openAdd = useUiStore((s) => s.openAdd)
@@ -61,7 +64,7 @@ export default function Reports() {
         if (tx.type === 'income') bal += tx.amount
         if (tx.type === 'expense') bal -= tx.amount
       }
-      growth.push({ label: format(m, 'MMM', { locale: localeId }), value: bal })
+      growth.push({ label: format(m, 'MMM', { locale: monthLocale }), value: bal })
     }
 
     return { periodIncome: inc, periodExpense: exp, growth, hasData: count > 0 }
