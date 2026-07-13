@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2 } from 'lucide-react'
+import { Check, ChevronDown, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2 } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -233,7 +233,15 @@ export default function Settings() {
           <label htmlFor="ai-key" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
             {t.settings.apiKey}
           </label>
-          <div className={cn('flex items-center', INPUT)}>
+          {/* Border & centang hijau saat key sudah terisi — feedback jelas */}
+          <div
+            className={cn(
+              'flex items-center rounded-rapi-md border-[1.5px] bg-white/70 outline-none transition-colors focus-within:border-rapi-blue dark:bg-white/5',
+              apiKey
+                ? 'border-rapi-income/50 dark:border-rapi-income/40'
+                : 'border-rapi-blue/20 dark:border-white/10',
+            )}
+          >
             <input
               id="ai-key"
               value={apiKey}
@@ -241,8 +249,13 @@ export default function Settings() {
               type={showKey ? 'text' : 'password'}
               placeholder={providerMeta(aiProvider).keyHint}
               autoComplete="off"
-              className="w-full bg-transparent px-3 py-2.5 text-[13px] outline-none"
+              className="w-full bg-transparent px-3 py-2.5 text-[13px] outline-none dark:text-rapi-dark-ink"
             />
+            {apiKey && (
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rapi-income text-white">
+                <Check size={13} strokeWidth={3} />
+              </span>
+            )}
             <button
               type="button"
               onClick={() => setShowKey((v) => !v)}
@@ -252,6 +265,12 @@ export default function Settings() {
               {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
+          {apiKey && (
+            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-rapi-income">
+              <Check size={12} strokeWidth={3} />
+              {t.settings.keySaved}
+            </p>
+          )}
 
           <label htmlFor="ai-model" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
             {t.settings.model}

@@ -48,6 +48,18 @@
 .dark .text-rapi-gray-600 {
   color: theme('colors.rapi.dark-muted');
 }
+
+/* Neon glow ikon nav aktif (ganti kotak/pill). Biru brand di light,
+   lebih terang di dark biar pop di atas surface gelap. */
+.rapi-nav-glow {
+  filter: drop-shadow(0 0 6px rgba(2, 72, 193, 0.55));
+}
+.dark .rapi-nav-glow {
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.85));
+}
+.rapi-dot-glow {
+  box-shadow: 0 0 6px 1px rgba(248, 214, 19, 0.8);
+}
 .dark .divide-rapi-gray-300\/40 > :not([hidden]) ~ :not([hidden]) {
   border-color: rgb(255 255 255 / 0.08);
 }

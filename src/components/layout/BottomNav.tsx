@@ -18,7 +18,7 @@ function NavItem({ to, label, icon: Icon }: NavItemData) {
       to={to}
       className={({ isActive }) =>
         cn(
-          'relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-full py-1 text-[10px] font-bold transition-colors',
+          'flex min-h-11 flex-1 flex-col items-center justify-center py-1 text-[10px] font-bold transition-colors',
           isActive
             ? 'text-rapi-blue dark:text-white'
             : 'text-rapi-gray-600 hover:text-rapi-navy dark:text-rapi-dark-muted dark:hover:text-rapi-dark-ink',
@@ -26,29 +26,29 @@ function NavItem({ to, label, icon: Icon }: NavItemData) {
       }
     >
       {({ isActive }) => (
-        <>
-          {/* Pill aktif meluncur antar tab (shared element, aturan shared-element-transition) */}
-          {isActive && (
-            <motion.span
-              layoutId="rapi-nav-pill"
-              transition={SPRING_POP}
-              aria-hidden
-              className="absolute inset-x-1 inset-y-0.5 rounded-full bg-rapi-blue/10 dark:bg-white/10"
-            />
-          )}
-          <Icon
-            size={20}
-            className={cn('relative transition-transform', isActive && '-translate-y-0.5 scale-110')}
-          />
-          <span className="relative">{label}</span>
+        // Tanpa kotak — tekan mengecil (bounce), aktif membesar + neon glow
+        <motion.span
+          className="flex flex-col items-center gap-0.5"
+          whileTap={{ scale: 0.82 }}
+          transition={SPRING_POP}
+        >
+          <motion.span
+            animate={{ scale: isActive ? 1.3 : 1, y: isActive ? -2 : 0 }}
+            transition={SPRING_POP}
+            className={cn('flex', isActive && 'rapi-nav-glow')}
+          >
+            <Icon size={20} />
+          </motion.span>
+          <span>{label}</span>
+          {/* Titik kuning bercahaya sebagai penanda aktif */}
           <span
             aria-hidden
             className={cn(
-              'relative h-1 w-1 rounded-full bg-rapi-yellow transition-opacity',
-              isActive ? 'opacity-100' : 'opacity-0',
+              'h-1 w-1 rounded-full bg-rapi-yellow transition-opacity',
+              isActive ? 'rapi-dot-glow opacity-100' : 'opacity-0',
             )}
           />
-        </>
+        </motion.span>
       )}
     </NavLink>
   )
