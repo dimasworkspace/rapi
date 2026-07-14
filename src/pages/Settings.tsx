@@ -1,12 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronDown, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2 } from 'lucide-react'
+import { Check, ChevronDown, Download, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
 import { RapiSelect } from '@/components/rapi/RapiSelect'
+import { exportData, importData } from '@/lib/backup'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
@@ -46,6 +47,7 @@ export default function Settings() {
 
   const [showKey, setShowKey] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
+  const importRef = useRef<HTMLInputElement>(null)
   const [newCat, setNewCat] = useState({ emoji: '', name: '', type: 'expense' as 'expense' | 'income' })
 
   const name = profile?.name ?? 'Kamu'
@@ -63,6 +65,23 @@ export default function Settings() {
     addCategory({ name: newCat.name.trim(), emoji: newCat.emoji.trim() || '🏷️', type: newCat.type })
     setNewCat({ emoji: '', name: '', type: newCat.type })
     showToast(t.settings.catAdded)
+  }
+
+  const handleExport = () => {
+    exportData()
+    showToast(t.settings.exportDone)
+  }
+
+  const handleImport = async (file: File | undefined) => {
+    if (!file) return
+    const ok = await importData(file)
+    if (importRef.current) importRef.current.value = ''
+    if (ok) {
+      showToast(t.settings.importDone)
+      setTimeout(() => window.location.reload(), 900)
+    } else {
+      showToast(t.settings.importFail)
+    }
   }
 
   const handleReset = () => {
@@ -447,10 +466,42 @@ export default function Settings() {
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '290ms' }}>
         <h2 className={SECTION_H}>{t.settings.other}</h2>
         <RapiCard className="flex flex-col gap-3">
+          {/* Backup / restore data — cegah kehilangan data LocalStorage */}
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleExport}
+              className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-rapi-md bg-rapi-gray-100 text-[13px] font-semibold text-rapi-navy transition-transform active:scale-[0.97] dark:bg-white/10 dark:text-rapi-dark-ink"
+            >
+              <Download size={15} />
+              {t.settings.exportData}
+            </button>
+            <button
+              type="button"
+              onClick={() => importRef.current?.click()}
+              className="flex min-h-11 flex-1 items-center justify-center gap-1.5 rounded-rapi-md bg-rapi-gray-100 text-[13px] font-semibold text-rapi-navy transition-transform active:scale-[0.97] dark:bg-white/10 dark:text-rapi-dark-ink"
+            >
+              <Upload size={15} />
+              {t.settings.importData}
+            </button>
+            <input
+              ref={importRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              aria-hidden
+              tabIndex={-1}
+              onChange={(e) => handleImport(e.target.files?.[0])}
+            />
+          </div>
+          <p className="text-[11px] leading-relaxed text-rapi-gray-600">{t.settings.backupHint}</p>
+
+          <hr className="border-rapi-gray-300/50 dark:border-white/10" />
+
           <button
             type="button"
             onClick={handleReset}
-            className="flex items-center gap-2 text-[13px] font-semibold text-rapi-expense"
+            className="flex min-h-11 items-center gap-2 text-[13px] font-semibold text-rapi-expense"
           >
             <Trash2 size={15} />
             {t.settings.resetData}
