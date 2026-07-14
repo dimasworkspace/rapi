@@ -435,7 +435,7 @@ export function AddTransactionSheet() {
                 type="button"
                 onClick={closeAdd}
                 aria-label={t.common.close}
-                className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
               >
                 <X size={17} />
               </button>

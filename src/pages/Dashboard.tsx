@@ -178,7 +178,7 @@ export default function Dashboard() {
               type="button"
               onClick={dismissHint}
               aria-label={t.common.close}
-              className="-mr-1 -mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
+              className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
             >
               <X size={15} />
             </button>

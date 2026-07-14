@@ -61,8 +61,8 @@ export function TransactionItem({
         <button
           type="button"
           onClick={onDelete}
-          aria-label={`Hapus ${tx.note || 'transaksi'}`}
-          className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
+          aria-label={`${t.common.delete} ${tx.note || t.transactions.title}`}
+          className="-mr-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
         >
           <Trash2 size={15} />
         </button>

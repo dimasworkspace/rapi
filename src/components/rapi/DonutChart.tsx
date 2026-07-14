@@ -13,6 +13,8 @@ interface DonutChartProps {
   centerTop?: string
   centerMain?: string
   centerColor?: string
+  /** Ringkasan buat screen reader (aturan screen-reader-summary). */
+  ariaLabel?: string
 }
 
 /** Donut chart SVG murni — tanpa lib eksternal, on-brand. */
@@ -23,15 +25,26 @@ export function DonutChart({
   centerTop,
   centerMain,
   centerColor,
+  ariaLabel,
 }: DonutChartProps) {
   const total = slices.reduce((s, x) => s + x.value, 0)
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   let acc = 0
 
+  // Fallback ringkasan dari slice kalau ariaLabel nggak dikasih
+  const autoLabel = slices.map((s) => `${s.label}: ${Math.round((s.value / (total || 1)) * 100)}%`).join(', ')
+
   return (
     <div className="relative shrink-0" style={{ width: size, height: size }}>
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="-rotate-90">
+      <svg
+        width={size}
+        height={size}
+        viewBox={`0 0 ${size} ${size}`}
+        className="-rotate-90"
+        role="img"
+        aria-label={ariaLabel ?? autoLabel}
+      >
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#E6ECF7" strokeWidth={stroke} />
         {total > 0 &&
           slices.map((s, i) => {

@@ -146,6 +146,9 @@ export default function Reports() {
                 centerTop={t.reports.difference}
                 centerMain={netStr}
                 centerColor={net >= 0 ? INCOME_GREEN : EXPENSE_RED}
+                ariaLabel={`${t.reports.incomeVsExpense}. ${t.common.income}: ${formatRupiah(
+                  periodIncome,
+                )}, ${t.common.expense}: ${formatRupiah(periodExpense)}. ${t.reports.difference}: ${netStr}.`}
               />
             </div>
             <div className="mt-5 flex items-start justify-center gap-8">
@@ -202,8 +205,8 @@ export default function Reports() {
               <button
                 type="button"
                 onClick={() => setMonthOffset((o) => o + 1)}
-                aria-label="Bulan sebelumnya"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
+                aria-label={lang === 'en' ? 'Previous month' : 'Bulan sebelumnya'}
+                className="-my-1 flex h-11 w-11 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
               >
                 <ChevronLeft size={16} />
               </button>
@@ -214,13 +217,20 @@ export default function Reports() {
                 type="button"
                 onClick={() => setMonthOffset((o) => Math.max(0, o - 1))}
                 disabled={monthOffset === 0}
-                aria-label="Bulan berikutnya"
-                className="flex h-7 w-7 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 disabled:opacity-30 dark:hover:bg-white/10"
+                aria-label={lang === 'en' ? 'Next month' : 'Bulan berikutnya'}
+                className="-my-1 flex h-11 w-11 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 disabled:opacity-30 dark:hover:bg-white/10"
               >
                 <ChevronRight size={16} />
               </button>
             </div>
-            <GrowthChart data={growth} />
+            <GrowthChart
+              data={growth}
+              ariaLabel={`${t.reports.growth}: ${growth[0].label} ${formatRupiah(
+                growth[0].value,
+              )} → ${growth[growth.length - 1].label} ${formatRupiah(
+                growth[growth.length - 1].value,
+              )}, ${growthDelta >= 0 ? '+' : '−'}${formatRupiah(Math.abs(growthDelta))}.`}
+            />
           </RapiCard>
         </>
       )}

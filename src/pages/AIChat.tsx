@@ -12,6 +12,7 @@ import { SPRING_SOFT } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAiStore } from '@/store/aiStore'
 import { type Lang, useSettingsStore } from '@/store/settingsStore'
+import { useUiStore } from '@/store/uiStore'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUserStore } from '@/store/userStore'
 import { DEFAULT_CATEGORIES } from '@/types'
@@ -70,6 +71,7 @@ export default function AIChat() {
   const chat = useAiStore((s) => s.chat)
   const addChat = useAiStore((s) => s.addChat)
   const clearChat = useAiStore((s) => s.clearChat)
+  const showConfirm = useUiStore((s) => s.showConfirm)
 
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -140,11 +142,16 @@ export default function AIChat() {
         {chat.length > 0 && (
           <button
             type="button"
-            onClick={() => {
-              if (confirm(t.ai.clearConfirm)) clearChat()
-            }}
+            onClick={() =>
+              showConfirm({
+                message: t.ai.clearConfirm,
+                confirmLabel: t.common.delete,
+                danger: true,
+                onConfirm: clearChat,
+              })
+            }
             aria-label={t.common.delete}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
           >
             <Trash2 size={16} />
           </button>

@@ -12,12 +12,14 @@ import { useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
 import { cn } from '@/lib/utils'
 import { assetStats, useInvestmentStore } from '@/store/investmentStore'
+import { useUiStore } from '@/store/uiStore'
 import { ASSET_TYPES } from '@/types'
 
 const typeMeta = (id: string) => ASSET_TYPES.find((a) => a.id === id)
 
 export default function Investments() {
   const t = useT()
+  const showConfirm = useUiStore((s) => s.showConfirm)
   const assets = useInvestmentStore((s) => s.assets)
   const removeAsset = useInvestmentStore((s) => s.removeAsset)
   const [addOpen, setAddOpen] = useState(false)
@@ -196,11 +198,16 @@ export default function Investments() {
                   </div>
                   <button
                     type="button"
-                    onClick={() => {
-                      if (confirm(t.investments.confirmDelete(asset.name))) removeAsset(asset.id)
-                    }}
+                    onClick={() =>
+                      showConfirm({
+                        message: t.investments.confirmDelete(asset.name),
+                        confirmLabel: t.common.delete,
+                        danger: true,
+                        onConfirm: () => removeAsset(asset.id),
+                      })
+                    }
                     aria-label={`${t.common.delete} ${asset.name}`}
-                    className="-mr-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
+                    className="-mr-1.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-rapi-gray-300 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
                   >
                     <Trash2 size={15} />
                   </button>

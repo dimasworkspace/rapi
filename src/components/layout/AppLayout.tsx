@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom'
 import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { AddTransactionSheet } from '@/components/rapi/AddTransactionSheet'
+import { RapiConfirm } from '@/components/rapi/RapiConfirm'
 import { Toast } from '@/components/rapi/Toast'
 import { EASE_PAGE } from '@/lib/motion'
 
@@ -52,6 +53,7 @@ export function AppLayout() {
       <AnimatedOutlet />
       <AddTransactionSheet />
       <Toast />
+      <RapiConfirm />
       <BottomNav />
     </div>
   )

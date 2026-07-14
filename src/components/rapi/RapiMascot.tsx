@@ -12,6 +12,10 @@ export function RapiMascot({ size = 128 }: { size?: number }) {
       <motion.img
         src="/rapi-mascot.png"
         alt="Maskot Rapi"
+        width={447}
+        height={640}
+        loading="lazy"
+        decoding="async"
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
         className="relative h-[78%] w-auto object-contain drop-shadow-md"

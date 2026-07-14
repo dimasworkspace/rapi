@@ -42,6 +42,7 @@ export default function Settings() {
   const addCategory = useCategoryStore((s) => s.addCategory)
   const removeCategory = useCategoryStore((s) => s.removeCategory)
   const showToast = useUiStore((s) => s.showToast)
+  const showConfirm = useUiStore((s) => s.showConfirm)
 
   const [showKey, setShowKey] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
@@ -65,11 +66,17 @@ export default function Settings() {
   }
 
   const handleReset = () => {
-    if (!confirm(t.settings.resetConfirm)) return
-    ;['rapi-user', 'rapi-transactions', 'rapi-categories', 'rapi-investments', 'rapi-ai'].forEach((k) =>
-      localStorage.removeItem(k),
-    )
-    window.location.href = '/'
+    showConfirm({
+      message: t.settings.resetConfirm,
+      confirmLabel: t.common.reset,
+      danger: true,
+      onConfirm: () => {
+        ;['rapi-user', 'rapi-transactions', 'rapi-categories', 'rapi-investments', 'rapi-ai'].forEach(
+          (k) => localStorage.removeItem(k),
+        )
+        window.location.href = '/'
+      },
+    })
   }
 
   const expenseCats = categories.filter((c) => c.type === 'expense')
@@ -412,7 +419,7 @@ export default function Settings() {
                         {list.map((cat) => (
                           <span
                             key={cat.id}
-                            className="inline-flex items-center gap-1 rounded-full bg-rapi-gray-100 py-1 pl-2.5 pr-1 text-[12px] font-medium text-rapi-navy dark:bg-white/10 dark:text-rapi-dark-ink"
+                            className="inline-flex items-center gap-1 rounded-full bg-rapi-gray-100 py-1 pl-2.5 pr-0.5 text-[12px] font-medium text-rapi-navy dark:bg-white/10 dark:text-rapi-dark-ink"
                           >
                             <Icon3D name={cat.id} size={15} fallback={cat.emoji} />
                             {cat.name}
@@ -420,9 +427,9 @@ export default function Settings() {
                               type="button"
                               onClick={() => removeCategory(cat.id)}
                               aria-label={`${t.common.delete} ${cat.name}`}
-                              className="flex h-5 w-5 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
+                              className="-my-1.5 -mr-1 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-expense-soft hover:text-rapi-expense"
                             >
-                              <Trash2 size={11} />
+                              <Trash2 size={12} />
                             </button>
                           </span>
                         ))}

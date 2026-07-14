@@ -97,7 +97,7 @@ export function AddInvestmentSheet({ open, onClose }: AddInvestmentSheetProps) {
                 type="button"
                 onClick={onClose}
                 aria-label={t.common.close}
-                className="-mr-1.5 flex h-8 w-8 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-white/60 dark:hover:bg-white/10"
               >
                 <X size={17} />
               </button>
@@ -112,7 +112,7 @@ export function AddInvestmentSheet({ open, onClose }: AddInvestmentSheetProps) {
                     type="button"
                     onClick={() => setType(at.id)}
                     className={cn(
-                      'flex flex-col items-center gap-1 rounded-rapi-md px-1 py-2 text-[9px] font-semibold transition-colors',
+                      'flex min-h-[58px] flex-col items-center justify-center gap-1 rounded-rapi-md px-1 py-2 text-[10px] font-semibold leading-tight transition-colors',
                       type === at.id
                         ? 'bg-rapi-blue text-white shadow-rapi-card'
                         : 'border border-white/60 bg-white/45 text-rapi-gray-600 dark:border-white/10 dark:bg-white/5',
