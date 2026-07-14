@@ -48,7 +48,7 @@ function AnimatedOutlet() {
 /** Kerangka app: konten max-w mobile di tengah + bottom nav menempel bawah. */
 export function AppLayout() {
   return (
-    <div className="mx-auto min-h-dvh w-full max-w-md pb-28">
+    <div className="relative mx-auto min-h-dvh w-full max-w-md pb-28 md:border-x md:border-white/50 md:shadow-[0_0_80px_rgba(17,24,53,0.10)] dark:md:border-white/10">
       <AmbientBackground />
       <AnimatedOutlet />
       <AddTransactionSheet />

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Camera, Keyboard, Loader2, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
+import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { aiReady, parseReceiptWithAi, RapiAiError } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
@@ -201,7 +202,25 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <>
+    <div className="relative">
+      {/* Overlay saat scan struk — feedback jelas selama AI vision jalan (aturan progressive-loading) */}
+      {scanning && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-rapi-lg bg-[#EAF1FF]/80 text-center backdrop-blur-sm dark:bg-rapi-dark-surface/85">
+          <RapiMascot size={96} />
+          <div>
+            <p className="text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
+              {t.add.scanningTitle}
+            </p>
+            <p className="mt-0.5 text-[12px] text-rapi-gray-600">{t.add.scanningDesc}</p>
+          </div>
+          {/* Skeleton shimmer meniru baris hasil */}
+          <div className="mt-1 w-40 space-y-1.5">
+            <div className="h-2.5 animate-pulse rounded-full bg-rapi-blue/20" />
+            <div className="h-2.5 w-3/4 animate-pulse rounded-full bg-rapi-blue/15" />
+          </div>
+        </div>
+      )}
+
       {/* ===== HERO: mode input + tulis transaksi ===== */}
       <div className="grid grid-cols-3 gap-2">
         {MODES.map(({ id, icon: Icon }) => {
@@ -387,7 +406,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
             : t.add.save(formatRupiah(amount))
           : t.add.saveDefault}
       </RapiButton>
-    </>
+    </div>
   )
 }
 

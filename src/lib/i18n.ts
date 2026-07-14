@@ -125,6 +125,8 @@ const id = {
     photoNeedsKey: 'Scan struk butuh API key — isi dulu di Profil ya 🔑',
     receiptFail: 'Struknya susah kebaca nih. Coba foto ulang yang lebih jelas ya 📸',
     receiptOk: 'Struk kebaca! Cek dulu terus simpan ya ✨',
+    scanningTitle: 'Lagi baca struk kamu…',
+    scanningDesc: 'Rapi AI lagi ngerjain, bentar ya ✨',
   },
   onboarding: {
     hello: 'Halo! Aku Rapi',
@@ -304,6 +306,8 @@ const en: typeof id = {
     photoNeedsKey: 'Receipt scan needs an API key — set it in Profile first 🔑',
     receiptFail: 'Hard to read the receipt. Try a clearer photo 📸',
     receiptOk: 'Receipt read! Check it then save ✨',
+    scanningTitle: 'Reading your receipt…',
+    scanningDesc: 'Rapi AI is on it, hang tight ✨',
   },
   onboarding: {
     hello: "Hi! I'm Rapi",

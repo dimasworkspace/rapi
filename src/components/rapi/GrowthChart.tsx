@@ -18,12 +18,14 @@ export function GrowthChart({ data, ariaLabel }: { data: GrowthPoint[]; ariaLabe
   const values = data.map((d) => d.value)
   const min = Math.min(...values)
   const max = Math.max(...values)
+  const flat = max === min // semua nilai sama (mis. user baru, saldo belum berubah)
   const range = max - min || 1
   const stepX = (W - pad * 2) / (data.length - 1 || 1)
 
   const pts = data.map((d, i) => ({
     x: pad + i * stepX,
-    y: pad + (1 - (d.value - min) / range) * (H - pad * 2),
+    // Kalau flat, taruh garis di tengah (bukan nempel dasar biar nggak keliatan nol)
+    y: flat ? H / 2 : pad + (1 - (d.value - min) / range) * (H - pad * 2),
     ...d,
   }))
 
