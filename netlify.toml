@@ -1,0 +1,4 @@
+# Config deploy Netlify. _headers & _redirects di public/ dibaca otomatis dari dist.
+[build]
+  command = "npm run build"
+  publish = "dist"
