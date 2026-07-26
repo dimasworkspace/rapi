@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Check, ChevronDown, Cloud, Download, Eye, EyeOff, LogOut, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
@@ -9,6 +9,7 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { InstallCard } from '@/components/rapi/InstallCard'
 import { RapiSelect } from '@/components/rapi/RapiSelect'
 import { exportData, importData } from '@/lib/backup'
+import { isSupabaseConfigured, supabase } from '@/lib/supabase'
 import { clearLocalData } from '@/lib/sync'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
@@ -52,7 +53,28 @@ export default function Settings() {
 
   const [showKey, setShowKey] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
+  const [showByok, setShowByok] = useState(false)
+  const [quota, setQuota] = useState<{ used: number; quota: number } | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
+
+  // AI lewat server: sudah login & belum pasang key sendiri
+  const serverAi = isSupabaseConfigured && Boolean(user) && apiKey.trim() === ''
+
+  // Ambil sisa kuota harian buat ditampilkan
+  useEffect(() => {
+    if (!serverAi || !supabase) return
+    let alive = true
+    supabase
+      .rpc('get_ai_quota', { p_limit: 30 })
+      .single()
+      .then(({ data }) => {
+        const q = data as { used: number; quota: number } | null
+        if (alive && q) setQuota(q)
+      })
+    return () => {
+      alive = false
+    }
+  }, [serverAi])
   const [newCat, setNewCat] = useState({ emoji: '', name: '', type: 'expense' as 'expense' | 'income' })
 
   const name = profile?.name ?? 'Kamu'
@@ -273,9 +295,49 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Rapi AI — BYOK multi-provider */}
+      {/* Rapi AI — proxy server (default) atau key sendiri (lanjutan) */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '170ms' }}>
         <h2 className={SECTION_H}>{t.settings.aiSection}</h2>
+
+        {serverAi && !showByok ? (
+          /* AI sudah siap lewat server — user nggak perlu ngapa-ngapain */
+          <RapiCard className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2">
+              <Sparkles size={15} className="shrink-0 text-rapi-blue" />
+              <span className="text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                {t.settings.aiReadyTitle}
+              </span>
+              <span className="ml-auto rounded-full bg-rapi-income-soft px-2 py-0.5 text-[10px] font-semibold text-rapi-income dark:bg-rapi-income/20">
+                {t.settings.active}
+              </span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-rapi-gray-600">
+              {t.settings.aiReadyDesc}
+            </p>
+
+            {quota && (
+              <div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-rapi-gray-100 dark:bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-rapi-blue transition-all"
+                    style={{ width: `${Math.min(100, (quota.used / quota.quota) * 100)}%` }}
+                  />
+                </div>
+                <p className="mt-1.5 text-[11px] font-semibold text-rapi-gray-600">
+                  {t.settings.aiQuotaLeft(Math.max(0, quota.quota - quota.used), quota.quota)}
+                </p>
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => setShowByok(true)}
+              className="min-h-11 text-left text-[12px] font-semibold text-rapi-blue"
+            >
+              {t.settings.aiOwnKeyToggle}
+            </button>
+          </RapiCard>
+        ) : (
         <RapiCard>
           <div className="flex items-center gap-2">
             <Sparkles size={15} className="text-rapi-blue" />
@@ -382,7 +444,19 @@ export default function Settings() {
             )}
             {t.settings.aiHelpEnd}
           </p>
+
+          {/* Balik ke kuota bawaan — cuma relevan kalau punya akun */}
+          {serverAi && (
+            <button
+              type="button"
+              onClick={() => setShowByok(false)}
+              className="mt-2 min-h-11 text-left text-[12px] font-semibold text-rapi-blue"
+            >
+              {t.settings.aiOwnKeyBack}
+            </button>
+          )}
         </RapiCard>
+        )}
       </section>
 
       {/* Kategori — collapsible */}
@@ -541,7 +615,9 @@ export default function Settings() {
               onChange={(e) => handleImport(e.target.files?.[0])}
             />
           </div>
-          <p className="text-[11px] leading-relaxed text-rapi-gray-600">{t.settings.backupHint}</p>
+          <p className="text-[11px] leading-relaxed text-rapi-gray-600">
+            {user ? t.settings.backupHintSynced : t.settings.backupHint}
+          </p>
 
           <hr className="border-rapi-gray-300/50 dark:border-white/10" />
 

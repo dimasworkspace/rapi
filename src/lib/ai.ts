@@ -1,4 +1,6 @@
+import { supabase } from '@/lib/supabase'
 import { providerMeta, useAiStore, type AiProvider } from '@/store/aiStore'
+import { useAuthStore } from '@/store/authStore'
 
 // Integrasi AI Rapi — BYOK multi-provider, semua request langsung dari browser
 // (key user nggak pernah lewat server kita). Pakai fetch polos (bukan SDK)
@@ -31,8 +33,15 @@ const getConfig = (): AiConfig => {
   return { provider, apiKey, model: model || providerMeta(provider).defaultModel, baseUrl }
 }
 
-/** Sudah siap dipakai? (API key terisi) */
-export const aiReady = (): boolean => useAiStore.getState().apiKey.trim() !== ''
+/** Pakai proxy server? (login + backend aktif + user belum pasang key sendiri) */
+export const usingServerAi = (): boolean =>
+  Boolean(supabase) &&
+  useAuthStore.getState().user !== null &&
+  useAiStore.getState().apiKey.trim() === ''
+
+/** Sudah siap dipakai? Lewat proxy server ATAU key sendiri. */
+export const aiReady = (): boolean =>
+  usingServerAi() || useAiStore.getState().apiKey.trim() !== ''
 
 const friendlyError = (status: number): RapiAiError => {
   if (status === 401 || status === 403)
@@ -199,18 +208,70 @@ const callGemini = async (
   return text
 }
 
+// ===== Proxy server (Edge Function) =====
+
+/** Sisa kuota harian dari respons terakhir — dipakai UI Settings. */
+export interface AiQuota {
+  used: number
+  quota: number
+}
+let lastQuota: AiQuota | null = null
+export const getLastQuota = (): AiQuota | null => lastQuota
+
+/** Lewat Edge Function: key ada di server, user nggak perlu punya key sendiri. */
+const callServerProxy = async (
+  system: string,
+  messages: AiChatMessage[],
+  image?: { data: string; mediaType: string },
+): Promise<string> => {
+  const { data, error } = await requireInvoke(system, messages, image)
+
+  if (error) {
+    // supabase-js membungkus error HTTP; baca body-nya buat pesan yang tepat
+    const status = (error as { context?: { status?: number } }).context?.status
+    if (status === 429) {
+      throw new RapiAiError(
+        'Kuota AI harianmu sudah habis nih. Coba lagi besok, atau pasang API key sendiri di Profil buat tanpa batas 😊',
+      )
+    }
+    if (status === 401) throw new RapiAiError('Sesimu berakhir. Coba masuk ulang ya 🔑')
+    if (status === 500) throw new RapiAiError('Fitur AI belum disetel pemilik app. Coba lagi nanti ya 😊')
+    throw new RapiAiError('Server AI lagi sibuk. Coba lagi bentar ya 😊')
+  }
+
+  const res = data as { text?: string; used?: number; quota?: number }
+  if (typeof res?.used === 'number' && typeof res?.quota === 'number') {
+    lastQuota = { used: res.used, quota: res.quota }
+  }
+  if (!res?.text) throw new RapiAiError('Jawabannya kosong nih. Coba tanya lagi ya 😊')
+  return res.text
+}
+
+const requireInvoke = (
+  system: string,
+  messages: AiChatMessage[],
+  image?: { data: string; mediaType: string },
+) => {
+  if (!supabase) throw new RapiAiError('Fitur AI butuh koneksi ke server. Coba lagi nanti ya 😊')
+  return supabase.functions.invoke('ai', { body: { system, messages, image } })
+}
+
 // ===== API publik =====
 
-/** Chat ke provider AI aktif. `messages` = riwayat percakapan (user/assistant). */
+/** Chat ke AI. Pakai proxy server kalau login; kalau user pasang key sendiri, pakai itu. */
 export async function chatWithAi(
   system: string,
   messages: AiChatMessage[],
   image?: { data: string; mediaType: string },
 ): Promise<string> {
   const cfg = getConfig()
+
+  // Key sendiri menang — dianggap mode "unlimited"
   if (!cfg.apiKey) {
+    if (usingServerAi()) return callServerProxy(system, messages, image)
     throw new RapiAiError('API key-nya belum diisi. Yuk lengkapi dulu di Profil 🔑')
   }
+
   if (cfg.provider === 'anthropic') return callAnthropic(cfg, system, messages, image)
   if (cfg.provider === 'google') return callGemini(cfg, system, messages, image)
   return callOpenAiCompatible(cfg, system, messages, image)
