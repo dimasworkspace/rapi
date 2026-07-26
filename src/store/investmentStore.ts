@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { syncBus } from '@/lib/syncBus'
 import type { InvestmentAsset } from '@/types'
 
 interface InvestmentState {
@@ -12,22 +13,28 @@ interface InvestmentState {
 
 export const useInvestmentStore = create<InvestmentState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       assets: [],
       addAsset: (asset) => {
         const id = crypto.randomUUID()
-        set((s) => ({
-          assets: [{ ...asset, id, updatedAt: new Date().toISOString() }, ...s.assets],
-        }))
+        const full: InvestmentAsset = { ...asset, id, updatedAt: new Date().toISOString() }
+        set((s) => ({ assets: [full, ...s.assets] }))
+        syncBus.investmentSaved?.(full)
         return id
       },
-      updateAsset: (id, patch) =>
+      updateAsset: (id, patch) => {
         set((s) => ({
           assets: s.assets.map((a) =>
             a.id === id ? { ...a, ...patch, updatedAt: new Date().toISOString() } : a,
           ),
-        })),
-      removeAsset: (id) => set((s) => ({ assets: s.assets.filter((a) => a.id !== id) })),
+        }))
+        const updated = get().assets.find((a) => a.id === id)
+        if (updated) syncBus.investmentSaved?.(updated)
+      },
+      removeAsset: (id) => {
+        set((s) => ({ assets: s.assets.filter((a) => a.id !== id) }))
+        syncBus.investmentDeleted?.(id)
+      },
     }),
     { name: 'rapi-investments' },
   ),

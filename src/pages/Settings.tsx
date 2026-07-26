@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronDown, Download, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
+import { Check, ChevronDown, Cloud, Download, Eye, EyeOff, LogOut, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -9,10 +9,12 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { InstallCard } from '@/components/rapi/InstallCard'
 import { RapiSelect } from '@/components/rapi/RapiSelect'
 import { exportData, importData } from '@/lib/backup'
+import { clearLocalData } from '@/lib/sync'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { AI_PROVIDERS, providerMeta, useAiStore } from '@/store/aiStore'
+import { useAuthStore } from '@/store/authStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { type Lang, type Theme, useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
@@ -45,6 +47,8 @@ export default function Settings() {
   const removeCategory = useCategoryStore((s) => s.removeCategory)
   const showToast = useUiStore((s) => s.showToast)
   const showConfirm = useUiStore((s) => s.showConfirm)
+  const user = useAuthStore((s) => s.user)
+  const signOut = useAuthStore((s) => s.signOut)
 
   const [showKey, setShowKey] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
@@ -133,6 +137,42 @@ export default function Settings() {
           />
         </div>
       </RapiCard>
+
+      {/* Akun — cuma muncul kalau backend aktif & user login */}
+      {user && (
+        <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '30ms' }}>
+          <h2 className={SECTION_H}>{t.auth.account}</h2>
+          <RapiCard className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Cloud size={15} className="shrink-0 text-rapi-income" />
+              <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                {user.email}
+              </span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-rapi-gray-600">{t.settings.syncedHint}</p>
+            <button
+              type="button"
+              onClick={() =>
+                showConfirm({
+                  message: t.auth.signOutConfirm,
+                  confirmLabel: t.auth.signOut,
+                  danger: true,
+                  onConfirm: () => {
+                    void signOut().then(() => {
+                      clearLocalData()
+                      window.location.href = '/'
+                    })
+                  },
+                })
+              }
+              className="flex min-h-11 items-center gap-2 text-[13px] font-semibold text-rapi-expense"
+            >
+              <LogOut size={15} />
+              {t.auth.signOut}
+            </button>
+          </RapiCard>
+        </section>
+      )}
 
       {/* Tampilan — Tema & Bahasa */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '50ms' }}>
