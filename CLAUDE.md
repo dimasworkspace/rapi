@@ -230,13 +230,28 @@ src/
 
 ### Pola Kode Wajib
 ```ts
-// Format Rupiah — selalu IDR
-export const formatRupiah = (amount: number): string => {
-  if (amount >= 1_000_000) return `Rp ${(amount / 1_000_000).toFixed(1)} jt`;
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency', currency: 'IDR', minimumFractionDigits: 0,
-  }).format(amount);
+// Format Rupiah — selalu IDR, SELALU angka penuh (tanpa pembulatan).
+// Keputusan product owner 26 Jul 2026: format lama "Rp 2,9 jt" menyembunyikan
+// selisih ratusan ribu (2.865.000 → "2,9 jt") dan bikin user nggak percaya
+// angkanya. Di app keuangan, akurasi menang atas keringkasan.
+// JANGAN kembalikan ke format singkat untuk saldo/total/nominal transaksi.
+export const formatRupiah = (amount: number): string =>
+  new Intl.NumberFormat('id-ID', {
+    style: 'currency', currency: 'IDR',
+    minimumFractionDigits: 0, maximumFractionDigits: 0,
+  }).format(amount); // → "Rp 2.865.000"
+
+// Untuk ruang sangat sempit (label grafik) boleh pakai versi ringkas, TAPI
+// harus lossless — cuma memadatkan angka bulat, kalau ada sisa tampil penuh.
+export const formatRupiahShort = (amount: number): string => {
+  const abs = Math.abs(amount);
+  if (abs >= 1_000_000 && abs % 1_000_000 === 0) return `Rp ${abs / 1_000_000} jt`;
+  if (abs >= 1_000 && abs % 1_000 === 0) return `Rp ${(abs / 1_000).toLocaleString('id-ID')} rb`;
+  return formatRupiah(abs);
 };
+
+// Angka nominal panjang: pakai `tabular-nums` + ukuran font responsif
+// (mis. text-[clamp(1.75rem,8.5vw,2.5rem)]) biar muat di layar 375px.
 
 // Transaction type
 export interface Transaction {
@@ -293,8 +308,11 @@ Detail requirement per fitur, user flow, dan roadmap fase (Alpha → Beta → MV
 
 ## 7. Checklist Sebelum Deliver Kode
 
-- [ ] Font Sulphur Point sudah di-import (fallback Poppins).
+- [ ] Font UI: Plus Jakarta Sans sudah di-import (fallback Poppins) — bukan Sulphur Point.
 - [ ] Warna menggunakan token Rapi di atas (bukan hex random, bukan palet Sky Blue lama).
+- [ ] Nominal tampil PENUH (`Rp 2.865.000`), tidak dibulatkan jadi "Rp 2,9 jt".
+- [ ] Dark mode: setiap permukaan/teks baru punya varian `dark:` yang kebaca.
+- [ ] Teks baru masuk kamus i18n (`src/lib/i18n.ts`) ID **dan** EN — jangan hardcode.
 - [ ] Border radius: 12–16px untuk card, 8px untuk input/button kecil.
 - [ ] Copy dalam Bahasa Indonesia yang santai & fun, ikuti tabel do/don't di Bagian 2.
 - [ ] Error state punya pesan yang friendly, bukan pesan sistem mentah.
