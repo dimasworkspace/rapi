@@ -86,12 +86,14 @@ export function InstallCard() {
         <RapiButton variant="accent" onClick={handleInstall} className="mt-3 w-full">
           {t.settings.installBtn}
         </RapiButton>
-      ) : isIOS() ? (
+      ) : (
+        /* Prompt otomatis belum muncul → kasih panduan manual sesuai platform,
+           jangan biarin kosong (user bingung mau ngapain). */
         <p className="mt-3 rounded-rapi-md bg-rapi-gray-100 px-3 py-2.5 text-[12px] leading-relaxed text-rapi-gray-600 dark:bg-white/5">
           <Share2 size={13} className="mb-0.5 mr-1 inline" />
-          {t.settings.iosHint}
+          {isIOS() ? t.settings.iosHint : t.settings.androidHint}
         </p>
-      ) : null}
+      )}
 
       {/* QR + salin link — buat dibagikan / dibuka dari HP */}
       {qr && (
