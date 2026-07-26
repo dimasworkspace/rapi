@@ -1,11 +1,29 @@
+import { MotionConfig } from 'framer-motion'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
-import AddTransaction from '@/pages/AddTransaction'
+import { useT } from '@/lib/i18n'
+import AIChat from '@/pages/AIChat'
 import ComingSoon from '@/pages/ComingSoon'
 import Dashboard from '@/pages/Dashboard'
+import Investments from '@/pages/Investments'
 import Onboarding from '@/pages/Onboarding'
+import Reports from '@/pages/Reports'
+import Settings from '@/pages/Settings'
 import Transactions from '@/pages/Transactions'
 import { useUserStore } from '@/store/userStore'
+
+function NotFound() {
+  const t = useT()
+  return (
+    <ComingSoon
+      title={t.comingSoon.notFoundTitle}
+      emoji="🧭"
+      icon="compass"
+      message={t.comingSoon.notFoundMsg}
+      showBack
+    />
+  )
+}
 
 export default function App() {
   const onboarded = useUserStore((s) => s.onboarded)
@@ -13,71 +31,20 @@ export default function App() {
   if (!onboarded) return <Onboarding />
 
   return (
-    <BrowserRouter>
+    <MotionConfig reducedMotion="user">
+      <BrowserRouter>
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/transaksi" element={<Transactions />} />
-          <Route path="/tambah" element={<AddTransaction />} />
-          <Route
-            path="/laporan"
-            element={
-              <ComingSoon
-                title="Laporan"
-                emoji="📊"
-                icon="report"
-                message="Bentar ya, grafik donat & tren pengeluaranmu lagi dirapiin. Nyusul segera! ✨"
-              />
-            }
-          />
-          <Route
-            path="/ai"
-            element={
-              <ComingSoon
-                title="Rapi AI"
-                emoji="🤖"
-                icon="robot"
-                message="Rapi AI bentar lagi siap nemenin kamu ngobrolin keuangan. Sabar ya! 😉"
-              />
-            }
-          />
-          <Route
-            path="/profil"
-            element={
-              <ComingSoon
-                title="Profil"
-                emoji="⚙️"
-                icon="gear"
-                message="Pengaturan profil & preferensi kamu lagi disiapin. Nyusul segera! 🙌"
-              />
-            }
-          />
-          <Route
-            path="/investasi"
-            element={
-              <ComingSoon
-                title="Investasi"
-                emoji="📈"
-                icon="invest"
-                message="Detail portofolio investasimu lagi dihitung. Bentar lagi jadi! 🚀"
-                showBack
-              />
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <ComingSoon
-                title="Halaman Nggak Ketemu"
-                emoji="🧭"
-                icon="compass"
-                message="Waduh, halaman ini nggak ada. Yuk balik ke beranda! 😊"
-                showBack
-              />
-            }
-          />
+          <Route path="/laporan" element={<Reports />} />
+          <Route path="/ai" element={<AIChat />} />
+          <Route path="/profil" element={<Settings />} />
+          <Route path="/investasi" element={<Investments />} />
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
-    </BrowserRouter>
+      </BrowserRouter>
+    </MotionConfig>
   )
 }

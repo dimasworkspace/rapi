@@ -1,0 +1,3 @@
+# SPA fallback — semua route client-side dilempar ke index.html (Netlify / Cloudflare Pages).
+# Tanpa ini, buka /laporan langsung atau refresh = 404.
+/*    /index.html   200

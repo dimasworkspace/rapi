@@ -31,6 +31,13 @@ const ICON_PATHS: Record<string, string> = {
   memo: 'Memo/3D/memo_3d.png',
   rocket: 'Rocket/3D/rocket_3d.png',
   party: 'Party popper/3D/party_popper_3d.png',
+  // Tipe aset investasi
+  investasi: 'Chart increasing/3D/chart_increasing_3d.png',
+  saham: 'Chart increasing/3D/chart_increasing_3d.png',
+  reksadana: 'Bank/3D/bank_3d.png',
+  kripto: 'Coin/3D/coin_3d.png',
+  emas: 'Gem stone/3D/gem_stone_3d.png',
+  deposito: 'Money with wings/3D/money_with_wings_3d.png',
 }
 
 interface Icon3DProps {

@@ -33,8 +33,35 @@
 @layer components {
   /* Kartu kaca premium Rapi — pakai di atas AmbientBackground */
   .rapi-glass {
-    @apply border border-white/60 bg-white/55 shadow-rapi-card backdrop-blur-xl;
+    @apply border border-white/70 bg-gradient-to-b from-white/70 to-white/40 shadow-rapi-card backdrop-blur-xl;
   }
+
+  /* Versi gelap: kaca navy transparan, border tipis biar tetap kebaca */
+  .dark .rapi-glass {
+    @apply border-white/10 from-white/[0.07] to-white/[0.03];
+  }
+}
+
+/* Remap aman khusus dark: teks sekunder abu (selalu di permukaan terang) →
+   muted terang. Warna navy TIDAK diremap global karena juga dipakai sebagai
+   teks gelap di atas tombol/badge kuning. */
+.dark .text-rapi-gray-600 {
+  color: theme('colors.rapi.dark-muted');
+}
+
+/* Neon glow ikon nav aktif (ganti kotak/pill). Biru brand di light,
+   lebih terang di dark biar pop di atas surface gelap. */
+.rapi-nav-glow {
+  filter: drop-shadow(0 0 6px rgba(2, 72, 193, 0.55));
+}
+.dark .rapi-nav-glow {
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.85));
+}
+.rapi-dot-glow {
+  box-shadow: 0 0 6px 1px rgba(248, 214, 19, 0.8);
+}
+.dark .divide-rapi-gray-300\/40 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgb(255 255 255 / 0.08);
 }
 
 @layer base {
@@ -44,14 +71,54 @@
   }
 
   body {
-    @apply bg-rapi-offwhite font-sulphur text-rapi-navy;
+    @apply bg-rapi-offwhite font-sans text-rapi-navy;
     margin: 0;
     min-height: 100dvh;
   }
 
-  /* Target sentuh nyaman di mobile */
+  /* Dark mode: background app + warna teks default */
+  .dark body {
+    @apply bg-rapi-dark text-rapi-dark-ink;
+  }
+
+  /* Transisi halus saat ganti tema (hormati reduced-motion di bawah) */
+  .dark body,
+  body {
+    transition:
+      background-color 0.3s ease,
+      color 0.3s ease;
+  }
+
+  /* Target sentuh nyaman di mobile + hilangkan delay tap 300ms */
   button,
-  a {
+  a,
+  input,
+  select,
+  textarea {
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Focus ring konsisten untuk navigasi keyboard (aturan focus-states) */
+  :focus-visible {
+    outline: 2px solid var(--rapi-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Angka nominal stabil — nggak goyang saat count-up (aturan number-tabular) */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Hormati preferensi kurangi gerakan (aturan reduced-motion) */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

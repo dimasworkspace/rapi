@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -16,11 +17,16 @@ export default {
           'savings-soft': '#E7EEFC',
           'warning-soft': '#FEF7DA',
           gray: { 600: '#5B6478', 300: '#D8DCE6', 100: '#F1F3F8' },
+          // Netral khusus dark mode — surface & teks
+          dark: '#0B1020', // background app gelap
+          'dark-surface': '#161C30', // kartu di dark mode
+          'dark-ink': '#EAECF3', // teks utama di dark mode
+          'dark-muted': '#9AA3BB', // teks sekunder di dark mode
         },
       },
       fontFamily: {
-        sulphur: ['Sulphur Point', 'Poppins', 'sans-serif'],
-        sans: ['Sulphur Point', 'Poppins', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Poppins', 'sans-serif'],
+        jakarta: ['Plus Jakarta Sans', 'Poppins', 'sans-serif'],
       },
       borderRadius: {
         'rapi-sm': '8px',
@@ -42,10 +48,22 @@ export default {
           '0%, 100%': { boxShadow: '0 8px 22px rgba(2,72,193,0.35)' },
           '50%': { boxShadow: '0 8px 34px rgba(2,72,193,0.6)' },
         },
+        'rapi-slide-down': {
+          from: { opacity: '0', transform: 'translateY(-40px)' },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'rapi-wiggle': {
+          '0%, 100%': { transform: 'rotate(0deg)' },
+          '25%': { transform: 'rotate(-12deg)' },
+          '50%': { transform: 'rotate(10deg)' },
+          '75%': { transform: 'rotate(-6deg)' },
+        },
       },
       animation: {
         'rapi-fade-up': 'rapi-fade-up 0.4s ease both',
         'rapi-pulse': 'rapi-pulse 2.4s ease-in-out infinite',
+        'rapi-slide-down': 'rapi-slide-down 0.55s cubic-bezier(0.22,1,0.36,1) both',
+        'rapi-wiggle': 'rapi-wiggle 1.1s ease-in-out 0.5s 2 both',
       },
     },
   },

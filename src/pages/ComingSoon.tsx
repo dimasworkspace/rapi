@@ -23,8 +23,10 @@ export default function ComingSoon({
   return (
     <PageWrapper>
       <TopBar title={title} showBack={showBack} />
-      <RapiCard className="mt-6 flex flex-col items-center gap-4 px-6 py-12 text-center">
-        <Icon3D name={icon} size={60} fallback={emoji} />
+      <RapiCard className="animate-rapi-fade-up mt-6 flex flex-col items-center gap-4 px-6 py-12 text-center">
+        <span className="animate-bounce" style={{ animationDuration: '1.8s' }}>
+          <Icon3D name={icon} size={60} fallback={emoji} />
+        </span>
         <p className="text-sm leading-relaxed text-rapi-gray-600">{message}</p>
       </RapiCard>
     </PageWrapper>

@@ -1,38 +1,56 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, Camera, ChevronRight, Mic } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronRight, MessageCircle, X } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
-import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
+import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatRupiah } from '@/lib/formatters'
+import { type Dict, useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
+import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
 
-const getGreeting = (): string => {
-  const h = new Date().getHours()
-  if (h < 11) return 'Selamat pagi 👋'
-  if (h < 15) return 'Selamat siang ☀️'
-  if (h < 18) return 'Selamat sore 🌤️'
-  return 'Selamat malam 🌙'
+// Rangkuman keuangan mingguan (7 hari terakhir) — diupdate otomatis dari data.
+const buildWeeklySummary = (
+  t: Dict,
+  name: string,
+  count: number,
+  income: number,
+  expense: number,
+): string => {
+  if (count === 0) return t.weekly.empty(name)
+  const base = t.weekly.base(count, income, expense)
+  if (income >= expense && income > 0) return t.weekly.good(name, base)
+  if (expense > income && income > 0) return t.weekly.warn(name, base)
+  return t.weekly.neutral(name, base)
 }
 
 export default function Dashboard() {
+  const t = useT()
   const navigate = useNavigate()
+  const openAdd = useUiStore((s) => s.openAdd)
   const profile = useUserStore((s) => s.profile)
+  const hintSeen = useUserStore((s) => s.hintSeen)
+  const dismissHint = useUserStore((s) => s.dismissHint)
   const transactions = useTransactionStore((s) => s.transactions)
+  const name = profile?.name ?? 'Kamu'
 
-  const { balance, monthIncome, monthExpense, recent, todayCount } = useMemo(() => {
+  const { balance, monthIncome, monthExpense, recent, todayCount, weeklySummary } = useMemo(() => {
     const initial = profile?.initialBalance ?? 0
     const now = new Date()
+    const weekAgo = now.getTime() - 7 * 24 * 60 * 60 * 1000
     let income = 0
     let expense = 0
     let inMonth = 0
     let outMonth = 0
     let today = 0
+    let weekCount = 0
+    let weekIncome = 0
+    let weekExpense = 0
 
     for (const tx of transactions) {
       if (tx.type === 'income') income += tx.amount
@@ -42,6 +60,11 @@ export default function Dashboard() {
       if (sameMonth && tx.type === 'income') inMonth += tx.amount
       if (sameMonth && tx.type === 'expense') outMonth += tx.amount
       if (isToday(d)) today += 1
+      if (d.getTime() >= weekAgo) {
+        weekCount += 1
+        if (tx.type === 'income') weekIncome += tx.amount
+        if (tx.type === 'expense') weekExpense += tx.amount
+      }
     }
 
     return {
@@ -50,122 +73,129 @@ export default function Dashboard() {
       monthExpense: outMonth,
       recent: sortByDateDesc(transactions).slice(0, 5),
       todayCount: today,
+      weeklySummary: buildWeeklySummary(t, name, weekCount, weekIncome, weekExpense),
     }
-  }, [transactions, profile])
+  }, [transactions, profile, name, t])
 
   const animatedBalance = useCountUp(balance)
-  const name = profile?.name ?? 'Kamu'
 
   return (
     <PageWrapper className="px-0">
-      {/* ===== Navy canvas — zona hero terintegrasi ===== */}
-      <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-rapi-navy to-[#1E2A55] px-5 pb-14 pt-7 text-white">
+      {/* ===== Navy canvas hero — navy diam nutup atas, konten yang turun ===== */}
+      <header className="relative overflow-hidden rounded-b-[28px] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] px-5 pb-7 pt-8 text-white">
         <div
           aria-hidden
-          className="absolute -right-12 -top-16 h-48 w-48 rounded-full bg-rapi-yellow/25 blur-2xl"
+          className="absolute -bottom-16 right-0 h-56 w-56 rounded-full bg-rapi-blue/40 blur-3xl"
         />
-        <div aria-hidden className="absolute -right-4 top-16 h-3 w-3 rounded-full bg-rapi-yellow/70" />
-        <div aria-hidden className="absolute right-14 top-8 h-2 w-2 rounded-full bg-rapi-yellow/50" />
         <div
           aria-hidden
-          className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full bg-rapi-blue/40 blur-2xl"
+          className="absolute -right-12 -top-16 h-44 w-44 rounded-full bg-rapi-yellow/20 blur-2xl"
         />
 
-        <div className="relative flex items-center justify-between">
-          <div>
-            <p className="text-xs text-white/60">{getGreeting()}</p>
-            <p className="mt-0.5 text-xl font-bold">Halo, {name}</p>
-          </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rapi-yellow font-bold text-rapi-navy">
-            {name.charAt(0).toUpperCase()}
-          </div>
-        </div>
+        {/* Pintu masuk Rapi AI — kanan atas hero */}
+        <Link
+          to="/ai"
+          aria-label={t.dashboard.aiLabel}
+          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white backdrop-blur-sm transition-all hover:bg-white/30 active:scale-90"
+        >
+          <MessageCircle size={18} />
+        </Link>
 
-        <p className="relative mt-7 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
-          Total Saldo
-        </p>
-        <p className="relative mt-1 text-[40px] font-bold leading-none tracking-tight">
-          {formatRupiah(animatedBalance)}
-        </p>
+        <div className="relative animate-rapi-slide-down text-center">
+          <p className="text-xs text-white/60">{t.greeting(new Date().getHours())}</p>
+          <p className="mt-1 text-xl font-bold">{t.dashboard.hello(name)}</p>
 
-        <div className="relative mt-4 flex flex-wrap items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
-            <ArrowUp size={12} className="text-emerald-300" strokeWidth={3} />
-            {formatRupiah(monthIncome)}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-bold backdrop-blur-sm">
-            <ArrowDown size={12} className="text-red-300" strokeWidth={3} />
-            {formatRupiah(monthExpense)}
-          </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-rapi-yellow px-3 py-1.5 text-xs font-bold text-rapi-navy">
-            <Icon3D name={todayCount > 0 ? 'fire' : 'zap'} size={15} fallback={todayCount > 0 ? '🔥' : '⚡'} />
-            {todayCount > 0 ? `${todayCount} kecatat hari ini` : 'Gas #RapiinAja!'}
-          </span>
+          <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
+            {t.dashboard.totalBalance}
+          </p>
+          <p className="tabular-nums mt-1.5 text-[40px] font-bold leading-none tracking-tight">
+            {formatRupiah(animatedBalance)}
+          </p>
+
+          {/* 3 card stat glass — semua bisa diklik, muncul berurutan (aturan stagger-sequence) */}
+          <div className="mt-6 grid grid-cols-3 gap-2 text-center">
+            <button
+              type="button"
+              onClick={() => navigate('/laporan?tipe=pemasukan')}
+              style={{ animationDelay: '180ms' }}
+              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-emerald-400/20 active:scale-[0.97]"
+            >
+              <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
+                <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" />
+                {t.dashboard.in}
+              </p>
+              <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthIncome)}</p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/transaksi')}
+              style={{ animationDelay: '250ms' }}
+              className="animate-rapi-fade-up flex flex-col items-center justify-center rounded-rapi-md border border-white/25 bg-white/15 px-2 py-2 backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.97]"
+            >
+              <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
+              <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
+                {t.dashboard.today}
+              </p>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/laporan?tipe=pengeluaran')}
+              style={{ animationDelay: '320ms' }}
+              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-red-300/25 bg-red-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-red-400/20 active:scale-[0.97]"
+            >
+              <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
+                <ArrowDown size={11} strokeWidth={3} className="text-red-300" />
+                {t.dashboard.out}
+              </p>
+              <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthExpense)}</p>
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* ===== Quick input — mengambang menembus batas navy ===== */}
-      <button
-        type="button"
-        onClick={() => navigate('/tambah')}
-        className="relative z-10 -mt-7 mx-5 flex items-center gap-3 rounded-rapi-lg border border-white/60 bg-white/65 p-3.5 text-left shadow-rapi-elevated backdrop-blur-xl transition-transform hover:-translate-y-0.5 active:translate-y-0"
-      >
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-rapi-yellow">
-          <Icon3D name="sparkles" size={22} fallback="✨" />
-        </span>
-        <span className="flex-1 truncate text-sm text-rapi-gray-600">
-          Ketik aja: <span className="font-bold text-rapi-navy">"makan 25rb"</span> — sisanya Rapi
-          yang beresin
-        </span>
-        <span className="flex shrink-0 items-center gap-2 text-rapi-gray-300">
-          <Mic size={16} />
-          <Camera size={16} />
-        </span>
-      </button>
-
       <div className="px-5">
-        {/* ===== Tile 2 kolom — mecah ritme full-width ===== */}
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <RapiCard
-            variant="blue"
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/investasi')}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/investasi')}
-            className="relative cursor-pointer overflow-hidden"
-          >
-            <div aria-hidden className="absolute -bottom-8 -right-6 h-20 w-20 rounded-full bg-white/10" />
-            <Icon3D name="invest" size={30} fallback="📈" />
-            <p className="mt-2 text-sm font-bold">Investasi</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-white/70">
-              Profit/loss kehitung otomatis
-            </p>
-          </RapiCard>
-          <RapiCard
-            role="button"
-            tabIndex={0}
-            onClick={() => navigate('/laporan')}
-            onKeyDown={(e) => e.key === 'Enter' && navigate('/laporan')}
-            className="cursor-pointer"
-          >
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-rapi-warning-soft">
-              <Icon3D name="report" size={24} fallback="📊" />
-            </span>
-            <p className="mt-2 text-sm font-bold">Laporan</p>
-            <p className="mt-0.5 text-[11px] leading-snug text-rapi-gray-600">
-              Ringkasan & tren bulananmu
-            </p>
-          </RapiCard>
-        </div>
+        {/* Rangkuman keuangan mingguan — biru (senada button & FAB), diupdate otomatis */}
+        <button
+          type="button"
+          onClick={() => navigate('/laporan')}
+          className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+        >
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
+            {t.dashboard.weekTitle}
+          </p>
+          <p className="mt-1.5 text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
+        </button>
 
-        {/* ===== Transaksi terbaru — satu container, bukan kartu bertumpuk ===== */}
+        {/* Hint fitur — sekali tampil, bisa ditutup (kenalin suara/foto/AI) */}
+        {!hintSeen && (
+          <div className="rapi-glass animate-rapi-fade-up mt-3 flex items-start gap-3 rounded-rapi-lg p-3.5">
+            <p className="flex-1 text-[13px] leading-relaxed text-rapi-navy dark:text-rapi-dark-ink">
+              <span className="font-bold">{t.dashboard.hintBold}</span> {t.dashboard.hintRest}
+            </p>
+            <button
+              type="button"
+              onClick={dismissHint}
+              aria-label={t.common.close}
+              className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        )}
+
+        {/* Transaksi terbaru — heading & link navy */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-gray-600">
-            Transaksi Terbaru
+          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy dark:text-rapi-dark-ink">
+            {t.dashboard.recent}
           </h2>
           {transactions.length > 0 && (
-            <Link to="/transaksi" className="flex items-center text-xs font-bold text-rapi-blue">
-              Lihat semua
+            <Link
+              to="/transaksi"
+              className="flex items-center text-xs font-bold text-rapi-navy dark:text-rapi-dark-ink"
+            >
+              {t.common.seeAll}
               <ChevronRight size={14} />
             </Link>
           )}
@@ -173,14 +203,10 @@ export default function Dashboard() {
 
         {recent.length === 0 ? (
           <RapiCard className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-            <span className="animate-bounce" style={{ animationDuration: '1.8s' }}>
-              <Icon3D name="party" size={52} fallback="🎉" />
-            </span>
-            <p className="text-sm leading-relaxed text-rapi-gray-600">
-              Belum ada catatan nih. Yuk mulai #RapiinAja!
-            </p>
-            <RapiButton variant="accent" onClick={() => navigate('/tambah')}>
-              Catat Transaksi Pertamamu ✍️
+            <RapiMascot size={110} />
+            <p className="text-sm leading-relaxed text-rapi-gray-600">{t.dashboard.emptyTitle}</p>
+            <RapiButton variant="accent" onClick={openAdd}>
+              {t.dashboard.emptyCta}
             </RapiButton>
           </RapiCard>
         ) : (

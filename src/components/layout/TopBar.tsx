@@ -25,7 +25,7 @@ export function TopBar({ title, showBack = false, greetingName }: TopBarProps) {
     return (
       <header className="flex items-center justify-between py-4">
         <div>
-          <p className="text-xs text-rapi-gray-600">{getGreeting()}</p>
+          <p className="text-xs text-rapi-gray-600 dark:text-rapi-dark-muted">{getGreeting()}</p>
           <p className="mt-0.5 text-lg font-bold">Halo, {greetingName}</p>
         </div>
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rapi-yellow font-bold text-rapi-navy">
@@ -42,7 +42,7 @@ export function TopBar({ title, showBack = false, greetingName }: TopBarProps) {
           type="button"
           onClick={() => navigate(-1)}
           aria-label="Kembali"
-          className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-rapi-navy transition-colors hover:bg-rapi-gray-100"
+          className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-rapi-navy transition-colors hover:bg-rapi-gray-100 dark:text-rapi-dark-ink dark:hover:bg-white/10"
         >
           <ChevronLeft size={22} />
         </button>

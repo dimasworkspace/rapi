@@ -33,6 +33,7 @@ export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'tagihan', name: 'Tagihan', emoji: '📡', type: 'expense' },
   { id: 'kesehatan', name: 'Kesehatan', emoji: '💊', type: 'expense' },
   { id: 'pendidikan', name: 'Pendidikan', emoji: '📚', type: 'expense' },
+  { id: 'investasi', name: 'Investasi', emoji: '📈', type: 'expense' },
   { id: 'lainnya-keluar', name: 'Lainnya', emoji: '🎁', type: 'expense' },
   { id: 'gaji', name: 'Gaji', emoji: '💼', type: 'income' },
   { id: 'freelance', name: 'Freelance', emoji: '💻', type: 'income' },
@@ -61,3 +62,17 @@ export interface InvestmentAsset {
   currentPrice: number // harga sekarang per unit
   updatedAt: string // ISO string
 }
+
+export interface AssetTypeMeta {
+  id: AssetType
+  label: string
+  emoji: string
+}
+
+export const ASSET_TYPES: AssetTypeMeta[] = [
+  { id: 'saham', label: 'Saham', emoji: '📈' },
+  { id: 'reksadana', label: 'Reksa Dana', emoji: '🏦' },
+  { id: 'kripto', label: 'Kripto', emoji: '🪙' },
+  { id: 'emas', label: 'Emas', emoji: '💎' },
+  { id: 'deposito', label: 'Deposito', emoji: '💸' },
+]

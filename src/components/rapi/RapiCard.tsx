@@ -11,7 +11,7 @@ export function RapiCard({ variant = 'default', className, ...props }: RapiCardP
     <div
       className={cn(
         'rounded-rapi-lg p-4 shadow-rapi-card transition-all hover:shadow-rapi-elevated',
-        variant === 'default' && 'rapi-glass text-rapi-navy',
+        variant === 'default' && 'rapi-glass text-rapi-navy dark:text-rapi-dark-ink',
         variant === 'navy' && 'bg-rapi-navy text-white',
         variant === 'blue' && 'bg-gradient-to-br from-rapi-blue to-[#0334A0] text-white',
         className,

@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
+import { useT } from '@/lib/i18n'
 import { useUserStore } from '@/store/userStore'
 
 /** First-run tanpa login: sapa → nama panggilan → saldo awal opsional → dashboard. */
 export default function Onboarding() {
+  const t = useT()
   const completeOnboarding = useUserStore((s) => s.completeOnboarding)
   const [name, setName] = useState('')
   const [balanceInput, setBalanceInput] = useState('')
@@ -32,41 +34,41 @@ export default function Onboarding() {
           aria-hidden
           className="absolute -bottom-16 -left-10 h-36 w-36 rounded-full bg-rapi-blue/30"
         />
-        <span className="relative">
-          <Icon3D name="wave" size={64} fallback="👋" />
-        </span>
-        <h1 className="relative mt-4 text-3xl font-bold">Halo! Aku Rapi</h1>
-        <p className="relative mt-2 max-w-xs text-sm leading-relaxed text-white/75">
-          Teman kamu buat catat keuangan tanpa ribet — ketik, ngomong, atau foto struk,
-          langsung rapi. ✨
-        </p>
+        <div className="animate-rapi-slide-down relative flex flex-col items-center">
+          {/* Tangan dadah beneran dadah 👋 */}
+          <span className="animate-rapi-wiggle inline-block">
+            <Icon3D name="wave" size={64} fallback="👋" />
+          </span>
+          <h1 className="mt-4 text-3xl font-bold">{t.onboarding.hello}</h1>
+          <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/75">{t.onboarding.subtitle}</p>
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-5 px-6 py-8">
-        <div>
+        <div className="animate-rapi-fade-up" style={{ animationDelay: '150ms' }}>
           <label htmlFor="ob-name" className="mb-1.5 block text-xs font-bold text-rapi-gray-600">
-            Panggil kamu siapa?
+            {t.onboarding.nameLabel}
           </label>
           <input
             id="ob-name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleStart()}
-            placeholder="Nama panggilanmu"
+            placeholder={t.onboarding.namePlaceholder}
             autoFocus
             maxLength={30}
-            className="w-full rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition-colors focus:border-rapi-blue"
+            className="w-full rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white px-4 py-3.5 text-sm outline-none transition-colors focus:border-rapi-blue dark:border-white/10 dark:bg-rapi-dark-surface dark:text-rapi-dark-ink"
           />
         </div>
 
-        <div>
+        <div className="animate-rapi-fade-up" style={{ animationDelay: '230ms' }}>
           <label
             htmlFor="ob-balance"
             className="mb-1.5 block text-xs font-bold text-rapi-gray-600"
           >
-            Saldo kamu sekarang — boleh dikosongin kok 😉
+            {t.onboarding.balanceLabel}
           </label>
-          <div className="flex items-center rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white transition-colors focus-within:border-rapi-blue">
+          <div className="flex items-center rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white transition-colors focus-within:border-rapi-blue dark:border-white/10 dark:bg-rapi-dark-surface">
             <span className="pl-4 text-sm font-bold text-rapi-gray-600">Rp</span>
             <input
               id="ob-balance"
@@ -75,21 +77,20 @@ export default function Onboarding() {
               onKeyDown={(e) => e.key === 'Enter' && handleStart()}
               placeholder="0"
               inputMode="numeric"
-              className="w-full bg-transparent px-2 py-3.5 text-sm outline-none"
+              className="w-full bg-transparent px-2 py-3.5 text-sm outline-none dark:text-rapi-dark-ink"
             />
           </div>
-          <p className="mt-1.5 text-[11px] text-rapi-gray-600">
-            Biar total saldomu langsung akurat. Bisa diubah kapan aja di Profil.
-          </p>
+          <p className="mt-1.5 text-[11px] text-rapi-gray-600">{t.onboarding.balanceHelper}</p>
         </div>
 
         <RapiButton
           variant="accent"
           onClick={handleStart}
           disabled={!name.trim()}
-          className="mt-auto w-full text-base"
+          className="animate-rapi-fade-up mt-auto w-full text-base"
+          style={{ animationDelay: '310ms' }}
         >
-          Mulai #RapiinAja 🚀
+          {t.onboarding.start}
         </RapiButton>
       </div>
     </div>
