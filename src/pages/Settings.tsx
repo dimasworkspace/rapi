@@ -6,6 +6,7 @@ import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
+import { InstallCard } from '@/components/rapi/InstallCard'
 import { RapiSelect } from '@/components/rapi/RapiSelect'
 import { exportData, importData } from '@/lib/backup'
 import { useT } from '@/lib/i18n'
@@ -202,6 +203,12 @@ export default function Settings() {
             </div>
           </div>
         </RapiCard>
+      </section>
+
+      {/* Aplikasi — pasang PWA + QR share */}
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '90ms' }}>
+        <h2 className={SECTION_H}>{t.settings.appSection}</h2>
+        <InstallCard />
       </section>
 
       {/* Keuangan */}
