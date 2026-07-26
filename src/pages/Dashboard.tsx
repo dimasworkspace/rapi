@@ -108,7 +108,8 @@ export default function Dashboard() {
           <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
             {t.dashboard.totalBalance}
           </p>
-          <p className="tabular-nums mt-1.5 text-[40px] font-bold leading-none tracking-tight">
+          {/* Ukuran menyesuaikan lebar layar — angka penuh (mis. Rp 12.865.000) tetap muat di HP kecil */}
+          <p className="tabular-nums mt-1.5 text-[clamp(1.75rem,8.5vw,2.5rem)] font-bold leading-none tracking-tight">
             {formatRupiah(animatedBalance)}
           </p>
 
@@ -118,13 +119,15 @@ export default function Dashboard() {
               type="button"
               onClick={() => navigate('/laporan?tipe=pemasukan')}
               style={{ animationDelay: '180ms' }}
-              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-emerald-400/20 active:scale-[0.97]"
+              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 px-1.5 py-2.5 backdrop-blur-sm transition-all hover:bg-emerald-400/20 active:scale-[0.97]"
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-emerald-200/80">
                 <ArrowUp size={11} strokeWidth={3} className="text-emerald-300" />
                 {t.dashboard.in}
               </p>
-              <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthIncome)}</p>
+              <p className="tabular-nums mt-1 text-[11px] font-bold leading-tight text-white">
+                {formatRupiah(monthIncome)}
+              </p>
             </button>
 
             <button
@@ -143,13 +146,15 @@ export default function Dashboard() {
               type="button"
               onClick={() => navigate('/laporan?tipe=pengeluaran')}
               style={{ animationDelay: '320ms' }}
-              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-red-300/25 bg-red-400/10 p-2.5 backdrop-blur-sm transition-all hover:bg-red-400/20 active:scale-[0.97]"
+              className="animate-rapi-fade-up flex flex-col items-center rounded-rapi-md border border-red-300/25 bg-red-400/10 px-1.5 py-2.5 backdrop-blur-sm transition-all hover:bg-red-400/20 active:scale-[0.97]"
             >
               <p className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-red-200/80">
                 <ArrowDown size={11} strokeWidth={3} className="text-red-300" />
                 {t.dashboard.out}
               </p>
-              <p className="tabular-nums mt-1 text-xs font-bold text-white">{formatRupiah(monthExpense)}</p>
+              <p className="tabular-nums mt-1 text-[11px] font-bold leading-tight text-white">
+                {formatRupiah(monthExpense)}
+              </p>
             </button>
           </div>
         </div>
