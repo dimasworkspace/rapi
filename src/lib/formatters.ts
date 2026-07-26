@@ -2,35 +2,31 @@ import { format, isToday, isYesterday } from 'date-fns'
 import { enUS as localeEn, id as localeId } from 'date-fns/locale'
 import { useSettingsStore } from '@/store/settingsStore'
 
-// Format Rupiah — selalu IDR (pola wajib CLAUDE.md).
-// Nominal ≥ 1 jt dipadatkan jadi "Rp X,X jt" sesuai UI kit (koma desimal id-ID).
-export const formatRupiah = (amount: number): string => {
-  if (amount >= 1_000_000) {
-    const jt = (amount / 1_000_000).toFixed(1).replace('.', ',').replace(/,0$/, '')
-    return `Rp ${jt} jt`
-  }
-  return new Intl.NumberFormat('id-ID', {
+// Format Rupiah — selalu IDR, SELALU angka penuh: "Rp 2.865.000".
+// Sengaja TIDAK dibulatkan jadi "Rp 2,9 jt": di app keuangan, pembulatan
+// menyembunyikan selisih ratusan ribu dan bikin user nggak percaya angkanya.
+export const formatRupiah = (amount: number): string =>
+  new Intl.NumberFormat('id-ID', {
     style: 'currency',
     currency: 'IDR',
     minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount)
+
+/** Versi ringkas untuk ruang sempit (label grafik). Lossless: cuma memadatkan
+ *  angka bulat, kalau ada sisa tetap tampil penuh. */
+export const formatRupiahShort = (amount: number): string => {
+  const abs = Math.abs(amount)
+  if (abs >= 1_000_000 && abs % 1_000_000 === 0) return `Rp ${abs / 1_000_000} jt`
+  if (abs >= 1_000 && abs % 1_000 === 0) return `Rp ${(abs / 1_000).toLocaleString('id-ID')} rb`
+  return formatRupiah(abs)
 }
 
-// Versi kompak untuk list transaksi — UI kit memakai "25rb" / "1,5 jt".
-export const formatRupiahCompact = (amount: number): string => {
-  if (amount >= 1_000_000) return formatRupiah(amount)
-  if (amount >= 1_000) {
-    const rb = (amount / 1_000).toFixed(1).replace('.', ',').replace(/,0$/, '')
-    return `Rp ${rb}rb`
-  }
-  return `Rp ${amount}`
-}
-
-// Nominal bertanda untuk list: pengeluaran "-Rp 25rb", pemasukan "+Rp 1,5 jt".
+// Nominal bertanda untuk list transaksi: "-Rp 45.000" / "+Rp 3.800.000".
 export const formatRupiahSigned = (
   amount: number,
   type: 'income' | 'expense',
-): string => `${type === 'income' ? '+' : '-'}${formatRupiahCompact(Math.abs(amount))}`
+): string => `${type === 'income' ? '+' : '-'}${formatRupiah(Math.abs(amount))}`
 
 // Label hari untuk pengelompokan list transaksi — ikut bahasa aktif.
 export const formatDayLabel = (isoDate: string): string => {
