@@ -4,6 +4,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { useT } from '@/lib/i18n'
+import { consumeLaunchIntent } from '@/lib/launchIntent'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { registerSync, setSyncErrorHandler, syncOnLogin } from '@/lib/sync'
 import AIChat from '@/pages/AIChat'
@@ -51,6 +52,8 @@ export default function App() {
   const user = useAuthStore((s) => s.user)
   const authLoading = useAuthStore((s) => s.loading)
   const showToast = useUiStore((s) => s.showToast)
+  const openAdd = useUiStore((s) => s.openAdd)
+  const openAddWithPhoto = useUiStore((s) => s.openAddWithPhoto)
 
   const [syncing, setSyncing] = useState(false)
   const syncedFor = useRef<string | null>(null)
@@ -60,6 +63,16 @@ export default function App() {
     initAuth()
     setSyncErrorHandler((label) => showToast(`Gagal ${label} ke server 😕`))
   }, [initAuth, showToast])
+
+  // Dibuka lewat shortcut ikon atau kiriman foto struk → langsung ke form.
+  // Kalau user ternyata belum login, sheet-nya menunggu sampai app kebuka penuh.
+  useEffect(() => {
+    void consumeLaunchIntent().then((intent) => {
+      if (!intent) return
+      if (intent.photo) openAddWithPhoto(intent.photo)
+      else openAdd()
+    })
+  }, [openAdd, openAddWithPhoto])
 
   // Begitu user login → tarik data (atau migrasikan data lokal warisan)
   useEffect(() => {

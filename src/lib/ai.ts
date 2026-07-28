@@ -34,14 +34,26 @@ const getConfig = (): AiConfig => {
 }
 
 /** Pakai proxy server? (login + backend aktif + user belum pasang key sendiri) */
+const hasOwnKey = (apiKey: string): boolean => apiKey.trim() !== ''
+
 export const usingServerAi = (): boolean =>
   Boolean(supabase) &&
   useAuthStore.getState().user !== null &&
-  useAiStore.getState().apiKey.trim() === ''
+  !hasOwnKey(useAiStore.getState().apiKey)
+
+const computeAiReady = (apiKey: string, user: unknown): boolean =>
+  hasOwnKey(apiKey) || (Boolean(supabase) && user !== null)
 
 /** Sudah siap dipakai? Lewat proxy server ATAU key sendiri. */
 export const aiReady = (): boolean =>
-  usingServerAi() || useAiStore.getState().apiKey.trim() !== ''
+  computeAiReady(useAiStore.getState().apiKey, useAuthStore.getState().user)
+
+/** Versi reaktif buat komponen — ikut render ulang begitu status AI berubah. */
+export const useAiReady = (): boolean =>
+  computeAiReady(
+    useAiStore((s) => s.apiKey),
+    useAuthStore((s) => s.user),
+  )
 
 const friendlyError = (status: number): RapiAiError => {
   if (status === 401 || status === 403)

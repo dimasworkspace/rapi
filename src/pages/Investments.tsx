@@ -161,7 +161,7 @@ export default function Investments() {
           </div>
 
           <div
-            className="animate-rapi-fade-up rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1"
+            className="animate-rapi-fade-up rapi-surface divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1"
             style={{ animationDelay: '240ms' }}
           >
             {rows.map(({ asset, value, plPct }, i) => {

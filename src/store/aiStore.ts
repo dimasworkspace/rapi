@@ -29,8 +29,8 @@ export const AI_PROVIDERS: AiProviderMeta[] = [
   {
     id: 'google',
     label: 'Google Gemini (gratis)',
-    defaultModel: 'gemini-1.5-flash',
-    keyHint: 'AIza...',
+    defaultModel: 'gemini-3.6-flash',
+    keyHint: 'AIza... / AQ....',
     keyUrl: 'aistudio.google.com',
     free: true,
   },

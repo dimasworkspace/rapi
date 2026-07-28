@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { endOfMonth, format, isSameMonth, isSameWeek, subMonths } from 'date-fns'
+import { endOfMonth, format, isSameMonth, isSameWeek, subMonths, subWeeks } from 'date-fns'
 import { enUS as localeEn, id as localeId } from 'date-fns/locale'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
@@ -14,6 +14,7 @@ import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useCategoryStore } from '@/store/categoryStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
@@ -29,26 +30,45 @@ export default function Reports() {
   const lang = useSettingsStore((s) => s.lang)
   const monthLocale = lang === 'en' ? localeEn : localeId
   const transactions = useTransactionStore((s) => s.transactions)
+  const categories = useCategoryStore((s) => s.categories)
   const profile = useUserStore((s) => s.profile)
   const openAdd = useUiStore((s) => s.openAdd)
 
   const [period, setPeriod] = useState<Period>('month')
   const [monthOffset, setMonthOffset] = useState(0)
 
-  const { periodIncome, periodExpense, growth, hasData } = useMemo(() => {
+  const { periodIncome, periodExpense, prevExpense, topCat, growth, hasData } = useMemo(() => {
     const now = new Date()
+    const prev = period === 'week' ? subWeeks(now, 1) : subMonths(now, 1)
     const inPeriod = (d: Date) =>
       period === 'week' ? isSameWeek(d, now, { weekStartsOn: 1 }) : isSameMonth(d, now)
+    // Periode sebelumnya — dipakai buat pembanding di kartu Insight
+    const inPrevPeriod = (d: Date) =>
+      period === 'week' ? isSameWeek(d, prev, { weekStartsOn: 1 }) : isSameMonth(d, prev)
 
     let inc = 0
     let exp = 0
+    let prevExp = 0
     let count = 0
+    const byCat = new Map<string, number>()
     for (const tx of transactions) {
       const d = new Date(tx.date)
+      if (tx.type === 'expense' && inPrevPeriod(d)) prevExp += tx.amount
       if (!inPeriod(d)) continue
       count += 1
       if (tx.type === 'income') inc += tx.amount
-      if (tx.type === 'expense') exp += tx.amount
+      if (tx.type === 'expense') {
+        exp += tx.amount
+        byCat.set(tx.category, (byCat.get(tx.category) ?? 0) + tx.amount)
+      }
+    }
+
+    // Kategori pengeluaran terbesar periode ini
+    let top: { label: string; amount: number } | null = null
+    for (const [catId, amount] of byCat) {
+      if (top && amount <= top.amount) continue
+      const cat = categories.find((c) => c.id === catId)
+      top = { label: cat ? `${cat.emoji} ${cat.name}` : t.common.uncategorized, amount }
     }
 
     // Saldo kumulatif per bulan (pertumbuhan keuangan) — jendela bisa digeser
@@ -67,20 +87,40 @@ export default function Reports() {
       growth.push({ label: format(m, 'MMM', { locale: monthLocale }), value: bal })
     }
 
-    return { periodIncome: inc, periodExpense: exp, growth, hasData: count > 0 }
-  }, [transactions, profile, period, monthOffset])
+    return {
+      periodIncome: inc,
+      periodExpense: exp,
+      prevExpense: prevExp,
+      topCat: top,
+      growth,
+      hasData: count > 0,
+    }
+  }, [transactions, categories, profile, period, monthOffset, monthLocale, t])
 
   const net = periodIncome - periodExpense
   const netStr = `${net < 0 ? '-' : ''}${formatRupiah(Math.abs(net))}`
   const periodLabel = period === 'week' ? t.reports.periodWeek : t.reports.periodMonth
   const growthDelta = growth[growth.length - 1].value - growth[0].value
 
+  // Insight = hal yang belum terbaca dari grafik: kategori penyedot terbesar,
+  // plus arah pengeluaran dibanding periode sebelumnya.
   const insight = useMemo(() => {
     if (!hasData) return null
-    return periodIncome >= periodExpense
-      ? t.reports.insightGood(periodLabel, periodIncome, periodExpense)
-      : t.reports.insightWarn(periodLabel, periodIncome, periodExpense)
-  }, [hasData, periodIncome, periodExpense, periodLabel, t])
+    if (!topCat) return t.reports.insightNoExpense
+
+    const unit = period === 'week' ? t.reports.periodWeekShort : t.reports.periodMonthShort
+    const share = Math.round((topCat.amount / periodExpense) * 100)
+    let text = t.reports.insightTopCat(topCat.label, topCat.amount, share)
+
+    // Tanpa data periode lalu, perbandingannya bohong — jadi dilewat saja.
+    if (prevExpense > 0) {
+      const delta = Math.round(((periodExpense - prevExpense) / prevExpense) * 100)
+      if (delta <= -5) text += t.reports.insightDown(Math.abs(delta), unit)
+      else if (delta >= 5) text += t.reports.insightUp(delta, unit)
+      else text += t.reports.insightFlat(unit)
+    }
+    return text
+  }, [hasData, topCat, periodExpense, prevExpense, period, t])
 
   return (
     <PageWrapper>

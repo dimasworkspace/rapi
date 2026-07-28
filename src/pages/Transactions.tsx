@@ -61,7 +61,7 @@ export default function Transactions() {
               <h2 className="mb-2 text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-gray-600">
                 {label}
               </h2>
-              <div className="rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
+              <div className="rapi-surface divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
                 {txs.map((tx) => (
                   <TransactionItem
                     key={tx.id}

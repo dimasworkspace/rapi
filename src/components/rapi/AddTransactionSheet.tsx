@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Camera, Keyboard, Loader2, Mic, X } from 'lucide-react'
+import { Camera, ChevronDown, Keyboard, Loader2, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
@@ -45,6 +45,8 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const addAsset = useInvestmentStore((s) => s.addAsset)
   const removeAsset = useInvestmentStore((s) => s.removeAsset)
   const showToast = useUiStore((s) => s.showToast)
+  const pendingPhoto = useUiStore((s) => s.pendingPhoto)
+  const clearPendingPhoto = useUiStore((s) => s.clearPendingPhoto)
 
   const MODE_LABEL: Record<string, string> = {
     text: t.add.modeText,
@@ -57,6 +59,8 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const [manualCategory, setManualCategory] = useState<string | null>(null)
   // User bisa nolak deteksi investasi → catat sebagai transaksi biasa
   const [forceNormal, setForceNormal] = useState(false)
+  // Jenis + grid kategori: tertutup sampai user memang mau mengoreksi
+  const [detailOpen, setDetailOpen] = useState(false)
 
   // ===== Mode input: voice (Web Speech API) & photo (AI vision) =====
   const [listening, setListening] = useState(false)
@@ -141,6 +145,17 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
     }
   }
 
+  // Foto struk yang dikirim dari app lain — langsung dipindai begitu form kebuka.
+  // Sengaja pakai ref supaya nggak kepicu dua kali oleh render ulang.
+  const sharedPhotoHandled = useRef(false)
+  useEffect(() => {
+    if (!pendingPhoto || sharedPhotoHandled.current) return
+    sharedPhotoHandled.current = true
+    clearPendingPhoto()
+    void handlePhoto(pendingPhoto)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingPhoto])
+
   const parsed = useMemo(() => parseTransaction(input), [input])
   const invest = useMemo(() => parseInvestment(input), [input])
   const isInvest = invest.matched && !forceNormal
@@ -158,6 +173,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
   const activeCategory = typeCategories.some((c) => c.id === category)
     ? category
     : (typeCategories[0]?.id ?? '')
+  const activeCat = typeCategories.find((c) => c.id === activeCategory)
 
   const canSave = isInvest ? amount > 0 : amount > 0 && activeCategory !== ''
 
@@ -299,25 +315,6 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         </div>
       )}
 
-      {/* Preview hasil parsing — user yakin dulu sebelum simpan */}
-      {input.trim() !== '' && !isInvest && (
-        <p
-          className={cn(
-            'mt-1.5 px-0.5 text-[11px] font-semibold',
-            amount > 0 ? 'text-rapi-income' : 'text-rapi-gray-600',
-          )}
-          aria-live="polite"
-        >
-          {amount > 0
-            ? t.add.parsed(
-                formatRupiah(amount),
-                categories.find((c) => c.id === activeCategory)?.name ?? t.settings.other,
-                type === 'income' ? t.common.income : t.common.expense,
-              )
-            : t.add.parsedFail}
-        </p>
-      )}
-
       {isInvest ? (
         /* Panel investasi — kedetect dari kalimat, masuk otomatis ke tab Investasi */
         <div className="mt-3 rounded-rapi-md border border-rapi-blue/25 bg-rapi-blue/10 p-3">
@@ -340,6 +337,67 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
         </div>
       ) : (
         <>
+          {/* Hasil baca. Parser SUDAH menebak jenis & kategori, jadi baris ini
+              tombol koreksi — bukan tempat mengisi. Detail teknisnya (jenis +
+              grid kategori) sengaja disembunyikan: menampilkan 11 pilihan yang
+              sudah terjawab bikin user mengira ada 11 keputusan yang wajib
+              diambil, padahal nol. */}
+          {input.trim() !== '' && (
+            <button
+              type="button"
+              onClick={() => setDetailOpen((v) => !v)}
+              aria-expanded={detailOpen}
+              aria-live="polite"
+              className="mt-2.5 flex w-full items-center gap-2.5 rounded-rapi-md border border-rapi-blue/20 bg-white/70 px-3 py-2.5 text-left transition-colors hover:border-rapi-blue/40 dark:border-white/10 dark:bg-white/5"
+            >
+              {amount > 0 ? (
+                <>
+                  <Icon3D
+                    name={activeCategory}
+                    size={24}
+                    fallback={activeCat?.emoji ?? '💸'}
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        'tabular-nums block truncate text-[15px] font-bold leading-tight',
+                        type === 'income' ? 'text-rapi-income' : 'text-rapi-navy dark:text-rapi-dark-ink',
+                      )}
+                    >
+                      {formatRupiah(amount)}
+                    </span>
+                    <span className="block truncate text-[11px] text-rapi-gray-600">
+                      {activeCat?.name ?? t.common.uncategorized} ·{' '}
+                      {type === 'income' ? t.common.income : t.common.expense}
+                      {!detailOpen && ` · ${t.add.detailHint}`}
+                    </span>
+                  </span>
+                </>
+              ) : (
+                <span className="flex-1 text-[11px] font-semibold text-rapi-gray-600">
+                  {t.add.parsedFail}
+                </span>
+              )}
+              <span className="flex shrink-0 items-center gap-1 text-[11px] font-bold text-rapi-blue">
+                {t.add.edit}
+                <ChevronDown
+                  size={14}
+                  className={cn('transition-transform', detailOpen && 'rotate-180')}
+                />
+              </span>
+            </button>
+          )}
+
+          <AnimatePresence initial={false}>
+            {detailOpen && (
+              <motion.div
+                key="tx-detail"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
       {/* Jenis — fokus pilihan Keluar / Masuk */}
       <div className="mt-3 flex rounded-rapi-md bg-white/50 p-1 dark:bg-white/5">
         {(
@@ -391,6 +449,9 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
           </button>
         ))}
       </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </>
       )}
 
@@ -426,7 +487,10 @@ export function AddTransactionSheet() {
   return (
     <AnimatePresence>
       {open && (
-        <motion.div key="add-sheet" className="fixed inset-0 z-40 flex items-center justify-center p-4">
+        <motion.div
+          key="add-sheet"
+          className="fixed inset-0 z-40 flex items-end justify-center sm:items-center sm:p-4"
+        >
           {/* Backdrop tipis — layar utama tetap terlihat, sekadar meredup */}
           <motion.button
             type="button"
@@ -439,14 +503,22 @@ export function AddTransactionSheet() {
             transition={FADE}
           />
 
-          {/* Modal — biru glass transparan; enter spring, exit lebih cepat */}
+          {/* Bottom sheet — naik dari bawah, menempel di sisi keyboard. Ibu jari
+              ada di bawah dan keyboard datang dari bawah; modal di tengah layar
+              kejepit dua-duanya begitu keyboard naik. Di layar lebar (sm+) balik
+              jadi kartu mengambang di tengah. */}
           <motion.div
-            className="relative flex max-h-[85vh] w-full max-w-[26rem] flex-col overflow-hidden rounded-rapi-xl border border-white/60 bg-[#EAF1FF]/60 shadow-rapi-elevated backdrop-blur-2xl dark:border-white/10 dark:bg-rapi-dark-surface/85"
-            initial={{ opacity: 0, scale: 0.92, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0, transition: SPRING_POP }}
-            exit={{ opacity: 0, scale: 0.95, y: 10, transition: TWEEN_EXIT }}
+            className="relative flex max-h-[88dvh] w-full max-w-[26rem] flex-col overflow-hidden rounded-t-rapi-xl border border-white/60 bg-rapi-offwhite/95 shadow-rapi-elevated backdrop-blur-xl dark:border-white/10 dark:bg-rapi-dark-surface/95 sm:rounded-rapi-xl"
+            initial={{ y: '100%' }}
+            animate={{ y: 0, transition: SPRING_POP }}
+            exit={{ y: '100%', transition: TWEEN_EXIT }}
           >
-            <div className="flex items-center justify-between px-4 pb-1 pt-3.5">
+            {/* Grabber — penanda visual "ini bisa ditarik/ditutup" ala sheet native */}
+            <div className="flex justify-center pt-2.5" aria-hidden>
+              <span className="h-1 w-9 rounded-full bg-rapi-gray-300 dark:bg-white/20" />
+            </div>
+
+            <div className="flex items-center justify-between px-4 pb-1 pt-2">
               <h2 className="text-[15px] font-bold text-rapi-navy dark:text-rapi-dark-ink">
                 {t.add.title}
               </h2>
@@ -460,7 +532,7 @@ export function AddTransactionSheet() {
               </button>
             </div>
 
-            <div className="overflow-y-auto px-4 pb-4 pt-1">
+            <div className="overflow-y-auto px-4 pt-1 pb-[max(env(safe-area-inset-bottom),1rem)]">
               <AddTransactionForm onClose={closeAdd} />
             </div>
           </motion.div>

@@ -5,17 +5,17 @@ import { Link } from 'react-router-dom'
 import { TopBar } from '@/components/layout/TopBar'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
-import { chatWithAi, RapiAiError } from '@/lib/ai'
+import { chatWithAi, RapiAiError, useAiReady } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
 import { SPRING_SOFT } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { useAiStore } from '@/store/aiStore'
+import { useCategoryStore } from '@/store/categoryStore'
 import { type Lang, useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUserStore } from '@/store/userStore'
-import { DEFAULT_CATEGORIES } from '@/types'
 
 /** Bangun system prompt: personality Rapi AI + konteks keuangan user yang sebenarnya. */
 const buildSystemPrompt = (
@@ -67,7 +67,7 @@ export default function AIChat() {
   const lang = useSettingsStore((s) => s.lang)
   const profile = useUserStore((s) => s.profile)
   const transactions = useTransactionStore((s) => s.transactions)
-  const apiKey = useAiStore((s) => s.apiKey)
+  const categories = useCategoryStore((s) => s.categories)
   const chat = useAiStore((s) => s.chat)
   const addChat = useAiStore((s) => s.addChat)
   const clearChat = useAiStore((s) => s.clearChat)
@@ -79,7 +79,8 @@ export default function AIChat() {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   const name = profile?.name ?? 'Kamu'
-  const hasKey = apiKey.trim() !== ''
+  // Dua jalur dianggap siap: proxy server (cukup punya akun) ATAU key sendiri.
+  const ready = useAiReady()
 
   const systemPrompt = useMemo(() => {
     const initial = profile?.initialBalance ?? 0
@@ -100,14 +101,14 @@ export default function AIChat() {
     const recentLines = sortByDateDesc(transactions)
       .slice(0, 15)
       .map((tx) => {
-        const cat = DEFAULT_CATEGORIES.find((c) => c.id === tx.category)?.name ?? tx.category
+        const cat = categories.find((c) => c.id === tx.category)?.name ?? tx.category
         const sign = tx.type === 'income' ? '+' : '-'
         return `- ${tx.date.slice(0, 10)} ${sign}${formatRupiah(tx.amount)} ${cat}${
           tx.note ? ` (${tx.note})` : ''
         }`
       })
     return buildSystemPrompt(lang, name, initial + income - expense, inMonth, outMonth, recentLines)
-  }, [transactions, profile, name, lang])
+  }, [transactions, categories, profile, name, lang])
 
   // Auto-scroll ke pesan terbaru
   useEffect(() => {
@@ -158,18 +159,18 @@ export default function AIChat() {
         )}
       </div>
 
-      {!hasKey ? (
-        /* Belum ada API key — arahkan ke Profil dengan ramah */
-        <div className="rapi-glass animate-rapi-fade-up mt-4 flex flex-col items-center gap-3 rounded-rapi-lg px-6 py-12 text-center">
+      {!ready ? (
+        /* Cuma kejadian di mode lokal (tanpa akun): arahkan pasang key sendiri */
+        <div className="rapi-surface animate-rapi-fade-up mt-4 flex flex-col items-center gap-3 rounded-rapi-lg px-6 py-12 text-center">
           <RapiMascot size={120} />
           <p className="mt-1 text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
-            {t.ai.readyTitle}
+            {t.ai.needAiTitle}
           </p>
-          <p className="text-[13px] leading-relaxed text-rapi-gray-600">{t.ai.readyDesc}</p>
+          <p className="text-[13px] leading-relaxed text-rapi-gray-600">{t.ai.needAiDesc}</p>
           <Link to="/profil">
             <RapiButton variant="accent">
               <Settings2 size={15} />
-              {t.ai.fillKey}
+              {t.ai.needAiCta}
             </RapiButton>
           </Link>
         </div>
@@ -211,10 +212,12 @@ export default function AIChat() {
               >
                 <div
                   className={cn(
-                    'max-w-[85%] whitespace-pre-wrap rounded-rapi-lg px-3.5 py-2.5 text-[13px] leading-relaxed shadow-rapi-card',
+                    // rapi-selectable: jawaban AI layak disalin, jadi dikecualikan
+                    // dari user-select:none global
+                    'rapi-selectable max-w-[85%] whitespace-pre-wrap rounded-rapi-lg px-3.5 py-2.5 text-[13px] leading-relaxed shadow-rapi-card',
                     m.role === 'user'
                       ? 'rounded-br-md bg-gradient-to-br from-rapi-blue to-[#0334A0] text-white'
-                      : 'rapi-glass rounded-bl-md text-rapi-navy dark:text-rapi-dark-ink',
+                      : 'rapi-surface rounded-bl-md text-rapi-navy dark:text-rapi-dark-ink',
                   )}
                 >
                   {m.role === 'assistant' && (
@@ -229,7 +232,7 @@ export default function AIChat() {
 
             {loading && (
               <div className="flex justify-start">
-                <div className="rapi-glass rounded-rapi-lg rounded-bl-md px-3.5 py-2.5">
+                <div className="rapi-surface rounded-rapi-lg rounded-bl-md px-3.5 py-2.5">
                   <TypingDots />
                 </div>
               </div>

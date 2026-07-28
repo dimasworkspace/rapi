@@ -56,10 +56,34 @@ export default defineConfig({
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
           { src: 'pwa-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
+        // Tahan ikon Rapi di home screen → aksi utama langsung muncul, tanpa
+        // perlu buka app dulu lalu cari tombol +.
+        shortcuts: [
+          {
+            name: 'Catat transaksi',
+            short_name: 'Catat',
+            description: 'Langsung buka form tambah transaksi',
+            url: '/?aksi=catat',
+            icons: [{ src: 'pwa-192.png', sizes: '192x192', type: 'image/png' }],
+          },
+        ],
+        // Rapi muncul di share sheet HP: habis foto struk, Bagikan → Rapi →
+        // langsung dipindai. Pencatatan bisa dimulai dari luar app.
+        share_target: {
+          action: '/bagikan',
+          method: 'POST',
+          enctype: 'multipart/form-data',
+          params: {
+            files: [{ name: 'foto', accept: ['image/*'] }],
+          },
+        },
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
         navigateFallback: '/index.html',
+        // Penangan POST /bagikan (share target) — Workbox nggak bisa bikin ini
+        // sendiri, jadi disisipkan sebagai script terpisah.
+        importScripts: ['/share-target-sw.js'],
         // Maskot PNG lumayan gede — izinkan masuk precache
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         runtimeCaching: [

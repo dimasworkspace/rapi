@@ -41,7 +41,10 @@ const API_KEY = Deno.env.get('AI_API_KEY') ?? ''
 const DAILY_LIMIT = Number(Deno.env.get('AI_DAILY_LIMIT') ?? '30')
 const MODEL =
   Deno.env.get('AI_MODEL') ??
-  (PROVIDER === 'groq' ? 'llama-3.3-70b-versatile' : 'gemini-2.0-flash')
+  // Catatan 28 Jul 2026: gemini-2.0-flash sudah tidak punya jatah free tier
+  // (API balas 429 "limit: 0"), jadi default digeser ke model flash terbaru
+  // yang masih gratis dan tetap mendukung vision buat scan struk.
+  (PROVIDER === 'groq' ? 'llama-3.3-70b-versatile' : 'gemini-3.6-flash')
 
 // ---------- Provider ----------
 
