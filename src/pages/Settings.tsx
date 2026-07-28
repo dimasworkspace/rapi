@@ -270,12 +270,6 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Aplikasi — pasang PWA + QR share */}
-      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '90ms' }}>
-        <h2 className={SECTION_H}>{t.settings.appSection}</h2>
-        <InstallCard />
-      </section>
-
       {/* Keuangan */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '110ms' }}>
         <h2 className={SECTION_H}>{t.settings.finance}</h2>
@@ -625,7 +619,15 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Lainnya */}
+      {/* Aplikasi — pasang ke home screen. Ditaruh di bawah, bukan di tengah
+          daftar setelan: ini ajakan, dan ajakan nggak boleh memotong barang
+          yang lagi dicari user. */}
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '270ms' }}>
+        <h2 className={SECTION_H}>{t.settings.appSection}</h2>
+        <InstallCard />
+      </section>
+
+      {/* Data & Backup */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '290ms' }}>
         <h2 className={SECTION_H}>{t.settings.dataSection}</h2>
         <RapiCard className="flex flex-col gap-3">

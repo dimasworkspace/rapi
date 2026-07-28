@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, ChevronRight, MessageCircle } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronRight, MessageCircle, Plus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { RapiButton } from '@/components/rapi/RapiButton'
@@ -147,16 +147,36 @@ export default function Dashboard() {
               </p>
             </button>
 
+            {/* Kartu tengah: kalau hari ini masih kosong, dia berhenti jadi angka
+                nol yang diam dan berubah jadi ajakan satu ketukan. Ini satu-satunya
+                pengingat yang app punya tanpa perlu izin notifikasi. Nadanya
+                ajakan — bukan teguran, jangan bikin user merasa bersalah. */}
             <button
               type="button"
-              onClick={() => navigate('/transaksi')}
+              onClick={todayCount > 0 ? () => navigate('/transaksi') : openAdd}
               style={{ animationDelay: '250ms' }}
-              className="animate-rapi-fade-up flex flex-col items-center justify-center rounded-rapi-md border border-white/25 bg-white/15 px-2 py-2 backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.97]"
+              className={
+                'animate-rapi-fade-up flex flex-col items-center justify-center rounded-rapi-md border px-2 py-2 backdrop-blur-sm transition-all active:scale-[0.97] ' +
+                (todayCount > 0
+                  ? 'border-white/25 bg-white/15 hover:bg-white/25'
+                  : 'border-rapi-yellow/50 bg-rapi-yellow/15 hover:bg-rapi-yellow/25')
+              }
             >
-              <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
-                {t.dashboard.today}
-              </p>
+              {todayCount > 0 ? (
+                <>
+                  <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
+                    {t.dashboard.today}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Plus size={17} strokeWidth={3} className="text-rapi-yellow" />
+                  <p className="mt-1 text-center text-[10px] font-bold uppercase leading-tight tracking-wide text-white/85">
+                    {t.dashboard.logToday}
+                  </p>
+                </>
+              )}
             </button>
 
             <button
@@ -225,6 +245,20 @@ export default function Dashboard() {
                 <TransactionItem transaction={tx} variant="row" />
               </div>
             ))}
+
+            {/* Baris ini cuma muncul selama catatan masih sedikit — mengisi
+                bagian bawah yang menggantung DENGAN aksi utama, bukan hiasan,
+                dan hilang sendiri begitu daftarnya sudah penuh. */}
+            {transactions.length < 5 && (
+              <button
+                type="button"
+                onClick={openAdd}
+                className="flex min-h-11 w-full items-center justify-center gap-1.5 px-4 py-3 text-[12px] font-bold text-rapi-blue transition-colors hover:bg-rapi-blue/5"
+              >
+                <Plus size={14} strokeWidth={3} />
+                {t.dashboard.addMore}
+              </button>
+            )}
           </div>
         )}
       </div>

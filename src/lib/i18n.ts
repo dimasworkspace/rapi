@@ -36,6 +36,9 @@ const id = {
     emptyTitle: 'Belum ada catatan nih. Yuk mulai #RapiinAja!',
     emptyCta: 'Catat Transaksi Pertamamu ✍️',
     aiLabel: 'Ngobrol sama Rapi AI',
+    /** Ajakan, BUKAN teguran — jangan pernah bikin user merasa bersalah. */
+    logToday: 'Catat hari ini',
+    addMore: 'Catat transaksi',
   },
   // Rangkuman mingguan: isinya harus hal yang BELUM kelihatan di kartu Masuk/Keluar
   // di atasnya — kategori penyedot terbesar, bukan mengulang angka yang sama.
@@ -276,6 +279,8 @@ const en: typeof id = {
     emptyTitle: "No records yet. Let's start #RapiinAja!",
     emptyCta: 'Add Your First Transaction ✍️',
     aiLabel: 'Chat with Rapi AI',
+    logToday: 'Log today',
+    addMore: 'Log a transaction',
   },
   weekly: {
     empty: (name: string) => `No records this week, ${name}. Start logging to keep things tidy.`,
