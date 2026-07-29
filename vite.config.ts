@@ -40,7 +40,12 @@ export default defineConfig({
     // PWA: installable ke home screen + jalan offline (service worker)
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'rapi-mascot.png'],
+      includeAssets: [
+        'favicon-16.png',
+        'favicon-32.png',
+        'apple-touch-icon.png',
+        'rapi-mascot.png',
+      ],
       manifest: {
         name: 'Rapi — Catat Keuangan Tanpa Ribet',
         short_name: 'Rapi',
