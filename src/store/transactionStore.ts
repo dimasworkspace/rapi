@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { syncBus } from '@/lib/syncBus'
 import type { Transaction } from '@/types'
 
 interface TransactionState {
@@ -12,19 +13,26 @@ interface TransactionState {
 
 export const useTransactionStore = create<TransactionState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       transactions: [],
       addTransaction: (tx) => {
         const id = crypto.randomUUID()
-        set((s) => ({ transactions: [{ ...tx, id }, ...s.transactions] }))
+        const full: Transaction = { ...tx, id }
+        set((s) => ({ transactions: [full, ...s.transactions] }))
+        syncBus.transactionSaved?.(full)
         return id
       },
-      updateTransaction: (id, patch) =>
+      updateTransaction: (id, patch) => {
         set((s) => ({
           transactions: s.transactions.map((t) => (t.id === id ? { ...t, ...patch } : t)),
-        })),
-      removeTransaction: (id) =>
-        set((s) => ({ transactions: s.transactions.filter((t) => t.id !== id) })),
+        }))
+        const updated = get().transactions.find((t) => t.id === id)
+        if (updated) syncBus.transactionSaved?.(updated)
+      },
+      removeTransaction: (id) => {
+        set((s) => ({ transactions: s.transactions.filter((t) => t.id !== id) }))
+        syncBus.transactionDeleted?.(id)
+      },
     }),
     { name: 'rapi-transactions' },
   ),

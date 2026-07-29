@@ -1,15 +1,17 @@
 import { Trash2 } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
+import { useCategoryStore } from '@/store/categoryStore'
 import type { Transaction } from '@/types'
-import { DEFAULT_CATEGORIES } from '@/types'
 import { formatRupiahSigned } from '@/lib/formatters'
 import { type Dict, useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
 
-const methodLabel = (t: Dict, tx: Transaction): string => {
+// Input manual sengaja tanpa label: itu keadaan default, bukan kabar. Label cuma
+// muncul kalau cara masukinnya memang bikin beda (suara / foto struk / AI).
+const methodLabel = (t: Dict, tx: Transaction): string | null => {
   if (tx.inputMethod === 'photo') return t.transactions.methodPhoto
   if (tx.inputMethod === 'voice') return t.transactions.methodVoice
-  return tx.aiParsed ? t.transactions.methodAi : t.common.manual
+  return tx.aiParsed ? t.transactions.methodAi : null
 }
 
 interface TransactionItemProps {
@@ -26,15 +28,19 @@ export function TransactionItem({
   onDelete,
 }: TransactionItemProps) {
   const t = useT()
-  const category = DEFAULT_CATEGORIES.find((c) => c.id === tx.category)
+  // Kategori dibaca dari store, bukan daftar default — biar kategori buatan user
+  // ikut tampil dengan nama & emoji-nya sendiri.
+  const categories = useCategoryStore((s) => s.categories)
+  const category = categories.find((c) => c.id === tx.category)
   const isIncome = tx.type === 'income'
+  const method = methodLabel(t, tx)
 
   return (
     <div
       className={cn(
         'flex items-center gap-3',
         variant === 'card'
-          ? 'rapi-glass rounded-rapi-lg p-3.5 transition-all hover:shadow-rapi-elevated'
+          ? 'rapi-surface rounded-rapi-lg p-3.5 transition-all hover:shadow-rapi-elevated'
           : 'px-4 py-3 transition-colors hover:bg-white/50 dark:hover:bg-white/5',
       )}
     >
@@ -46,7 +52,8 @@ export function TransactionItem({
           {tx.note || category?.name || t.transactions.title}
         </p>
         <p className="mt-0.5 truncate text-xs text-rapi-gray-600">
-          {category?.name ?? t.settings.other} · {methodLabel(t, tx)}
+          {category?.name ?? t.common.uncategorized}
+          {method && ` · ${method}`}
         </p>
       </div>
       <p

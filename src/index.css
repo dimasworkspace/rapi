@@ -31,7 +31,21 @@
 }
 
 @layer components {
-  /* Kartu kaca premium Rapi — pakai di atas AmbientBackground */
+  /* Permukaan utama Rapi — SOLID. Dipakai kartu, baris daftar, gelembung chat.
+     Sengaja bukan kaca: kalau semua permukaan mengambang, nggak ada yang
+     benar-benar mengambang — kaca berhenti jadi penanda hierarki dan cuma
+     menyisakan buram + tepi putih yang terbaca ramai, bukan mahal. Bonusnya,
+     buram bertumpuk itu mahal buat GPU dan bikin scroll tersendat di HP
+     kelas menengah, dan mata membaca tersendat sebagai murah. */
+  .rapi-surface {
+    @apply border border-rapi-gray-300/50 bg-white shadow-rapi-card;
+  }
+  .dark .rapi-surface {
+    @apply border-white/10 bg-rapi-dark-surface;
+  }
+
+  /* Kaca disisakan buat yang memang MENGAMBANG di atas konten: bottom nav,
+     modal/sheet, dan aksen dekoratif (lingkaran di belakang maskot & donut). */
   .rapi-glass {
     @apply border border-white/70 bg-gradient-to-b from-white/70 to-white/40 shadow-rapi-card backdrop-blur-xl;
   }
@@ -68,12 +82,34 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Cegah Android/iOS membesarkan font sendiri — bikin layout geser tak terduga */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-rapi-offwhite font-sans text-rapi-navy;
     margin: 0;
     min-height: 100dvh;
+    /* Matikan pantulan & pull-to-refresh — itu gerakan khas halaman web,
+       bukan aplikasi. Salah satu tanda paling kentara yang bikin PWA
+       ketahuan "cuma web di dalam ikon". */
+    overscroll-behavior: none;
+    /* Tahan lama di teks jangan memunculkan bubble Salin/Cari ala browser.
+       Input & area yang memang perlu disalin di-opt-in di bawah. */
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Teks yang memang layak disalin: isian form & konten (mis. jawaban Rapi AI) */
+  input,
+  textarea,
+  [contenteditable],
+  .rapi-selectable {
+    -webkit-touch-callout: default;
+    -webkit-user-select: text;
+    user-select: text;
   }
 
   /* Dark mode: background app + warna teks default */

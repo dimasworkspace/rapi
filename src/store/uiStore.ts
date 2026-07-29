@@ -27,6 +27,11 @@ interface UiState {
   addOpen: boolean
   openAdd: () => void
   closeAdd: () => void
+  /** Foto struk yang dikirim dari app lain (share sheet HP) — dipungut sekali
+   *  oleh form tambah transaksi, lalu langsung dibersihkan. */
+  pendingPhoto: File | null
+  openAddWithPhoto: (file: File) => void
+  clearPendingPhoto: () => void
 }
 
 export const useUiStore = create<UiState>()((set) => ({
@@ -38,5 +43,8 @@ export const useUiStore = create<UiState>()((set) => ({
   hideConfirm: () => set({ confirm: null }),
   addOpen: false,
   openAdd: () => set({ addOpen: true }),
-  closeAdd: () => set({ addOpen: false }),
+  closeAdd: () => set({ addOpen: false, pendingPhoto: null }),
+  pendingPhoto: null,
+  openAddWithPhoto: (file) => set({ addOpen: true, pendingPhoto: file }),
+  clearPendingPhoto: () => set({ pendingPhoto: null }),
 }))

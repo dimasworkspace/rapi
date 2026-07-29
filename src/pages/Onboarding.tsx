@@ -39,7 +39,7 @@ export default function Onboarding() {
           <span className="animate-rapi-wiggle inline-block">
             <Icon3D name="wave" size={64} fallback="👋" />
           </span>
-          <h1 className="mt-4 text-3xl font-bold">{t.onboarding.hello}</h1>
+          <h1 className="mt-4 text-3xl font-bold">{t.onboarding.title}</h1>
           <p className="mt-2 max-w-xs text-sm leading-relaxed text-white/75">{t.onboarding.subtitle}</p>
         </div>
       </div>

@@ -1,13 +1,6 @@
 import { ChevronLeft } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
-
-const getGreeting = (): string => {
-  const h = new Date().getHours()
-  if (h < 11) return 'Selamat pagi 👋'
-  if (h < 15) return 'Selamat siang ☀️'
-  if (h < 18) return 'Selamat sore 🌤️'
-  return 'Selamat malam 🌙'
-}
+import { useT } from '@/lib/i18n'
 
 interface TopBarProps {
   /** Mode judul — untuk halaman selain dashboard. */
@@ -20,13 +13,16 @@ interface TopBarProps {
 
 export function TopBar({ title, showBack = false, greetingName }: TopBarProps) {
   const navigate = useNavigate()
+  const t = useT()
 
   if (greetingName) {
     return (
       <header className="flex items-center justify-between py-4">
         <div>
-          <p className="text-xs text-rapi-gray-600 dark:text-rapi-dark-muted">{getGreeting()}</p>
-          <p className="mt-0.5 text-lg font-bold">Halo, {greetingName}</p>
+          <p className="text-xs text-rapi-gray-600 dark:text-rapi-dark-muted">
+            {t.greeting(new Date().getHours())}
+          </p>
+          <p className="mt-0.5 text-lg font-bold">{t.dashboard.hello(greetingName)}</p>
         </div>
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-rapi-yellow font-bold text-rapi-navy">
           {greetingName.charAt(0).toUpperCase()}
@@ -41,7 +37,7 @@ export function TopBar({ title, showBack = false, greetingName }: TopBarProps) {
         <button
           type="button"
           onClick={() => navigate(-1)}
-          aria-label="Kembali"
+          aria-label={t.common.back}
           className="-ml-2 flex h-11 w-11 items-center justify-center rounded-full text-rapi-navy transition-colors hover:bg-rapi-gray-100 dark:text-rapi-dark-ink dark:hover:bg-white/10"
         >
           <ChevronLeft size={22} />

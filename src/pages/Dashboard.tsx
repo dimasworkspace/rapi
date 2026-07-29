@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, ChevronRight, MessageCircle, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronRight, MessageCircle, Plus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { RapiButton } from '@/components/rapi/RapiButton'
@@ -10,23 +10,29 @@ import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatRupiah } from '@/lib/formatters'
 import { type Dict, useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
+import { useCategoryStore } from '@/store/categoryStore'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
 
-// Rangkuman keuangan mingguan (7 hari terakhir) — diupdate otomatis dari data.
+// Rangkuman mingguan (7 hari terakhir). Sengaja mengangkat kategori penyedot
+// terbesar, bukan mengulang total masuk/keluar — dua angka itu sudah tercetak
+// di kartu tepat di atas kartu ini.
 const buildWeeklySummary = (
   t: Dict,
   name: string,
   count: number,
   income: number,
   expense: number,
+  topCat: { label: string; amount: number } | null,
 ): string => {
   if (count === 0) return t.weekly.empty(name)
-  const base = t.weekly.base(count, income, expense)
-  if (income >= expense && income > 0) return t.weekly.good(name, base)
-  if (expense > income && income > 0) return t.weekly.warn(name, base)
-  return t.weekly.neutral(name, base)
+  if (!topCat) return t.weekly.noExpense
+  const net = income - expense
+  return (
+    t.weekly.topCat(topCat.label, topCat.amount) +
+    (net >= 0 ? t.weekly.netLeft(net) : t.weekly.netShort(-net))
+  )
 }
 
 export default function Dashboard() {
@@ -34,9 +40,8 @@ export default function Dashboard() {
   const navigate = useNavigate()
   const openAdd = useUiStore((s) => s.openAdd)
   const profile = useUserStore((s) => s.profile)
-  const hintSeen = useUserStore((s) => s.hintSeen)
-  const dismissHint = useUserStore((s) => s.dismissHint)
   const transactions = useTransactionStore((s) => s.transactions)
+  const categories = useCategoryStore((s) => s.categories)
   const name = profile?.name ?? 'Kamu'
 
   const { balance, monthIncome, monthExpense, recent, todayCount, weeklySummary } = useMemo(() => {
@@ -51,6 +56,7 @@ export default function Dashboard() {
     let weekCount = 0
     let weekIncome = 0
     let weekExpense = 0
+    const weekByCat = new Map<string, number>()
 
     for (const tx of transactions) {
       if (tx.type === 'income') income += tx.amount
@@ -63,8 +69,19 @@ export default function Dashboard() {
       if (d.getTime() >= weekAgo) {
         weekCount += 1
         if (tx.type === 'income') weekIncome += tx.amount
-        if (tx.type === 'expense') weekExpense += tx.amount
+        if (tx.type === 'expense') {
+          weekExpense += tx.amount
+          weekByCat.set(tx.category, (weekByCat.get(tx.category) ?? 0) + tx.amount)
+        }
       }
+    }
+
+    // Kategori penyedot terbesar minggu ini — inti dari kartu rangkuman
+    let topCat: { label: string; amount: number } | null = null
+    for (const [catId, amount] of weekByCat) {
+      if (topCat && amount <= topCat.amount) continue
+      const cat = categories.find((c) => c.id === catId)
+      topCat = { label: cat ? `${cat.emoji} ${cat.name}` : t.common.uncategorized, amount }
     }
 
     return {
@@ -73,9 +90,9 @@ export default function Dashboard() {
       monthExpense: outMonth,
       recent: sortByDateDesc(transactions).slice(0, 5),
       todayCount: today,
-      weeklySummary: buildWeeklySummary(t, name, weekCount, weekIncome, weekExpense),
+      weeklySummary: buildWeeklySummary(t, name, weekCount, weekIncome, weekExpense, topCat),
     }
-  }, [transactions, profile, name, t])
+  }, [transactions, profile, name, t, categories])
 
   const animatedBalance = useCountUp(balance)
 
@@ -130,16 +147,36 @@ export default function Dashboard() {
               </p>
             </button>
 
+            {/* Kartu tengah: kalau hari ini masih kosong, dia berhenti jadi angka
+                nol yang diam dan berubah jadi ajakan satu ketukan. Ini satu-satunya
+                pengingat yang app punya tanpa perlu izin notifikasi. Nadanya
+                ajakan — bukan teguran, jangan bikin user merasa bersalah. */}
             <button
               type="button"
-              onClick={() => navigate('/transaksi')}
+              onClick={todayCount > 0 ? () => navigate('/transaksi') : openAdd}
               style={{ animationDelay: '250ms' }}
-              className="animate-rapi-fade-up flex flex-col items-center justify-center rounded-rapi-md border border-white/25 bg-white/15 px-2 py-2 backdrop-blur-sm transition-all hover:bg-white/25 active:scale-[0.97]"
+              className={
+                'animate-rapi-fade-up flex flex-col items-center justify-center rounded-rapi-md border px-2 py-2 backdrop-blur-sm transition-all active:scale-[0.97] ' +
+                (todayCount > 0
+                  ? 'border-white/25 bg-white/15 hover:bg-white/25'
+                  : 'border-rapi-yellow/50 bg-rapi-yellow/15 hover:bg-rapi-yellow/25')
+              }
             >
-              <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
-              <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
-                {t.dashboard.today}
-              </p>
+              {todayCount > 0 ? (
+                <>
+                  <p className="tabular-nums text-lg font-bold leading-none">{todayCount}</p>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-wide text-white/70">
+                    {t.dashboard.today}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <Plus size={17} strokeWidth={3} className="text-rapi-yellow" />
+                  <p className="mt-1 text-center text-[10px] font-bold uppercase leading-tight tracking-wide text-white/85">
+                    {t.dashboard.logToday}
+                  </p>
+                </>
+              )}
             </button>
 
             <button
@@ -173,23 +210,6 @@ export default function Dashboard() {
           <p className="mt-1.5 text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
         </button>
 
-        {/* Hint fitur — sekali tampil, bisa ditutup (kenalin suara/foto/AI) */}
-        {!hintSeen && (
-          <div className="rapi-glass animate-rapi-fade-up mt-3 flex items-start gap-3 rounded-rapi-lg p-3.5">
-            <p className="flex-1 text-[13px] leading-relaxed text-rapi-navy dark:text-rapi-dark-ink">
-              <span className="font-bold">{t.dashboard.hintBold}</span> {t.dashboard.hintRest}
-            </p>
-            <button
-              type="button"
-              onClick={dismissHint}
-              aria-label={t.common.close}
-              className="-mr-2 -mt-2 flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-rapi-gray-600 transition-colors hover:bg-rapi-gray-100 dark:hover:bg-white/10"
-            >
-              <X size={15} />
-            </button>
-          </div>
-        )}
-
         {/* Transaksi terbaru — heading & link navy */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
           <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy dark:text-rapi-dark-ink">
@@ -215,7 +235,7 @@ export default function Dashboard() {
             </RapiButton>
           </RapiCard>
         ) : (
-          <div className="rapi-glass divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
+          <div className="rapi-surface divide-y divide-rapi-gray-300/40 rounded-rapi-lg py-1">
             {recent.map((tx, i) => (
               <div
                 key={tx.id}
@@ -225,6 +245,20 @@ export default function Dashboard() {
                 <TransactionItem transaction={tx} variant="row" />
               </div>
             ))}
+
+            {/* Baris ini cuma muncul selama catatan masih sedikit — mengisi
+                bagian bawah yang menggantung DENGAN aksi utama, bukan hiasan,
+                dan hilang sendiri begitu daftarnya sudah penuh. */}
+            {transactions.length < 5 && (
+              <button
+                type="button"
+                onClick={openAdd}
+                className="flex min-h-11 w-full items-center justify-center gap-1.5 px-4 py-3 text-[12px] font-bold text-rapi-blue transition-colors hover:bg-rapi-blue/5"
+              >
+                <Plus size={14} strokeWidth={3} />
+                {t.dashboard.addMore}
+              </button>
+            )}
           </div>
         )}
       </div>

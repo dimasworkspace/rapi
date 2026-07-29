@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Check, ChevronDown, Download, Eye, EyeOff, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
+import { Check, ChevronDown, Cloud, Download, Eye, EyeOff, LogOut, Moon, Plus, Sparkles, Sun, Trash2, Upload } from 'lucide-react'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { Icon3D } from '@/components/rapi/Icon3D'
@@ -9,10 +9,13 @@ import { RapiCard } from '@/components/rapi/RapiCard'
 import { InstallCard } from '@/components/rapi/InstallCard'
 import { RapiSelect } from '@/components/rapi/RapiSelect'
 import { exportData, importData } from '@/lib/backup'
+import { isSupabaseConfigured, supabase } from '@/lib/supabase'
+import { clearLocalData } from '@/lib/sync'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { AI_PROVIDERS, providerMeta, useAiStore } from '@/store/aiStore'
+import { useAuthStore } from '@/store/authStore'
 import { useCategoryStore } from '@/store/categoryStore'
 import { type Lang, type Theme, useSettingsStore } from '@/store/settingsStore'
 import { useUiStore } from '@/store/uiStore'
@@ -45,10 +48,36 @@ export default function Settings() {
   const removeCategory = useCategoryStore((s) => s.removeCategory)
   const showToast = useUiStore((s) => s.showToast)
   const showConfirm = useUiStore((s) => s.showConfirm)
+  const user = useAuthStore((s) => s.user)
+  const signOut = useAuthStore((s) => s.signOut)
+
+  // Punya akun → AI dilayani server. Key sendiri (BYOK) tetap menang kalau diisi.
+  const hasServerAi = isSupabaseConfigured && Boolean(user)
+  const usingOwnKey = apiKey.trim() !== ''
+  const serverAi = hasServerAi && !usingOwnKey
 
   const [showKey, setShowKey] = useState(false)
   const [catOpen, setCatOpen] = useState(false)
+  // Kebuka duluan cuma kalau memang lagi dipakai — selain itu biar user awam nggak lihat
+  const [byokOpen, setByokOpen] = useState(usingOwnKey)
+  const [quota, setQuota] = useState<{ used: number; quota: number } | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
+
+  // Ambil sisa kuota harian buat ditampilkan
+  useEffect(() => {
+    if (!serverAi || !supabase) return
+    let alive = true
+    supabase
+      .rpc('get_ai_quota', { p_limit: 30 })
+      .single()
+      .then(({ data }) => {
+        const q = data as { used: number; quota: number } | null
+        if (alive && q) setQuota(q)
+      })
+    return () => {
+      alive = false
+    }
+  }, [serverAi])
   const [newCat, setNewCat] = useState({ emoji: '', name: '', type: 'expense' as 'expense' | 'income' })
 
   const name = profile?.name ?? 'Kamu'
@@ -134,6 +163,42 @@ export default function Settings() {
         </div>
       </RapiCard>
 
+      {/* Akun — cuma muncul kalau backend aktif & user login */}
+      {user && (
+        <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '30ms' }}>
+          <h2 className={SECTION_H}>{t.auth.account}</h2>
+          <RapiCard className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <Cloud size={15} className="shrink-0 text-rapi-income" />
+              <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                {user.email}
+              </span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-rapi-gray-600">{t.settings.syncedHint}</p>
+            <button
+              type="button"
+              onClick={() =>
+                showConfirm({
+                  message: t.auth.signOutConfirm,
+                  confirmLabel: t.auth.signOut,
+                  danger: true,
+                  onConfirm: () => {
+                    void signOut().then(() => {
+                      clearLocalData()
+                      window.location.href = '/'
+                    })
+                  },
+                })
+              }
+              className="flex min-h-11 items-center gap-2 text-[13px] font-semibold text-rapi-expense"
+            >
+              <LogOut size={15} />
+              {t.auth.signOut}
+            </button>
+          </RapiCard>
+        </section>
+      )}
+
       {/* Tampilan — Tema & Bahasa */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '50ms' }}>
         <h2 className={SECTION_H}>{t.settings.appearance}</h2>
@@ -205,12 +270,6 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Aplikasi — pasang PWA + QR share */}
-      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '90ms' }}>
-        <h2 className={SECTION_H}>{t.settings.appSection}</h2>
-        <InstallCard />
-      </section>
-
       {/* Keuangan */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '110ms' }}>
         <h2 className={SECTION_H}>{t.settings.finance}</h2>
@@ -233,115 +292,206 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Rapi AI — BYOK multi-provider */}
-      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '170ms' }}>
-        <h2 className={SECTION_H}>{t.settings.aiSection}</h2>
-        <RapiCard>
-          <div className="flex items-center gap-2">
-            <Sparkles size={15} className="text-rapi-blue" />
-            <span className="text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
-              {t.settings.aiProvider}
-            </span>
-            <span
-              className={cn(
-                'ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold',
-                apiKey
-                  ? 'bg-rapi-income-soft text-rapi-income dark:bg-rapi-income/20'
-                  : 'bg-rapi-gray-100 text-rapi-gray-600 dark:bg-white/10',
-              )}
-            >
-              {apiKey ? t.settings.active : t.settings.inactive}
-            </span>
-          </div>
-
-          <div className="mt-2">
-            <RapiSelect
-              value={aiProvider}
-              onChange={(v) => setProvider(v as typeof aiProvider)}
-              ariaLabel={t.settings.aiProvider}
-              options={AI_PROVIDERS.map((p) => ({ value: p.id, label: p.label }))}
-            />
-          </div>
-
-          <label htmlFor="ai-key" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
-            {t.settings.apiKey}
-          </label>
-          {/* Border & centang hijau saat key sudah terisi — feedback jelas */}
-          <div
-            className={cn(
-              'flex items-center rounded-rapi-md border-[1.5px] bg-white/70 outline-none transition-colors focus-within:border-rapi-blue dark:bg-white/5',
-              apiKey
-                ? 'border-rapi-income/50 dark:border-rapi-income/40'
-                : 'border-rapi-blue/20 dark:border-white/10',
-            )}
-          >
-            <input
-              id="ai-key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              type={showKey ? 'text' : 'password'}
-              placeholder={providerMeta(aiProvider).keyHint}
-              autoComplete="off"
-              className="w-full bg-transparent px-3 py-2.5 text-[13px] outline-none dark:text-rapi-dark-ink"
-            />
-            {apiKey && (
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rapi-income text-white">
-                <Check size={13} strokeWidth={3} />
+      {/* Rapi AI — kartu status saja. Setelan teknis sengaja nggak di sini:
+          user awam cukup tahu "AI-nya siap", titik. */}
+      {hasServerAi && (
+        <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '170ms' }}>
+          <h2 className={SECTION_H}>{t.settings.aiSection}</h2>
+          <RapiCard className="flex flex-col gap-2.5">
+            <div className="flex items-center gap-2">
+              <Sparkles size={15} className="shrink-0 text-rapi-blue" />
+              <span className="text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                {usingOwnKey ? t.settings.aiOwnKeyActiveTitle : t.settings.aiReadyTitle}
               </span>
+              <span className="ml-auto rounded-full bg-rapi-income-soft px-2 py-0.5 text-[10px] font-semibold text-rapi-income dark:bg-rapi-income/20">
+                {t.settings.active}
+              </span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-rapi-gray-600">
+              {usingOwnKey ? t.settings.aiOwnKeyActiveDesc : t.settings.aiReadyDesc}
+            </p>
+
+            {/* Kuota cuma relevan buat yang numpang key server */}
+            {!usingOwnKey && quota && (
+              <div>
+                <div className="h-1.5 overflow-hidden rounded-full bg-rapi-gray-100 dark:bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-rapi-blue transition-all"
+                    style={{ width: `${Math.min(100, (quota.used / quota.quota) * 100)}%` }}
+                  />
+                </div>
+                <p className="mt-1.5 text-[11px] font-semibold text-rapi-gray-600">
+                  {t.settings.aiQuotaLeft(Math.max(0, quota.quota - quota.used), quota.quota)}
+                </p>
+              </div>
             )}
+          </RapiCard>
+        </section>
+      )}
+
+      {/* Key sendiri (BYOK). Sudah punya akun → sembunyiin di balik "Lanjutan",
+          karena ini katup darurat buat yang butuh, bukan langkah wajib.
+          Belum punya akun → ini satu-satunya jalan ke AI, jadi tampil apa adanya. */}
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '200ms' }}>
+        <h2 className={SECTION_H}>
+          {hasServerAi ? t.settings.advancedSection : t.settings.aiSection}
+        </h2>
+
+        <RapiCard className={cn(hasServerAi && 'overflow-hidden p-0')}>
+          {hasServerAi ? (
             <button
               type="button"
-              onClick={() => setShowKey((v) => !v)}
-              aria-label={showKey ? t.common.close : 'Show'}
-              className="px-3 text-rapi-gray-600"
+              onClick={() => setByokOpen((v) => !v)}
+              aria-expanded={byokOpen}
+              className="flex w-full items-center justify-between gap-3 p-4 text-left"
             >
-              {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
-            </button>
-          </div>
-          {apiKey && (
-            <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-rapi-income">
-              <Check size={12} strokeWidth={3} />
-              {t.settings.keySaved}
-            </p>
-          )}
-
-          <label htmlFor="ai-model" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
-            {t.settings.model}
-          </label>
-          <input
-            id="ai-model"
-            value={aiModel}
-            onChange={(e) => setModel(e.target.value)}
-            placeholder={providerMeta(aiProvider).defaultModel || 'model-name'}
-            autoComplete="off"
-            className={cn('w-full px-3 py-2.5 text-[13px] outline-none', INPUT)}
-          />
-
-          {providerMeta(aiProvider).needsBaseUrl && (
-            <>
-              <label htmlFor="ai-url" className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600">
-                {t.settings.baseUrl}
-              </label>
-              <input
-                id="ai-url"
-                value={baseUrl}
-                onChange={(e) => setBaseUrl(e.target.value)}
-                placeholder="https://api.provider.com/v1"
-                autoComplete="off"
-                className={cn('w-full px-3 py-2.5 text-[13px] outline-none', INPUT)}
-              />
-            </>
-          )}
-
-          <p className="mt-2 text-[11px] leading-relaxed text-rapi-gray-600">
-            {t.settings.aiHelp}
-            {providerMeta(aiProvider).keyUrl && (
-              <span className="font-semibold text-rapi-blue">
-                {t.settings.aiHelpKey(providerMeta(aiProvider).keyUrl)}
+              <span className="flex flex-col">
+                <span className="text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                  {t.settings.aiOwnKeyToggle}
+                </span>
+                <span className="text-[11px] text-rapi-gray-600">{t.settings.aiOwnKeyHint}</span>
               </span>
+              <span className="flex shrink-0 items-center gap-2">
+                {usingOwnKey && (
+                  <span className="rounded-full bg-rapi-income-soft px-2 py-0.5 text-[10px] font-semibold text-rapi-income dark:bg-rapi-income/20">
+                    {t.settings.active}
+                  </span>
+                )}
+                <ChevronDown
+                  size={16}
+                  className={cn('text-rapi-gray-600 transition-transform', byokOpen && 'rotate-180')}
+                />
+              </span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Sparkles size={15} className="text-rapi-blue" />
+              <span className="text-[13px] font-semibold text-rapi-navy dark:text-rapi-dark-ink">
+                {t.settings.aiProvider}
+              </span>
+              <span
+                className={cn(
+                  'ml-auto rounded-full px-2 py-0.5 text-[10px] font-semibold',
+                  apiKey
+                    ? 'bg-rapi-income-soft text-rapi-income dark:bg-rapi-income/20'
+                    : 'bg-rapi-gray-100 text-rapi-gray-600 dark:bg-white/10',
+                )}
+              >
+                {apiKey ? t.settings.active : t.settings.inactive}
+              </span>
+            </div>
+          )}
+
+          <AnimatePresence initial={false}>
+            {(!hasServerAi || byokOpen) && (
+              <motion.div
+                key="byok-body"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                <div className={cn(hasServerAi ? 'px-4 pb-4' : 'mt-2')}>
+                  <RapiSelect
+                    value={aiProvider}
+                    onChange={(v) => setProvider(v as typeof aiProvider)}
+                    ariaLabel={t.settings.aiProvider}
+                    options={AI_PROVIDERS.map((p) => ({ value: p.id, label: p.label }))}
+                  />
+
+                  <label
+                    htmlFor="ai-key"
+                    className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600"
+                  >
+                    {t.settings.apiKey}
+                  </label>
+                  {/* Border & centang hijau saat key sudah terisi — feedback jelas */}
+                  <div
+                    className={cn(
+                      'flex items-center rounded-rapi-md border-[1.5px] bg-white/70 outline-none transition-colors focus-within:border-rapi-blue dark:bg-white/5',
+                      apiKey
+                        ? 'border-rapi-income/50 dark:border-rapi-income/40'
+                        : 'border-rapi-blue/20 dark:border-white/10',
+                    )}
+                  >
+                    <input
+                      id="ai-key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      type={showKey ? 'text' : 'password'}
+                      placeholder={providerMeta(aiProvider).keyHint}
+                      autoComplete="off"
+                      className="w-full bg-transparent px-3 py-2.5 text-[13px] outline-none dark:text-rapi-dark-ink"
+                    />
+                    {apiKey && (
+                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-rapi-income text-white">
+                        <Check size={13} strokeWidth={3} />
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setShowKey((v) => !v)}
+                      aria-label={showKey ? t.common.close : 'Show'}
+                      className="px-3 text-rapi-gray-600"
+                    >
+                      {showKey ? <EyeOff size={16} /> : <Eye size={16} />}
+                    </button>
+                  </div>
+                  {apiKey && (
+                    <p className="mt-1.5 flex items-center gap-1 text-[11px] font-semibold text-rapi-income">
+                      <Check size={12} strokeWidth={3} />
+                      {t.settings.keySaved}
+                    </p>
+                  )}
+
+                  <label
+                    htmlFor="ai-model"
+                    className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600"
+                  >
+                    {t.settings.model}
+                  </label>
+                  <input
+                    id="ai-model"
+                    value={aiModel}
+                    onChange={(e) => setModel(e.target.value)}
+                    placeholder={providerMeta(aiProvider).defaultModel || 'model-name'}
+                    autoComplete="off"
+                    className={cn('w-full px-3 py-2.5 text-[13px] outline-none', INPUT)}
+                  />
+
+                  {providerMeta(aiProvider).needsBaseUrl && (
+                    <>
+                      <label
+                        htmlFor="ai-url"
+                        className="mb-1 mt-3 block text-[12px] font-medium text-rapi-gray-600"
+                      >
+                        {t.settings.baseUrl}
+                      </label>
+                      <input
+                        id="ai-url"
+                        value={baseUrl}
+                        onChange={(e) => setBaseUrl(e.target.value)}
+                        placeholder="https://api.provider.com/v1"
+                        autoComplete="off"
+                        className={cn('w-full px-3 py-2.5 text-[13px] outline-none', INPUT)}
+                      />
+                    </>
+                  )}
+
+                  <p className="mt-2 text-[11px] leading-relaxed text-rapi-gray-600">
+                    {t.settings.aiHelp}
+                    {providerMeta(aiProvider).keyUrl && (
+                      <span className="font-semibold text-rapi-blue">
+                        {t.settings.aiHelpKey(providerMeta(aiProvider).keyUrl)}
+                      </span>
+                    )}
+                    {t.settings.aiHelpEnd}
+                  </p>
+                </div>
+              </motion.div>
             )}
-            {t.settings.aiHelpEnd}
-          </p>
+          </AnimatePresence>
         </RapiCard>
       </section>
 
@@ -469,9 +619,17 @@ export default function Settings() {
         </RapiCard>
       </section>
 
-      {/* Lainnya */}
+      {/* Aplikasi — pasang ke home screen. Ditaruh di bawah, bukan di tengah
+          daftar setelan: ini ajakan, dan ajakan nggak boleh memotong barang
+          yang lagi dicari user. */}
+      <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '270ms' }}>
+        <h2 className={SECTION_H}>{t.settings.appSection}</h2>
+        <InstallCard />
+      </section>
+
+      {/* Data & Backup */}
       <section className="animate-rapi-fade-up mt-5" style={{ animationDelay: '290ms' }}>
-        <h2 className={SECTION_H}>{t.settings.other}</h2>
+        <h2 className={SECTION_H}>{t.settings.dataSection}</h2>
         <RapiCard className="flex flex-col gap-3">
           {/* Backup / restore data — cegah kehilangan data LocalStorage */}
           <div className="flex gap-2">
@@ -501,7 +659,9 @@ export default function Settings() {
               onChange={(e) => handleImport(e.target.files?.[0])}
             />
           </div>
-          <p className="text-[11px] leading-relaxed text-rapi-gray-600">{t.settings.backupHint}</p>
+          <p className="text-[11px] leading-relaxed text-rapi-gray-600">
+            {user ? t.settings.backupHintSynced : t.settings.backupHint}
+          </p>
 
           <hr className="border-rapi-gray-300/50 dark:border-white/10" />
 

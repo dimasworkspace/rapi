@@ -10,6 +10,10 @@ export function AmbientBackground() {
   useEffect(() => {
     const el = gridRef.current
     if (!el) return
+    // Parallax cuma buat perangkat bermouse. Di HP, pointermove ikut menyala
+    // sepanjang jari menggeser layar — grid bergeser tiap frame persis saat
+    // user lagi scroll, dan itu terbaca sebagai patah-patah.
+    if (!window.matchMedia('(pointer: fine)').matches) return
     let raf = 0
     const onMove = (e: PointerEvent) => {
       const x = e.clientX / window.innerWidth - 0.5
