@@ -39,6 +39,8 @@ const id = {
     /** Ajakan, BUKAN teguran — jangan pernah bikin user merasa bersalah. */
     logToday: 'Catat hari ini',
     addMore: 'Catat transaksi',
+    hideBalance: 'Sembunyikan nominal',
+    showBalance: 'Tampilkan nominal',
   },
   // Rangkuman mingguan: isinya harus hal yang BELUM kelihatan di kartu Masuk/Keluar
   // di atasnya — kategori penyedot terbesar, bukan mengulang angka yang sama.
@@ -229,6 +231,8 @@ const id = {
     emailPlaceholder: 'kamu@email.com',
     password: 'Kata sandi',
     passwordPlaceholder: 'Minimal 6 karakter',
+    showPassword: 'Tampilkan kata sandi',
+    hidePassword: 'Sembunyikan kata sandi',
     signIn: 'Masuk',
     signUp: 'Daftar',
     signingIn: 'Sebentar ya…',
@@ -281,6 +285,8 @@ const en: typeof id = {
     aiLabel: 'Chat with Rapi AI',
     logToday: 'Log today',
     addMore: 'Log a transaction',
+    hideBalance: 'Hide amounts',
+    showBalance: 'Show amounts',
   },
   weekly: {
     empty: (name: string) => `No records this week, ${name}. Start logging to keep things tidy.`,
@@ -463,6 +469,8 @@ const en: typeof id = {
     emailPlaceholder: 'you@email.com',
     password: 'Password',
     passwordPlaceholder: 'At least 6 characters',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
     signIn: 'Sign in',
     signUp: 'Sign up',
     signingIn: 'One moment…',

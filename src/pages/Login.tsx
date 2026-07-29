@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AuthError } from '@supabase/supabase-js'
-import { Loader2, Mail } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail } from 'lucide-react'
 import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
@@ -61,6 +61,7 @@ export default function Login() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -164,17 +165,30 @@ export default function Login() {
           <label htmlFor="auth-pass" className="mb-1 block text-xs font-bold text-rapi-gray-600">
             {t.auth.password}
           </label>
-          <input
-            id="auth-pass"
-            type="password"
-            required
-            minLength={6}
-            autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t.auth.passwordPlaceholder}
-            className={INPUT}
-          />
+          {/* Tombol lihat kata sandi — di HP, salah ketik password itu mahal
+              karena hurufnya nggak kelihatan sama sekali. */}
+          <div className="relative">
+            <input
+              id="auth-pass"
+              type={showPassword ? 'text' : 'password'}
+              required
+              minLength={6}
+              autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={t.auth.passwordPlaceholder}
+              className={cn(INPUT, 'pr-12')}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? t.auth.hidePassword : t.auth.showPassword}
+              aria-pressed={showPassword}
+              className="absolute inset-y-0 right-0 flex w-12 items-center justify-center text-rapi-gray-600 transition-colors hover:text-rapi-blue"
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         {error && (

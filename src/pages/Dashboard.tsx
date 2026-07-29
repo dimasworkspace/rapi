@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { isToday } from 'date-fns'
-import { ArrowDown, ArrowUp, ChevronRight, MessageCircle, Plus } from 'lucide-react'
+import { ArrowDown, ArrowUp, ChevronRight, Eye, EyeOff, MessageCircle, Plus } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { RapiButton } from '@/components/rapi/RapiButton'
@@ -11,9 +11,15 @@ import { formatRupiah } from '@/lib/formatters'
 import { type Dict, useT } from '@/lib/i18n'
 import { useCountUp } from '@/lib/useCountUp'
 import { useCategoryStore } from '@/store/categoryStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { sortByDateDesc, useTransactionStore } from '@/store/transactionStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
+
+// Pengganti nominal saat disembunyikan. Pakai titik tebal, bukan angka acak —
+// biar jelas ini disamarkan, bukan saldonya beneran segitu.
+const MASKED = '•••••••'
+const MASKED_SM = '••••'
 
 // Rangkuman mingguan (7 hari terakhir). Sengaja mengangkat kategori penyedot
 // terbesar, bukan mengulang total masuk/keluar — dua angka itu sudah tercetak
@@ -42,6 +48,8 @@ export default function Dashboard() {
   const profile = useUserStore((s) => s.profile)
   const transactions = useTransactionStore((s) => s.transactions)
   const categories = useCategoryStore((s) => s.categories)
+  const hideBalance = useSettingsStore((s) => s.hideBalance)
+  const toggleHideBalance = useSettingsStore((s) => s.toggleHideBalance)
   const name = profile?.name ?? 'Kamu'
 
   const { balance, monthIncome, monthExpense, recent, todayCount, weeklySummary } = useMemo(() => {
@@ -122,12 +130,25 @@ export default function Dashboard() {
           <p className="text-xs text-white/60">{t.greeting(new Date().getHours())}</p>
           <p className="mt-1 text-xl font-bold">{t.dashboard.hello(name)}</p>
 
-          <p className="mt-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
-            {t.dashboard.totalBalance}
-          </p>
+          {/* Label + tombol sembunyikan nominal. Tombolnya nempel di label, bukan
+              di pojok layar, biar hubungannya dengan angka di bawahnya jelas. */}
+          <div className="mt-6 flex items-center justify-center gap-1.5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-white/50">
+              {t.dashboard.totalBalance}
+            </p>
+            <button
+              type="button"
+              onClick={toggleHideBalance}
+              aria-label={hideBalance ? t.dashboard.showBalance : t.dashboard.hideBalance}
+              aria-pressed={hideBalance}
+              className="-my-2 flex h-9 w-9 items-center justify-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white/80 active:scale-90"
+            >
+              {hideBalance ? <EyeOff size={14} /> : <Eye size={14} />}
+            </button>
+          </div>
           {/* Ukuran menyesuaikan lebar layar — angka penuh (mis. Rp 12.865.000) tetap muat di HP kecil */}
           <p className="tabular-nums mt-1.5 text-[clamp(1.75rem,8.5vw,2.5rem)] font-bold leading-none tracking-tight">
-            {formatRupiah(animatedBalance)}
+            {hideBalance ? MASKED : formatRupiah(animatedBalance)}
           </p>
 
           {/* 3 card stat glass — semua bisa diklik, muncul berurutan (aturan stagger-sequence) */}
@@ -143,7 +164,7 @@ export default function Dashboard() {
                 {t.dashboard.in}
               </p>
               <p className="tabular-nums mt-1 text-[11px] font-bold leading-tight text-white">
-                {formatRupiah(monthIncome)}
+                {hideBalance ? MASKED_SM : formatRupiah(monthIncome)}
               </p>
             </button>
 
@@ -190,7 +211,7 @@ export default function Dashboard() {
                 {t.dashboard.out}
               </p>
               <p className="tabular-nums mt-1 text-[11px] font-bold leading-tight text-white">
-                {formatRupiah(monthExpense)}
+                {hideBalance ? MASKED_SM : formatRupiah(monthExpense)}
               </p>
             </button>
           </div>
