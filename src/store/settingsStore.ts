@@ -7,9 +7,12 @@ export type Lang = 'id' | 'en'
 interface SettingsState {
   theme: Theme
   lang: Lang
+  /** Sembunyikan nominal di Dashboard — buat dipakai di tempat ramai. */
+  hideBalance: boolean
   setTheme: (theme: Theme) => void
   toggleTheme: () => void
   setLang: (lang: Lang) => void
+  toggleHideBalance: () => void
 }
 
 /** Terapkan tema ke <html>: class 'dark' untuk Tailwind + warna status bar. */
@@ -30,6 +33,7 @@ export const useSettingsStore = create<SettingsState>()(
     (set) => ({
       theme: 'light',
       lang: 'id',
+      hideBalance: false,
       setTheme: (theme) => {
         applyTheme(theme)
         set({ theme })
@@ -44,6 +48,7 @@ export const useSettingsStore = create<SettingsState>()(
         applyLang(lang)
         set({ lang })
       },
+      toggleHideBalance: () => set((s) => ({ hideBalance: !s.hideBalance })),
     }),
     {
       name: 'rapi-settings',
