@@ -1,84 +1,115 @@
 ---
-// Fitur dikelompokkan: 3 cara mencatat dulu (itu inti Rapi), baru sisanya.
-const caraCatat = [
-  {
-    emoji: '⌨️',
-    judul: 'Ketik sekenanya',
-    isi: 'Tulis "makan siang 25rb" apa adanya. Nominal, kategori, dan jenisnya kebaca otomatis — nggak ada form panjang.',
-  },
-  {
-    emoji: '🎙️',
-    judul: 'Ngomong aja',
-    isi: 'Lagi nyetir atau tangan penuh? Sebutin transaksinya, Rapi yang nulis. Selesai sebelum kamu sempat lupa.',
-  },
-  {
-    emoji: '📸',
-    judul: 'Foto struknya',
-    isi: 'Jepret struk belanja, AI-nya baca sendiri totalnya. Nggak usah ngetik satu per satu.',
-  },
-]
-
-const lainnya = [
-  {
-    emoji: '💬',
-    judul: 'Rapi AI',
-    isi: 'Tanya apa aja soal keuanganmu. Jawabannya dari catatanmu yang beneran, bukan template.',
-  },
-  {
-    emoji: '📊',
-    judul: 'Laporan yang ngomong',
-    isi: 'Bukan cuma grafik. Rapi kasih tahu kategori paling boros dan bandingannya dengan bulan lalu.',
-  },
-  {
-    emoji: '📈',
-    judul: 'Investasi',
-    isi: 'Saham, reksa dana, kripto, emas. Untung ruginya kehitung sendiri.',
-  },
-  {
-    emoji: '☁️',
-    judul: 'Sinkron otomatis',
-    isi: 'Catat di HP, kebuka di laptop. Datamu ikut ke mana pun kamu masuk.',
-  },
-]
+import Icon from '@/components/Icon.astro'
 ---
 
-<section id="fitur" class="py-20 md:py-28">
+<section id="fitur" class="py-24 md:py-32">
   <div class="rapi-container">
-    <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Fitur</p>
-    <h2 class="mt-3 max-w-2xl text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tight">
-      Tiga cara nyatat. Pilih yang paling nggak ngerepotin.
-    </h2>
-    <p class="mt-4 max-w-xl text-[16px] leading-relaxed text-rapi-gray-600">
-      Kebanyakan orang berhenti nyatat karena ribet, bukan karena nggak mau. Jadi Rapi
-      bikin langkahnya sesedikit mungkin.
-    </p>
-
-    <div class="mt-10 grid gap-4 md:grid-cols-3">
-      {
-        caraCatat.map((f) => (
-          <article class="rapi-card">
-            <span class="text-3xl" aria-hidden="true">
-              {f.emoji}
-            </span>
-            <h3 class="mt-3 text-[17px] font-bold">{f.judul}</h3>
-            <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">{f.isi}</p>
-          </article>
-        ))
-      }
+    <div class="max-w-2xl" data-reveal>
+      <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Fitur</p>
+      <h2 class="mt-3 text-display-lg font-extrabold">
+        Tiga cara nyatat.<br class="hidden sm:block" /> Pilih yang paling nggak ngerepotin.
+      </h2>
     </div>
 
-    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {
-        lainnya.map((f) => (
-          <article class="rapi-card">
-            <span class="text-2xl" aria-hidden="true">
-              {f.emoji}
-            </span>
-            <h3 class="mt-3 text-[15px] font-bold">{f.judul}</h3>
-            <p class="mt-1.5 text-[13px] leading-relaxed text-rapi-gray-600">{f.isi}</p>
-          </article>
-        ))
-      }
+    <!-- Bento: ukuran kartu sengaja beda-beda.
+         Grid seragam bikin semua fitur terasa sama penting — padahal nggak.
+         "Ketik" itu jalan utama, jadi dia dapat ruang paling besar. -->
+    <div class="mt-12 grid gap-4 lg:grid-cols-6">
+      <!-- Kartu utama -->
+      <article
+        class="group relative overflow-hidden rounded-rapi-xl bg-rapi-navy p-8 text-white lg:col-span-4 lg:row-span-2"
+        data-reveal
+      >
+        <div
+          aria-hidden="true"
+          class="absolute -right-16 -top-16 h-64 w-64 rounded-full bg-rapi-blue/40 blur-3xl transition-transform duration-700 group-hover:scale-125"
+        >
+        </div>
+        <div class="relative">
+          <span class="inline-flex h-12 w-12 items-center justify-center rounded-rapi-md bg-rapi-yellow text-rapi-navy">
+            <Icon name="keyboard" />
+          </span>
+          <h3 class="mt-6 text-display-md font-extrabold">Ketik sekenanya</h3>
+          <p class="mt-3 max-w-md text-[15px] leading-relaxed text-white/65">
+            Tulis apa adanya, seperti ngabarin teman. Nominal, kategori, dan jenis
+            transaksinya kebaca sendiri — dan Rapi selalu nunjukin tebakannya dulu
+            sebelum menyimpan, jadi nggak ada yang masuk diam-diam.
+          </p>
+
+          <div class="mt-7 flex flex-wrap gap-2">
+            {
+              ['nasi padang 32rb', 'gaji 3jt', 'grab 18rb', 'listrik 250rb'].map((c) => (
+                <span class="rounded-full border border-white/15 bg-white/5 px-3 py-1.5 text-[13px] font-medium text-white/70">
+                  {c}
+                </span>
+              ))
+            }
+          </div>
+        </div>
+      </article>
+
+      <article class="rapi-card lg:col-span-2" data-reveal>
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
+          <Icon name="mic" class="h-5 w-5" />
+        </span>
+        <h3 class="mt-4 text-[18px] font-bold">Ngomong aja</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">
+          Tangan penuh belanjaan? Sebutin transaksinya, Rapi yang nulis.
+        </p>
+      </article>
+
+      <article class="rapi-card lg:col-span-2" data-reveal>
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
+          <Icon name="camera" class="h-5 w-5" />
+        </span>
+        <h3 class="mt-4 text-[18px] font-bold">Foto struknya</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">
+          Jepret struk, AI-nya baca sendiri totalnya. Nggak usah ngetik satu-satu.
+        </p>
+      </article>
+
+      <!-- Kartu kuning — satu-satunya di halaman, jadi mata pasti mampir -->
+      <article class="relative overflow-hidden rounded-rapi-xl bg-rapi-yellow p-8 lg:col-span-3" data-reveal>
+        <span class="inline-flex h-12 w-12 items-center justify-center rounded-rapi-md bg-rapi-navy text-rapi-yellow">
+          <Icon name="chat" />
+        </span>
+        <h3 class="mt-5 text-[22px] font-extrabold text-rapi-navy">Rapi AI</h3>
+        <p class="mt-2 max-w-sm text-[14px] leading-relaxed text-rapi-navy/70">
+          Tanya "aku boros nggak sih bulan ini?" — dijawab pakai catatanmu yang
+          beneran, bukan jawaban umum yang bisa dikasih ke siapa aja.
+        </p>
+      </article>
+
+      <article class="rapi-card lg:col-span-3" data-reveal>
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
+          <Icon name="chart" class="h-5 w-5" />
+        </span>
+        <h3 class="mt-4 text-[18px] font-bold">Laporan yang ngomong</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">
+          Bukan cuma grafik. Rapi sebutin kategori paling nyedot dan bandingannya
+          dengan bulan lalu — hal yang nggak kelihatan dari angka saja.
+        </p>
+      </article>
+
+      <article class="rapi-card lg:col-span-3" data-reveal>
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
+          <Icon name="trend" class="h-5 w-5" />
+        </span>
+        <h3 class="mt-4 text-[18px] font-bold">Investasi</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">
+          Saham, reksa dana, kripto, emas. Untung ruginya kehitung sendiri.
+        </p>
+      </article>
+
+      <article class="rapi-card lg:col-span-3" data-reveal>
+        <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
+          <Icon name="cloud" class="h-5 w-5" />
+        </span>
+        <h3 class="mt-4 text-[18px] font-bold">Sinkron otomatis</h3>
+        <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">
+          Catat di HP, kebuka di laptop. Datamu ikut ke mana pun kamu masuk.
+        </p>
+      </article>
     </div>
   </div>
 </section>

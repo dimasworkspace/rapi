@@ -39,14 +39,26 @@ src/
   Bagian 2 di `../CLAUDE.md`.
 - **Nominal ditulis penuh** (`Rp 2.865.000`), nggak dibulatkan jadi "Rp 2,9 jt".
 
+## Keputusan desain
+
+- **Nggak pakai emoji sebagai ikon.** Emoji beda rupa di tiap sistem operasi dan
+  ukurannya nggak bisa dikontrol. Semua ikon digambar di `components/Icon.astro`
+  dengan ketebalan garis seragam.
+- **Grid sengaja nggak simetris** (bento). Kalau semua kartu seukuran, semua
+  fitur terasa sama penting — padahal "ketik" itu jalan utamanya.
+- **Satu kartu kuning saja** di seluruh halaman, supaya mata punya tujuan.
+- **Hero memperagakan, bukan menceritakan.** Demo ketik di hero menjalankan
+  contoh sungguhan → hasil baca → tersimpan. Menjelaskan itu butuh satu
+  paragraf; memperagakan butuh lima detik.
+
 ## Yang masih perlu diganti
 
 | Bagian | Status |
 |---|---|
-| Pratinjau app di Hero | Masih **tiruan HTML**, bukan tangkapan layar asli. Ganti dengan screenshot Dashboard beneran. |
+| Bukti sosial | **Sengaja tanpa angka & testimoni.** Rapi belum punya pengguna sebanyak itu, dan mengarang angka di app keuangan itu bunuh diri. Diganti section "Kenapa bisa dipercaya" yang semua klaimnya bisa dicek di kode. Ganti dengan testimoni asli begitu ada. |
+| Gambar Open Graph | ✅ Sudah 1200×630 (`public/og-image.png`). |
+| Pratinjau app | Hero sekarang pakai **demo ketik interaktif**, bukan screenshot. Kalau nanti mau menambah tangkapan layar Dashboard asli, taruh di `public/` lalu sisipkan di section Fitur. |
 | `site` di `astro.config.mjs` | Masih `rapi-landing.vercel.app`. Ganti kalau sudah punya domain. |
-| Bukti sosial | Belum ada sama sekali — jumlah pengguna, testimoni, atau ulasan. Tambahkan kalau datanya sudah nyata, jangan dikarang. |
-| Gambar Open Graph | Masih memakai ikon app. Idealnya dibuat khusus 1200×630. |
 
 ## Deploy
 

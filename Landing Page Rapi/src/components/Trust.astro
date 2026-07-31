@@ -1,0 +1,78 @@
+---
+import Icon from '@/components/Icon.astro'
+
+// CATATAN PENTING BUAT SIAPA PUN YANG MENGEDIT FILE INI:
+// Section ini menggantikan "bukti sosial" yang biasa dipajang di landing page
+// (jumlah pengguna, testimoni, rating bintang). Rapi belum punya angka itu,
+// dan mengarangnya bukan cuma nggak jujur — buat app keuangan itu bunuh diri.
+// Sekali ketahuan, nggak ada yang mau menitipkan catatan duitnya.
+//
+// Yang dipakai di sini semuanya bisa diverifikasi di kode:
+//   - RLS per user      -> supabase/schema.sql
+//   - Key AI di server  -> supabase/functions/ai/index.ts
+//   - Jalan offline     -> service worker (vite-plugin-pwa)
+// Kalau nanti sudah punya pengguna sungguhan, ganti dengan testimoni asli.
+
+const jaminan = [
+  {
+    icon: 'lock' as const,
+    judul: 'Catatanmu cuma bisa dibuka kamu',
+    isi: 'Dijaga aturan akses di tingkat database, bukan sekadar disembunyikan di tampilan. Secara teknis, akun lain nggak punya jalan buat membaca datamu.',
+  },
+  {
+    icon: 'bolt' as const,
+    judul: 'Gratis, termasuk AI-nya',
+    isi: 'Nggak perlu bikin API key sendiri, nggak perlu masukin kartu. Ada batas wajar pemakaian AI per hari biar adil buat semua orang.',
+  },
+  {
+    icon: 'cloud' as const,
+    judul: 'Tetap jalan waktu offline',
+    isi: 'Catat di angkot tanpa sinyal, nanti tersinkron sendiri begitu ada internet.',
+  },
+]
+---
+
+<section class="border-y border-rapi-gray-300/40 bg-white py-24 md:py-28">
+  <div class="rapi-container">
+    <div class="grid gap-14 lg:grid-cols-12">
+      <div class="lg:col-span-5" data-reveal>
+        <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">
+          Kenapa bisa dipercaya
+        </p>
+        <h2 class="mt-3 text-display-lg font-extrabold">Rapi masih baru. Dan kami nggak nutupin itu.</h2>
+        <p class="mt-5 text-[16px] leading-relaxed text-rapi-gray-600">
+          Kamu nggak akan nemu klaim "dipakai 10.000 orang" di halaman ini, karena
+          angkanya belum sampai situ. Yang bisa kami tunjukin sekarang cuma satu:
+          bagaimana Rapi memperlakukan datamu.
+        </p>
+
+        <div class="mt-8 rounded-rapi-lg border-l-[3px] border-rapi-yellow bg-rapi-gray-100 p-5">
+          <p class="text-[14px] leading-relaxed text-rapi-gray-600">
+            <span class="font-bold text-rapi-navy">Yang belum bisa Rapi lakuin:</span>
+            nyambung langsung ke rekening bank. Itu butuh akses ke data yang sangat
+            sensitif, dan kami milih nunda sampai benar-benar siap — daripada
+            buru-buru demi kelihatan lengkap.
+          </p>
+        </div>
+      </div>
+
+      <ul class="grid gap-4 lg:col-span-7">
+        {
+          jaminan.map((j) => (
+            <li class="flex items-start gap-4 rounded-rapi-lg border border-rapi-gray-300/50 p-6" data-reveal>
+              <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-rapi-md bg-rapi-navy text-rapi-yellow">
+                <Icon name={j.icon} class="h-5 w-5" />
+              </span>
+              <span>
+                <span class="block text-[16px] font-bold">{j.judul}</span>
+                <span class="mt-1.5 block text-[14px] leading-relaxed text-rapi-gray-600">
+                  {j.isi}
+                </span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

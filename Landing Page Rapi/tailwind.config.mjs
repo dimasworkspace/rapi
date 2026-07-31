@@ -34,6 +34,43 @@ export default {
       maxWidth: {
         content: '72rem',
       },
+      // Skala tipe display — landing page butuh ukuran yang lebih berani
+      // daripada app. Angkanya clamp() supaya turun mulus di HP tanpa
+      // breakpoint manual.
+      fontSize: {
+        'display-xl': ['clamp(2.75rem,8vw,5.5rem)', { lineHeight: '0.95', letterSpacing: '-0.035em' }],
+        'display-lg': ['clamp(2rem,5vw,3.5rem)', { lineHeight: '1.05', letterSpacing: '-0.03em' }],
+        'display-md': ['clamp(1.5rem,3.5vw,2.25rem)', { lineHeight: '1.15', letterSpacing: '-0.02em' }],
+      },
+      // Token gerak — satu sumber biar semua animasi terasa dari keluarga
+      // yang sama, bukan tiap komponen bikin easing sendiri.
+      transitionTimingFunction: {
+        'rapi-out': 'cubic-bezier(0.22, 1, 0.36, 1)',
+      },
+      keyframes: {
+        'rapi-reveal': {
+          from: { opacity: '0', transform: 'translateY(18px)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+        'rapi-caret': {
+          '0%, 45%': { opacity: '1' },
+          '50%, 95%': { opacity: '0' },
+        },
+        'rapi-pop': {
+          from: { opacity: '0', transform: 'scale(0.94) translateY(6px)' },
+          to: { opacity: '1', transform: 'none' },
+        },
+        'rapi-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+      },
+      animation: {
+        'rapi-reveal': 'rapi-reveal 0.7s cubic-bezier(0.22,1,0.36,1) both',
+        'rapi-caret': 'rapi-caret 1.1s steps(1) infinite',
+        'rapi-pop': 'rapi-pop 0.45s cubic-bezier(0.22,1,0.36,1) both',
+        'rapi-float': 'rapi-float 6s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

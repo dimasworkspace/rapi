@@ -1,85 +1,207 @@
 ---
 import { APP_URL, SITE } from '@/consts'
+import Icon from '@/components/Icon.astro'
 ---
 
 <section class="relative overflow-hidden bg-rapi-navy text-white">
-  <!-- Aksen latar — glow biru & kuning, senada hero di dalam app -->
+  <!-- Latar: glow + grid halus, senada AmbientBackground di app -->
   <div aria-hidden="true" class="pointer-events-none absolute inset-0">
-    <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-rapi-blue/40 blur-3xl"></div>
-    <div class="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-rapi-yellow/15 blur-3xl"></div>
+    <div class="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-rapi-blue/45 blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-24 h-[26rem] w-[26rem] rounded-full bg-rapi-yellow/12 blur-3xl"></div>
+    <div
+      class="absolute inset-0 opacity-[0.35]"
+      style="background-image:linear-gradient(to right,rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.06) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 75%)"
+    >
+    </div>
   </div>
 
-  <div class="rapi-container relative grid items-center gap-12 py-20 md:grid-cols-2 md:py-28">
-    <div>
-      <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-yellow">
-        {SITE.hashtag}
-      </p>
-      <!-- Pakai span block, bukan <br />: patahan barisnya tetap sama, tapi
-           pembaca layar & mesin pencari tetap membacanya sebagai dua kata
-           terpisah ("keuangan semudah", bukan "keuangansemudah"). -->
-      <h1 class="mt-4 text-[clamp(2.25rem,6vw,3.5rem)] font-extrabold leading-[1.08] tracking-tight">
-        <span class="block">Nyatat keuangan</span>
-        <span class="block">semudah ngobrol.</span>
-      </h1>
-      <p class="mt-5 max-w-lg text-[17px] leading-relaxed text-white/75">
-        Ketik <em class="not-italic font-semibold text-white">"makan siang 25rb"</em>, ngomong aja,
-        atau foto struknya. Rapi yang ngerapiin — kamu tinggal lanjut hidup.
-      </p>
+  <div class="rapi-container relative pb-24 pt-16 md:pb-32 md:pt-24">
+    <!-- Kolom teks sengaja lebih lebar dari kolom demo (7:5), bukan 50:50.
+         Simetri sempurna itu yang bikin halaman terasa template. -->
+    <div class="grid items-center gap-14 lg:grid-cols-12">
+      <div class="lg:col-span-7">
+        <p class="animate-rapi-reveal inline-flex items-center gap-2 rounded-full border border-rapi-yellow/30 bg-rapi-yellow/10 px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.16em] text-rapi-yellow">
+          <Icon name="bolt" class="h-3.5 w-3.5" />
+          {SITE.hashtag}
+        </p>
 
-      <div class="mt-8 flex flex-wrap items-center gap-3">
-        <a href={APP_URL} class="rapi-btn-primary">Mulai Gratis</a>
-        <a href="#fitur" class="rapi-btn-ghost !border-white/25 !text-white hover:!border-rapi-yellow hover:!text-rapi-yellow">
-          Lihat fiturnya
-        </a>
+        <h1
+          class="animate-rapi-reveal mt-6 text-display-xl font-extrabold"
+          style="animation-delay:80ms"
+        >
+          <span class="block">Nyatat duit</span>
+          <span class="block text-rapi-yellow">secepat ngetik chat.</span>
+        </h1>
+
+        <p
+          class="animate-rapi-reveal mt-7 max-w-xl text-[18px] leading-relaxed text-white/70"
+          style="animation-delay:160ms"
+        >
+          Nggak ada form. Nggak ada dropdown kategori. Tulis kalimat biasa —
+          Rapi yang baca nominalnya, tebak kategorinya, dan simpan.
+        </p>
+
+        <div
+          class="animate-rapi-reveal mt-9 flex flex-wrap items-center gap-3"
+          style="animation-delay:240ms"
+        >
+          <a href={APP_URL} class="rapi-btn-primary group">
+            Mulai Gratis
+            <Icon name="arrow" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </a>
+          <a
+            href="#fitur"
+            class="rapi-btn-ghost !border-white/20 !text-white hover:!border-rapi-yellow hover:!text-rapi-yellow"
+          >
+            Lihat cara kerjanya
+          </a>
+        </div>
+
+        <ul
+          class="animate-rapi-reveal mt-8 flex flex-wrap gap-x-6 gap-y-2 text-[13px] text-white/45"
+          style="animation-delay:320ms"
+        >
+          <li class="flex items-center gap-1.5"><Icon name="check" class="h-4 w-4 text-rapi-yellow" />Gratis, termasuk AI</li>
+          <li class="flex items-center gap-1.5"><Icon name="check" class="h-4 w-4 text-rapi-yellow" />Tanpa kartu kredit</li>
+          <li class="flex items-center gap-1.5"><Icon name="check" class="h-4 w-4 text-rapi-yellow" />HP & laptop</li>
+        </ul>
       </div>
 
-      <p class="mt-5 text-[13px] text-white/50">
-        Gratis · Nggak perlu kartu kredit · Jalan di HP & laptop
-      </p>
-    </div>
+      <!-- DEMO HIDUP.
+           Ini pengganti "screenshot produk" yang biasa. Alih-alih memajang
+           gambar diam, halaman ini memperagakan hal yang paling sulit
+           dipercaya dari Rapi: kamu ngetik kalimat biasa, dan transaksinya
+           jadi. Menceritakan itu butuh satu paragraf; memperagakan butuh
+           lima detik. -->
+      <div class="animate-rapi-reveal lg:col-span-5" style="animation-delay:200ms">
+        <div class="relative mx-auto max-w-[22rem]">
+          <div class="absolute -inset-4 rounded-[2rem] bg-rapi-blue/20 blur-2xl" aria-hidden="true"></div>
 
-    <!-- Pratinjau app dalam bingkai HP.
-         CATATAN: ini tiruan sederhana pakai token yang sama, dibikin supaya
-         halaman nggak kosong sebelum ada tangkapan layar asli. Ganti dengan
-         screenshot Dashboard beneran begitu tersedia. -->
-    <div class="justify-self-center">
-      <div class="w-[280px] rounded-[2.25rem] border-[10px] border-black/40 bg-rapi-navy shadow-rapi-elevated">
-        <div class="rounded-[1.6rem] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] p-5">
-          <p class="text-center text-[11px] text-white/50">Selamat sore 🌤️</p>
-          <p class="mt-1 text-center text-lg font-bold">Halo, Dimas</p>
-
-          <p class="mt-6 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
-            Total Saldo
-          </p>
-          <p class="mt-1 text-center text-[28px] font-bold leading-none tracking-tight tabular-nums">
-            Rp 2.865.000
-          </p>
-
-          <div class="mt-5 grid grid-cols-3 gap-1.5 text-center">
-            <div class="rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 px-1 py-2">
-              <p class="text-[9px] font-bold uppercase text-emerald-200/80">Masuk</p>
-              <p class="mt-0.5 text-[10px] font-bold tabular-nums">Rp 3.800.000</p>
-            </div>
-            <div class="rounded-rapi-md border border-rapi-yellow/50 bg-rapi-yellow/15 px-1 py-2">
-              <p class="text-[15px] font-bold leading-none text-rapi-yellow">+</p>
-              <p class="mt-1 text-[9px] font-bold uppercase text-white/85">Catat hari ini</p>
-            </div>
-            <div class="rounded-rapi-md border border-red-300/25 bg-red-400/10 px-1 py-2">
-              <p class="text-[9px] font-bold uppercase text-red-200/80">Keluar</p>
-              <p class="mt-0.5 text-[10px] font-bold tabular-nums">Rp 935.000</p>
-            </div>
-          </div>
-
-          <div class="mt-4 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-3">
-            <p class="text-[9px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
-              Rangkuman Minggu Ini
+          <div class="relative rounded-rapi-xl border border-white/12 bg-white/[0.07] p-5 backdrop-blur-xl">
+            <p class="text-[11px] font-bold uppercase tracking-[0.14em] text-white/40">
+              Coba ketik apa aja
             </p>
-            <p class="mt-1 text-[11px] font-semibold leading-snug">
-              🛍️ Belanja nyedot paling banyak minggu ini: Rp 935.000.
-            </p>
+
+            <!-- Kolom ketik -->
+            <div class="mt-3 flex min-h-[52px] items-center rounded-rapi-md border border-white/15 bg-rapi-navy/60 px-4 py-3">
+              <p class="text-[15px] font-medium">
+                <span id="demo-text" data-fallback="makan siang 25rb">makan siang 25rb</span
+                ><span
+                  id="demo-caret"
+                  class="ml-0.5 inline-block h-[1.1em] w-[2px] translate-y-[0.18em] bg-rapi-yellow align-middle"
+                  aria-hidden="true"></span>
+              </p>
+            </div>
+
+            <!-- Hasil baca -->
+            <div id="demo-result" class="mt-3 opacity-0 transition-opacity duration-300">
+              <div class="flex items-center gap-3 rounded-rapi-md border border-rapi-yellow/25 bg-rapi-yellow/10 px-4 py-3">
+                <span
+                  id="demo-emoji"
+                  class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rapi-yellow/20 text-lg"
+                  aria-hidden="true">🍜</span
+                >
+                <span class="min-w-0 flex-1">
+                  <span id="demo-amount" class="block text-[17px] font-bold tabular-nums leading-tight">
+                    Rp 25.000
+                  </span>
+                  <span id="demo-meta" class="block text-[12px] text-white/55">
+                    Makanan · Pengeluaran
+                  </span>
+                </span>
+                <Icon name="check" class="h-5 w-5 shrink-0 text-rapi-yellow" />
+              </div>
+              <p class="mt-2.5 text-center text-[12px] font-semibold text-white/40">
+                Kecatat dalam <span class="text-rapi-yellow">1,8 detik</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Pembatas lengkung — memutus kotak persegi yang bikin halaman kaku -->
+  <div aria-hidden="true" class="absolute inset-x-0 bottom-0">
+    <svg class="block h-[40px] w-full sm:h-[64px]" viewBox="0 0 1440 64" preserveAspectRatio="none">
+      <path d="M0 64V24C240 56 480 64 720 64s480-8 720-40v80z" fill="#FBFCFC"></path>
+    </svg>
+  </div>
 </section>
+
+<script>
+  // Demo ketik. Sengaja vanilla & kecil — landing page nggak perlu framework
+  // buat satu animasi. Kalau JS mati, teks contoh terakhir tetap terbaca.
+  const CONTOH = [
+    { teks: 'makan siang 25rb', emoji: '🍜', nominal: 'Rp 25.000', meta: 'Makanan · Pengeluaran' },
+    { teks: 'gaji bulanan 3jt', emoji: '💼', nominal: 'Rp 3.000.000', meta: 'Gaji · Pemasukan' },
+    { teks: 'bensin 20rb', emoji: '🚗', nominal: 'Rp 20.000', meta: 'Transportasi · Pengeluaran' },
+    { teks: 'kopi 18rb', emoji: '🍜', nominal: 'Rp 18.000', meta: 'Makanan · Pengeluaran' },
+  ]
+
+  const el = {
+    teks: document.getElementById('demo-text'),
+    hasil: document.getElementById('demo-result'),
+    emoji: document.getElementById('demo-emoji'),
+    nominal: document.getElementById('demo-amount'),
+    meta: document.getElementById('demo-meta'),
+    caret: document.getElementById('demo-caret'),
+  }
+
+  const kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  if (el.teks && el.hasil && !kurangiGerak) {
+    const tunggu = (ms: number) => new Promise((r) => setTimeout(r, ms))
+    let i = 0
+
+    const putar = async () => {
+      const c = CONTOH[i % CONTOH.length]
+      i++
+
+      // Kelas animasinya WAJIB dilepas duluan. Dia pakai fill-mode "both",
+      // yang menahan opacity:1 dan mengalahkan style.opacity di bawah —
+      // akibatnya hasil lama masih nangkring waktu contoh baru diketik.
+      el.hasil!.classList.remove('animate-rapi-pop')
+      el.hasil!.style.opacity = '0'
+      el.teks!.textContent = ''
+      el.caret?.classList.add('animate-rapi-caret')
+      await tunggu(400)
+
+      // Ketik huruf per huruf, ritmenya sedikit acak biar terasa manusia
+      for (const huruf of c.teks) {
+        el.teks!.textContent += huruf
+        await tunggu(38 + Math.random() * 55)
+      }
+
+      el.caret?.classList.remove('animate-rapi-caret')
+      await tunggu(320)
+
+      el.emoji!.textContent = c.emoji
+      el.nominal!.textContent = c.nominal
+      el.meta!.textContent = c.meta
+      el.hasil!.style.opacity = '1'
+      void el.hasil!.offsetWidth // paksa reflow biar animasinya jalan lagi
+      el.hasil!.classList.add('animate-rapi-pop')
+
+      await tunggu(2400)
+      void putar()
+    }
+
+    // Baru mulai kalau demonya benar-benar kelihatan — jangan buang tenaga
+    // menganimasikan sesuatu di luar layar.
+    const pengamat = new IntersectionObserver(
+      (entri) => {
+        if (entri[0]?.isIntersecting) {
+          pengamat.disconnect()
+          void putar()
+        }
+      },
+      { threshold: 0.4 },
+    )
+    pengamat.observe(el.hasil)
+  } else if (el.hasil) {
+    // Tanpa JS / mode kurangi gerak: tampilkan hasilnya langsung
+    el.hasil.style.opacity = '1'
+    el.caret?.remove()
+  }
+</script>
