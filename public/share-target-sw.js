@@ -12,7 +12,7 @@ const RAPI_SHARE_KEY = '/__struk-dibagikan'
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url)
-  if (event.request.method !== 'POST' || url.pathname !== '/bagikan') return
+  if (event.request.method !== 'POST' || url.pathname !== '/app/bagikan') return
 
   event.respondWith(
     (async () => {
@@ -27,13 +27,13 @@ self.addEventListener('fetch', (event) => {
               headers: { 'Content-Type': file.type || 'image/jpeg' },
             }),
           )
-          return Response.redirect('/?aksi=struk', 303)
+          return Response.redirect('/app/?aksi=struk', 303)
         }
       } catch (err) {
         // Kiriman gagal dibaca — jangan biarkan user mendarat di layar error.
         console.error('[rapi] gagal baca kiriman struk:', err)
       }
-      return Response.redirect('/', 303)
+      return Response.redirect('/app/', 303)
     })(),
   )
 })

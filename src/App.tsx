@@ -99,7 +99,9 @@ export default function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <BrowserRouter>
+      {/* basename ikut base Vite ("/app/"), jadi rute internal tetap benar
+          waktu app disajikan di bawah subpath, bukan di akar domain. */}
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
         <Routes>
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />

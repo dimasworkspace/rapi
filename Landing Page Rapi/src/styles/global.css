@@ -12,6 +12,14 @@
 }
 
 @layer base {
+  /* Atribut [hidden] kalah lawan class display Tailwind (mis. `flex`), karena
+     selektor class lebih kuat daripada selektor atribut. Akibatnya elemen yang
+     sudah di-`hidden` tetap tampil — dan di section Pasang itu bikin "sudah
+     terpasang" dan "Pasang Sekarang" muncul barengan. */
+  [hidden] {
+    display: none !important;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

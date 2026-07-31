@@ -34,6 +34,11 @@ const cspPlugin = (): Plugin => ({
 
 // https://vite.dev/config/
 export default defineConfig({
+  // App disajikan di /app, landing page (Astro) yang memegang "/".
+  // Satu origin itu WAJIB: browser cuma mengizinkan sebuah halaman memasang
+  // PWA milik origin-nya sendiri, jadi tombol "Pasang" di landing page baru
+  // bisa berfungsi kalau app-nya satu domain dengannya.
+  base: '/app/',
   plugins: [
     react(),
     cspPlugin(),
@@ -55,7 +60,12 @@ export default defineConfig({
         theme_color: '#111835',
         background_color: '#FBFCFC',
         display: 'standalone',
-        start_url: '/',
+        // start_url ke /app/ (app-nya), tapi scope tetap "/" supaya halaman
+        // landing di akar domain ikut masuk jangkauan manifest. Tanpa itu
+        // browser nggak akan menawarkan pemasangan dari landing page.
+        start_url: '/app/',
+        scope: '/',
+        id: '/app/',
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -68,14 +78,14 @@ export default defineConfig({
             name: 'Catat transaksi',
             short_name: 'Catat',
             description: 'Langsung buka form tambah transaksi',
-            url: '/?aksi=catat',
+            url: '/app/?aksi=catat',
             icons: [{ src: 'pwa-192.png', sizes: '192x192', type: 'image/png' }],
           },
         ],
         // Rapi muncul di share sheet HP: habis foto struk, Bagikan → Rapi →
         // langsung dipindai. Pencatatan bisa dimulai dari luar app.
         share_target: {
-          action: '/bagikan',
+          action: '/app/bagikan',
           method: 'POST',
           enctype: 'multipart/form-data',
           params: {
@@ -83,12 +93,21 @@ export default defineConfig({
           },
         },
       },
+      // Service worker didaftarkan dengan scope "/" walau file-nya ada di
+      // /app/sw.js. Butuh header Service-Worker-Allowed: / (lihat vercel.json).
+      // Tanpa scope seluas ini, halaman landing di akar nggak dikuasai SW dan
+      // browser nggak akan menawarkan pemasangan di sana.
+      scope: '/',
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,webmanifest}'],
-        navigateFallback: '/index.html',
-        // Penangan POST /bagikan (share target) — Workbox nggak bisa bikin ini
-        // sendiri, jadi disisipkan sebagai script terpisah.
-        importScripts: ['/share-target-sw.js'],
+        navigateFallback: '/app/index.html',
+        // PENTING: fallback SPA cuma berlaku di bawah /app/. Tanpa batas ini,
+        // permintaan ke "/" (landing page) ikut dilempar ke cangkang app —
+        // landing page-nya hilang begitu offline.
+        navigateFallbackAllowlist: [/^\/app\//],
+        // Penangan POST /app/bagikan (share target) — Workbox nggak bisa bikin
+        // ini sendiri, jadi disisipkan sebagai script terpisah.
+        importScripts: ['/app/share-target-sw.js'],
         // Maskot PNG lumayan gede — izinkan masuk precache
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         runtimeCaching: [

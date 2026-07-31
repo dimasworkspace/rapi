@@ -27,6 +27,13 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/app/apple-touch-icon.png" />
+
+    <!-- Manifest MILIK APP, ditautkan dari landing page.
+         Scope-nya "/" dan start_url-nya "/app/", jadi halaman ini masuk
+         jangkauan manifest — syarat wajib supaya browser mau menawarkan
+         pemasangan di sini, sementara yang dipasang tetap aplikasinya. -->
+    <link rel="manifest" href="/app/manifest.webmanifest" />
 
     <!-- Open Graph — dipakai waktu link dibagikan di WhatsApp, IG, X -->
     <meta property="og:type" content="website" />
@@ -62,6 +69,25 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
     <script>
       // Semua gerakan halaman diatur di satu file
       import '@/scripts/motion'
+    </script>
+
+    <script is:inline>
+      // Daftarkan service worker milik app dengan scope "/" supaya halaman ini
+      // ikut dikuasai. Chrome baru mengirim `beforeinstallprompt` kalau halaman
+      // yang dibuka dikuasai SW yang punya penangan fetch — tanpa ini, tombol
+      // "Pasang" di landing page nggak akan pernah aktif.
+      //
+      // File-nya ada di /app/sw.js tapi mengklaim scope "/", yang cuma
+      // diizinkan berkat header Service-Worker-Allowed di vercel.json.
+      if ('serviceWorker' in navigator) {
+        addEventListener('load', () => {
+          navigator.serviceWorker.register('/app/sw.js', { scope: '/' }).catch((e) => {
+            // Bukan hal fatal: halaman tetap jalan, cuma tombol pasang otomatis
+            // nggak muncul dan user memakai petunjuk manual.
+            console.warn('[rapi] service worker gagal didaftarkan:', e)
+          })
+        })
+      }
     </script>
   </body>
 </html>

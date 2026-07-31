@@ -95,7 +95,7 @@ if (kurangiGerak) {
     animate(
       el,
       { opacity: [0, 1], transform: ['translateY(24px)', 'none'] },
-      { duration: DURASI, easing: PEGAS },
+      { duration: DURASI, ease: PEGAS },
     )
   })
 
@@ -110,7 +110,7 @@ if (kurangiGerak) {
         animate(
           el,
           { opacity: [0, 1], transform: ['translateY(26px)', 'none'] },
-          { duration: DURASI, easing: PEGAS, delay: i * 0.06 },
+          { duration: DURASI, ease: PEGAS, delay: i * 0.06 },
         )
       })
     },
@@ -119,7 +119,8 @@ if (kurangiGerak) {
 
   // 3) Parallax latar hero — bergerak lebih lambat dari teksnya. Itu yang
   //    bikin halaman terasa punya kedalaman, bukan selembar kertas.
-  //    Dipasang manual + rAF supaya nggak menghitung ulang tiap event gulir.
+  //    Dipasang lewat daftarGulir (pendengar pasif, bukan rAF — lihat alasannya
+  //    di komentar fungsi itu).
   const glow = document.querySelector<HTMLElement>('[data-parallax="glow"]')
   const hero = document.querySelector<HTMLElement>('[data-hero]')
   if (glow && hero) {
@@ -194,7 +195,7 @@ if (kurangiGerak) {
         tombol.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`
       })
       tombol.addEventListener('pointerleave', () => {
-        animate(tombol, { transform: 'translate(0px, 0px)' }, { duration: 0.4, easing: PEGAS })
+        animate(tombol, { transform: 'translate(0px, 0px)' }, { duration: 0.4, ease: PEGAS })
       })
     })
   }
