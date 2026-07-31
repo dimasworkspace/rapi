@@ -3,9 +3,10 @@ import { APP_URL, SITE } from '@/consts'
 import Icon from '@/components/Icon.astro'
 ---
 
-<section class="relative overflow-hidden bg-rapi-navy text-white">
-  <!-- Latar: glow + grid halus, senada AmbientBackground di app -->
-  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+<section data-hero class="relative overflow-hidden bg-rapi-navy text-white">
+  <!-- Latar: glow + grid halus, senada AmbientBackground di app.
+       data-parallax: bergerak lebih lambat dari teks saat digulir -->
+  <div data-parallax="glow" aria-hidden="true" class="pointer-events-none absolute inset-0">
     <div class="absolute -right-32 -top-40 h-[34rem] w-[34rem] rounded-full bg-rapi-blue/45 blur-3xl"></div>
     <div class="absolute -bottom-40 -left-24 h-[26rem] w-[26rem] rounded-full bg-rapi-yellow/12 blur-3xl"></div>
     <div
@@ -45,7 +46,7 @@ import Icon from '@/components/Icon.astro'
           class="animate-rapi-reveal mt-9 flex flex-wrap items-center gap-3"
           style="animation-delay:240ms"
         >
-          <a href={APP_URL} class="rapi-btn-primary group">
+          <a href={APP_URL} data-magnetic class="rapi-btn-primary group">
             Mulai Gratis
             <Icon name="arrow" class="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </a>

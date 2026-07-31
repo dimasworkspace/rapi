@@ -60,26 +60,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href
     </script>
 
     <script>
-      // Reveal saat digulir. Sekali muncul, pengamatnya dilepas — nggak ada
-      // gunanya terus memantau elemen yang sudah selesai animasinya.
-      const target = document.querySelectorAll('[data-reveal]')
-      const kurangiGerak = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-      if (kurangiGerak) {
-        target.forEach((el) => el.classList.add('is-visible'))
-      } else {
-        const pengamat = new IntersectionObserver(
-          (entri) => {
-            entri.forEach((e) => {
-              if (!e.isIntersecting) return
-              e.target.classList.add('is-visible')
-              pengamat.unobserve(e.target)
-            })
-          },
-          { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
-        )
-        target.forEach((el) => pengamat.observe(el))
-      }
+      // Semua gerakan halaman diatur di satu file
+      import '@/scripts/motion'
     </script>
   </body>
 </html>

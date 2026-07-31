@@ -21,6 +21,16 @@ import { APP_URL, NAV } from '@/consts'
       }
     </nav>
 
-    <a href={APP_URL} class="rapi-btn-primary !min-h-10 !px-4 !text-[14px]">Buka Rapi</a>
+    <a href={APP_URL} data-magnetic class="rapi-btn-primary !min-h-10 !px-4 !text-[14px]">
+      Buka Rapi
+    </a>
+  </div>
+
+  <!-- Garis progress baca. Murni CSS (animation-timeline: scroll()) — nol JS.
+       Browser yang belum dukung cuma nggak menampilkannya, nggak ada yang rusak. -->
+  <div
+    aria-hidden="true"
+    class="rapi-progress absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-rapi-blue to-rapi-yellow"
+  >
   </div>
 </header>

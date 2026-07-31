@@ -74,24 +74,35 @@
      yang dipasang skrip di Base.astro. Jadi kalau JS gagal dimuat, konten
      TIDAK pernah disembunyikan. Menyembunyikan duluan lalu berharap JS
      memunculkannya itu cara paling gampang bikin halaman kosong melompong. */
-  .js [data-reveal] {
+  /* Keadaan awal saja — animasinya diurus Motion (src/scripts/motion.ts),
+     bukan transition CSS. Dua-duanya sekaligus bikin gerakan saling tarik. */
+  .js [data-reveal],
+  .js [data-stagger] > * {
     opacity: 0;
-    transform: translateY(22px);
-    transition:
-      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-
-  .js [data-reveal].is-visible {
-    opacity: 1;
-    transform: none;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .js [data-reveal] {
+    .js [data-reveal],
+    .js [data-stagger] > * {
       opacity: 1;
-      transform: none;
-      transition: none;
+    }
+  }
+
+  /* Progress baca di header — animasi berbasis gulir bawaan CSS, nol JS.
+     Browser yang belum dukung cuma nggak menampilkannya; nggak ada yang rusak. */
+  @supports (animation-timeline: scroll()) {
+    .rapi-progress {
+      transform-origin: 0 50%;
+      animation: rapi-progress-grow linear both;
+      animation-timeline: scroll(root block);
+    }
+    @keyframes rapi-progress-grow {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
     }
   }
 }

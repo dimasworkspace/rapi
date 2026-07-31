@@ -11,7 +11,8 @@
     "check": "astro check"
   },
   "dependencies": {
-    "astro": "^4.16.18"
+    "astro": "^4.16.18",
+    "motion": "^12.43.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

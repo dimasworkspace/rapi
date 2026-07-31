@@ -14,11 +14,10 @@ import Icon from '@/components/Icon.astro'
     <!-- Bento: ukuran kartu sengaja beda-beda.
          Grid seragam bikin semua fitur terasa sama penting — padahal nggak.
          "Ketik" itu jalan utama, jadi dia dapat ruang paling besar. -->
-    <div class="mt-12 grid gap-4 lg:grid-cols-6">
+    <div data-stagger class="mt-12 grid gap-4 lg:grid-cols-6">
       <!-- Kartu utama -->
       <article
         class="group relative overflow-hidden rounded-rapi-xl bg-rapi-navy p-8 text-white lg:col-span-4 lg:row-span-2"
-        data-reveal
       >
         <div
           aria-hidden="true"
@@ -48,7 +47,7 @@ import Icon from '@/components/Icon.astro'
         </div>
       </article>
 
-      <article class="rapi-card lg:col-span-2" data-reveal>
+      <article class="rapi-card lg:col-span-2">
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
           <Icon name="mic" class="h-5 w-5" />
         </span>
@@ -58,7 +57,7 @@ import Icon from '@/components/Icon.astro'
         </p>
       </article>
 
-      <article class="rapi-card lg:col-span-2" data-reveal>
+      <article class="rapi-card lg:col-span-2">
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
           <Icon name="camera" class="h-5 w-5" />
         </span>
@@ -69,7 +68,7 @@ import Icon from '@/components/Icon.astro'
       </article>
 
       <!-- Kartu kuning — satu-satunya di halaman, jadi mata pasti mampir -->
-      <article class="relative overflow-hidden rounded-rapi-xl bg-rapi-yellow p-8 lg:col-span-3" data-reveal>
+      <article class="relative overflow-hidden rounded-rapi-xl bg-rapi-yellow p-8 lg:col-span-3">
         <span class="inline-flex h-12 w-12 items-center justify-center rounded-rapi-md bg-rapi-navy text-rapi-yellow">
           <Icon name="chat" />
         </span>
@@ -80,7 +79,7 @@ import Icon from '@/components/Icon.astro'
         </p>
       </article>
 
-      <article class="rapi-card lg:col-span-3" data-reveal>
+      <article class="rapi-card lg:col-span-3">
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
           <Icon name="chart" class="h-5 w-5" />
         </span>
@@ -91,7 +90,7 @@ import Icon from '@/components/Icon.astro'
         </p>
       </article>
 
-      <article class="rapi-card lg:col-span-3" data-reveal>
+      <article class="rapi-card lg:col-span-3">
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
           <Icon name="trend" class="h-5 w-5" />
         </span>
@@ -101,7 +100,7 @@ import Icon from '@/components/Icon.astro'
         </p>
       </article>
 
-      <article class="rapi-card lg:col-span-3" data-reveal>
+      <article class="rapi-card lg:col-span-3">
         <span class="inline-flex h-11 w-11 items-center justify-center rounded-rapi-md bg-rapi-blue/10 text-rapi-blue">
           <Icon name="cloud" class="h-5 w-5" />
         </span>
