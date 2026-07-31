@@ -143,6 +143,18 @@
     }
   }
 
+  /* Layar HP di "Cara Pakai" ditumpuk absolut. Tanpa keadaan awal, ketiganya
+     tampil barengan sebelum JS sempat jalan — dan selamanya kalau JS gagal.
+     Jadi keadaan diamnya ditetapkan di CSS: cuma layar pertama yang terlihat. */
+  [data-layar] {
+    opacity: 0;
+    pointer-events: none;
+  }
+  [data-layar='0'] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* Progress baca di header — animasi berbasis gulir bawaan CSS, nol JS.
      Browser yang belum dukung cuma nggak menampilkannya; nggak ada yang rusak. */
   @supports (animation-timeline: scroll()) {

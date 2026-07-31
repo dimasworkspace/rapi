@@ -41,6 +41,32 @@ const tetapkanAkhir = (el: HTMLElement) => {
   el.style.transform = 'none'
 }
 
+/**
+ * Pasang penangan gulir yang aman.
+ *
+ * KENAPA BUKAN pola "flag + requestAnimationFrame" yang biasa dipakai:
+ * pola itu menandai `menunggu = true`, menjadwalkan rAF, lalu membersihkan
+ * flag-nya DI DALAM rAF. Kalau tab pindah ke latar belakang tepat setelah
+ * frame dijadwalkan, rAF-nya nggak pernah jalan — dan flag-nya terkunci
+ * selamanya. Semua gulir sesudahnya diabaikan diam-diam, animasinya mati
+ * tanpa satu pun error. Sudah kejadian di halaman ini.
+ *
+ * Gantinya: kerjakan langsung di pendengar pasif, dilewati kalau posisinya
+ * nggak berubah. Dua pembacaan tata letak per gulir itu murah, dan pendengar
+ * pasif nggak pernah menghambat gulir.
+ */
+const daftarGulir = (kerjakan: () => void) => {
+  let terakhir = -1
+  const jalan = () => {
+    if (window.scrollY === terakhir) return
+    terakhir = window.scrollY
+    kerjakan()
+  }
+  addEventListener('scroll', jalan, { passive: true })
+  addEventListener('resize', kerjakan, { passive: true })
+  kerjakan()
+}
+
 /** Jalankan sesuatu sekali, saat elemennya masuk layar. */
 const saatTerlihat = (
   target: Iterable<Element>,
@@ -97,22 +123,11 @@ if (kurangiGerak) {
   const glow = document.querySelector<HTMLElement>('[data-parallax="glow"]')
   const hero = document.querySelector<HTMLElement>('[data-hero]')
   if (glow && hero) {
-    let menunggu = false
     const perbarui = () => {
-      menunggu = false
       const lewat = Math.min(Math.max(window.scrollY, 0), hero.offsetHeight)
       glow.style.transform = `translate3d(0, ${lewat * 0.28}px, 0)`
     }
-    addEventListener(
-      'scroll',
-      () => {
-        if (menunggu) return
-        menunggu = true
-        requestAnimationFrame(perbarui)
-      },
-      { passive: true },
-    )
-    perbarui()
+    daftarGulir(perbarui)
   }
 
   // 4) Tahapan "Cara Pakai" yang TERIKAT ke gulir.
@@ -154,9 +169,7 @@ if (kurangiGerak) {
       })
     }
 
-    let menungguTahap = false
     const hitungTahap = () => {
-      menungguTahap = false
       const r = tahapan.getBoundingClientRect()
       const totalGulir = tahapan.offsetHeight - innerHeight
       if (totalGulir <= 0) return setAktif(0)
@@ -165,16 +178,7 @@ if (kurangiGerak) {
       setAktif(Math.floor(maju * baris.length))
     }
 
-    addEventListener(
-      'scroll',
-      () => {
-        if (menungguTahap) return
-        menungguTahap = true
-        requestAnimationFrame(hitungTahap)
-      },
-      { passive: true },
-    )
-    hitungTahap()
+    daftarGulir(hitungTahap)
   }
 
   // 5) Tombol magnetik — CTA menarik kursor sedikit waktu didekati.

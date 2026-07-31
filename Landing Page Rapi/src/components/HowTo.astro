@@ -30,21 +30,27 @@ const langkah = [
   Di layar kecil semuanya balik jadi tumpukan biasa: menempel + tinggi 300vh
   itu menyiksa di HP, dan tiga langkah pendek nggak butuh perlakuan itu.
 */}
-<section id="cara-pakai" class="py-20 md:py-28">
-  <div class="rapi-container">
-    <div data-reveal>
-      <p class="rapi-bubble">Cara Pakai</p>
-      <h2 class="mt-3 max-w-2xl text-display-lg font-extrabold">
-        Tiga langkah, nggak sampai dua menit.
-      </h2>
-    </div>
+<section id="cara-pakai" class="pt-20 md:pt-28">
+  <!-- Judul di layar kecil saja; di layar lebar dia ikut masuk ke area
+       menempel (lihat di bawah) supaya nggak ketinggalan di atas. -->
+  <div class="rapi-container lg:hidden">
+    <p class="rapi-bubble">Cara Pakai</p>
+    <h2 class="mt-4 max-w-2xl text-display-lg font-extrabold">
+      Tiga langkah, nggak sampai dua menit.
+    </h2>
   </div>
 
   <!-- Versi menempel — cuma di layar lebar -->
-  <div data-tahapan class="relative mt-12 hidden lg:block" style="height:280vh">
+  <div data-tahapan class="relative hidden lg:block" style="height:300vh">
     <div class="sticky top-0 flex h-screen items-center">
-      <div class="rapi-container grid w-full grid-cols-12 items-center gap-12">
-        <ol class="col-span-7 space-y-3">
+      <div class="rapi-container grid w-full grid-cols-12 items-center gap-10">
+        <div class="col-span-7">
+          <p class="rapi-bubble">Cara Pakai</p>
+          <h2 class="mt-4 text-display-lg font-extrabold">
+            Tiga langkah, nggak sampai dua menit.
+          </h2>
+
+          <ol class="mt-8 space-y-2">
           {
             langkah.map((l, i) => (
               <li
@@ -69,12 +75,13 @@ const langkah = [
               </li>
             ))
           }
-        </ol>
+          </ol>
+        </div>
 
         <!-- Layar HP yang isinya berganti mengikuti langkah -->
         <div class="col-span-5 justify-self-center">
-          <div class="relative w-[264px] rounded-[2.25rem] border-[10px] border-rapi-navy/85 bg-rapi-navy shadow-rapi-elevated">
-            <div class="relative h-[520px] overflow-hidden rounded-[1.6rem] bg-rapi-offwhite">
+          <div class="relative w-[248px] rounded-[2rem] border-[9px] border-rapi-navy/85 bg-rapi-navy shadow-rapi-elevated">
+            <div class="relative h-[460px] overflow-hidden rounded-[1.4rem] bg-rapi-offwhite">
               {/* Layar 1 — masuk */}
               <div
                 data-layar="0"

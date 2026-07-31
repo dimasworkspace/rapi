@@ -1,0 +1,153 @@
+---
+import Icon from '@/components/Icon.astro'
+import { APP_URL } from '@/consts'
+---
+
+{/*
+  KENDALA YANG WAJIB DIPAHAMI SEBELUM MENGEDIT FILE INI:
+
+  Browser cuma mengizinkan sebuah halaman memasang PWA MILIK ORIGIN-NYA SENDIRI.
+  Event `beforeinstallprompt` nggak pernah dikirim buat aplikasi di domain lain,
+  dan nggak ada API buat memasang PWA lintas-origin — itu batasan keamanan,
+  bukan kekurangan implementasi.
+
+  Artinya: selama landing page dan app Rapi masih di dua domain berbeda,
+  tombol "Pasang" di sini nggak bisa memasang app-nya. Yang bisa dilakukan
+  cuma memberi petunjuk, atau mengirim orang ke app.
+
+  Tombol pasang sungguhan baru hidup kalau keduanya satu origin
+  (mis. landing di "/", app di "/app"). Komponen ini sudah siap untuk itu:
+  begitu satu origin, `beforeinstallprompt` tertangkap dan tombolnya bekerja
+  tanpa perlu diubah lagi.
+*/}
+
+<section id="pasang" class="relative overflow-hidden bg-rapi-navy py-24 text-white md:py-28">
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <div class="absolute -bottom-40 left-1/2 h-[28rem] w-[44rem] -translate-x-1/2 rounded-full bg-rapi-blue/35 blur-3xl"></div>
+  </div>
+
+  <div class="rapi-container relative">
+    <div class="mx-auto max-w-2xl text-center" data-reveal>
+      <p class="rapi-bubble rapi-bubble--kuning">Pasang</p>
+      <h2 class="mt-5 text-display-lg font-extrabold">
+        Taruh Rapi di layar utama HP-mu.
+      </h2>
+      <p class="mx-auto mt-4 max-w-lg text-[16px] leading-relaxed text-white/70">
+        Punya ikon sendiri, kebuka fullscreen, dan tetap jalan waktu offline —
+        tanpa lewat Play Store atau App Store.
+      </p>
+    </div>
+
+    <div class="mx-auto mt-10 max-w-xl" data-reveal>
+      {/* Sudah terpasang */}
+      <div
+        data-pasang="sudah"
+        hidden
+        class="flex items-center justify-center gap-3 rounded-rapi-lg border border-rapi-income/40 bg-rapi-income/15 px-6 py-4 text-[15px] font-bold"
+      >
+        <Icon name="check" class="h-5 w-5 text-rapi-income" />
+        Rapi sudah terpasang di perangkat ini
+      </div>
+
+      {/* Bisa dipasang langsung — tombol asli dari browser */}
+      <div data-pasang="bisa" hidden class="text-center">
+        <button type="button" data-pasang-tombol data-magnetic class="rapi-btn-primary !min-h-14 !px-8 !text-[16px]">
+          <Icon name="bolt" class="h-5 w-5" />
+          Pasang Rapi Sekarang
+        </button>
+        <p class="mt-3 text-[13px] text-white/45">Gratis · ±2 MB · nggak lewat toko aplikasi</p>
+      </div>
+
+      {/* Belum bisa otomatis → petunjuk sesuai perangkat */}
+      <div data-pasang="manual" class="rounded-rapi-xl border border-white/12 bg-white/[0.06] p-6 backdrop-blur-xl">
+        <p data-pasang-judul class="text-[15px] font-bold">Cara pasang di perangkatmu</p>
+        <ol data-pasang-langkah class="mt-4 space-y-3 text-[14px] leading-relaxed text-white/70"></ol>
+
+        <a href={APP_URL} class="rapi-btn-primary mt-6 w-full">
+          Buka Rapi dulu
+          <Icon name="arrow" class="h-4 w-4" />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Deteksi perangkat & keadaan pasang. Sengaja vanilla dan kecil.
+  const $ = (s: string) => document.querySelector<HTMLElement>(s)
+  const kotak = {
+    sudah: $('[data-pasang="sudah"]'),
+    bisa: $('[data-pasang="bisa"]'),
+    manual: $('[data-pasang="manual"]'),
+  }
+  const judul = $('[data-pasang-judul]')
+  const daftar = $('[data-pasang-langkah]')
+  const tombol = $('[data-pasang-tombol]')
+
+  const tampilkan = (nama: 'sudah' | 'bisa' | 'manual') => {
+    for (const [k, el] of Object.entries(kotak)) {
+      if (el) el.hidden = k !== nama
+    }
+  }
+
+  const sudahTerpasang = () =>
+    matchMedia('(display-mode: standalone)').matches ||
+    (navigator as { standalone?: boolean }).standalone === true
+
+  const iOS = () =>
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+
+  const isiLangkah = (langkah: string[]) => {
+    if (!daftar) return
+    daftar.innerHTML = langkah
+      .map(
+        (t, i) =>
+          `<li class="flex gap-3"><span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rapi-yellow text-[12px] font-extrabold text-rapi-navy">${i + 1}</span><span>${t}</span></li>`,
+      )
+      .join('')
+  }
+
+  if (sudahTerpasang()) {
+    tampilkan('sudah')
+  } else {
+    // Keadaan awal: petunjuk manual sesuai perangkat.
+    tampilkan('manual')
+    if (iOS()) {
+      if (judul) judul.textContent = 'Cara pasang di iPhone / iPad'
+      isiLangkah([
+        'Buka Rapi lewat <b class="text-white">Safari</b> — Chrome di iOS nggak bisa memasang.',
+        'Tekan tombol <b class="text-white">Bagikan</b> (ikon kotak dengan panah ke atas).',
+        'Pilih <b class="text-white">Tambahkan ke Layar Utama</b>.',
+      ])
+    } else {
+      if (judul) judul.textContent = 'Cara pasang di Android / desktop'
+      isiLangkah([
+        'Buka Rapi di browser.',
+        'Tekan menu <b class="text-white">⋮</b> di pojok kanan atas.',
+        'Pilih <b class="text-white">Instal aplikasi</b> atau <b class="text-white">Tambahkan ke Layar Utama</b>.',
+      ])
+    }
+  }
+
+  // Kalau browser menawarkan pemasangan (cuma terjadi bila landing page dan
+  // app satu origin), ganti petunjuk manual dengan tombol asli.
+  let tawaran: (Event & { prompt: () => Promise<void> }) | null = null
+
+  addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault()
+    tawaran = e as Event & { prompt: () => Promise<void> }
+    if (!sudahTerpasang()) tampilkan('bisa')
+  })
+
+  tombol?.addEventListener('click', async () => {
+    if (!tawaran) return
+    await tawaran.prompt()
+    tawaran = null
+  })
+
+  addEventListener('appinstalled', () => {
+    tawaran = null
+    tampilkan('sudah')
+  })
+</script>

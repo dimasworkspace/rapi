@@ -97,8 +97,12 @@ import Icon from '@/components/Icon.astro'
               </p>
             </div>
 
-            <!-- Hasil baca -->
-            <div id="demo-result" class="mt-3 opacity-0 transition-opacity duration-300">
+            <!-- Hasil baca.
+                 Sengaja TIDAK disembunyikan saat contoh berikutnya diketik —
+                 kalau dikosongkan, kartunya menganga separuh dan terlihat
+                 rusak. Yang dilakukan cuma diredupkan, jadi jelas "ini hasil
+                 yang lama" tanpa meninggalkan lubang. -->
+            <div id="demo-result" class="mt-3 transition-opacity duration-300">
               <div class="flex items-center gap-3 rounded-rapi-md border border-rapi-yellow/25 bg-rapi-yellow/10 px-4 py-3">
                 <span
                   id="demo-emoji"
@@ -166,7 +170,7 @@ import Icon from '@/components/Icon.astro'
       // yang menahan opacity:1 dan mengalahkan style.opacity di bawah —
       // akibatnya hasil lama masih nangkring waktu contoh baru diketik.
       el.hasil!.classList.remove('animate-rapi-pop')
-      el.hasil!.style.opacity = '0'
+      el.hasil!.style.opacity = '0.28'
       el.teks!.textContent = ''
       el.caret?.classList.add('animate-rapi-caret')
       await tunggu(400)
