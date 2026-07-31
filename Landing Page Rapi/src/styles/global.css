@@ -57,6 +57,61 @@
            text-rapi-navy transition-colors hover:border-rapi-blue hover:text-rapi-blue;
   }
 
+  /* ============================================================
+     TANDA TANGAN VISUAL RAPI
+     Tiga motif di bawah ini yang bikin halaman ini nggak bisa
+     ditempel ke produk lain: gelembung obrolan (karena Rapi soal
+     "nyatat semudah ngobrol"), coretan stabilo (tulisan tangan di
+     tengah tipografi geometris), dan garis sobek struk (bahasa
+     visual keuangan Indonesia — warung, bukan bank).
+     ============================================================ */
+
+  /* Label section berupa gelembung chat, bukan huruf besar berjarak.
+     "FITUR" dengan tracking lebar itu label paling generik yang ada. */
+  .rapi-bubble {
+    @apply relative inline-block rounded-rapi-lg rounded-bl-[4px] bg-rapi-navy
+           px-4 py-2 text-[13px] font-semibold text-white;
+  }
+  .rapi-bubble--kuning {
+    @apply bg-rapi-yellow text-rapi-navy;
+  }
+
+  /* Coretan stabilo di belakang kata kunci — sengaja miring & nggak rapi,
+     supaya ada satu hal buatan tangan di antara huruf yang serba geometris. */
+  .rapi-stabilo {
+    @apply relative inline-block;
+  }
+  .rapi-stabilo::after {
+    content: '';
+    @apply absolute inset-x-[-6px] bottom-[0.08em] -z-10 h-[0.42em] bg-rapi-yellow;
+    transform: rotate(-1.4deg) skewX(-8deg);
+    border-radius: 2px 8px 4px 6px;
+  }
+
+  /* Varian untuk LATAR GELAP.
+     Coretan tipis cuma menutupi bagian bawah huruf — aman di latar terang,
+     tapi di atas navy separuh atas hurufnya jadi navy-di-atas-navy alias
+     hilang. Versi ini menutup penuh, jadi hurufnya duduk di atas kuning. */
+  .rapi-stabilo--penuh::after {
+    @apply inset-x-[-14px] bottom-[-0.08em] top-[-0.04em] h-auto;
+    border-radius: 4px 10px 6px 8px;
+  }
+
+  /* Garis sobek struk — pemisah antar bagian besar */
+  .rapi-sobek {
+    @apply relative h-6 w-full;
+    background-image: radial-gradient(circle at 6px 50%, transparent 5px, currentColor 5px);
+    background-size: 16px 100%;
+    mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  /* Kartu stiker — sedikit miring & bayangan keras, bukan blur lembut.
+     Bayangan keras itu yang bikin terasa "ditempel", bukan melayang. */
+  .rapi-stiker {
+    @apply rounded-rapi-lg border-2 border-rapi-navy bg-white p-6;
+    box-shadow: 5px 5px 0 0 theme('colors.rapi.navy');
+  }
+
   .rapi-card {
     @apply rounded-rapi-lg border border-rapi-gray-300/50 bg-white p-6 shadow-rapi-card
            transition-all duration-300 hover:-translate-y-1 hover:shadow-rapi-elevated;

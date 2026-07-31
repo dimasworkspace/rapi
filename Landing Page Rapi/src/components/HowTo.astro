@@ -1,4 +1,6 @@
 ---
+import Icon from '@/components/Icon.astro'
+
 const langkah = [
   {
     no: '1',
@@ -18,14 +20,137 @@ const langkah = [
 ]
 ---
 
+{/*
+  Section ini dipasangi gulir yang MENGIKAT, bukan sekadar memicu.
+  Bedanya: reveal biasa muncul sekali lalu selesai — kamu gulir balik, nggak
+  terjadi apa-apa. Di sini kemajuan langkahnya terikat ke posisi gulir, jadi
+  maju-mundur pun ikut bergerak. Itu yang bikin terasa "dikendalikan", bukan
+  ditonton.
+
+  Di layar kecil semuanya balik jadi tumpukan biasa: menempel + tinggi 300vh
+  itu menyiksa di HP, dan tiga langkah pendek nggak butuh perlakuan itu.
+*/}
 <section id="cara-pakai" class="py-20 md:py-28">
   <div class="rapi-container">
-    <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Cara Pakai</p>
-    <h2 class="mt-3 max-w-2xl text-display-lg font-extrabold">
-      Tiga langkah, nggak sampai dua menit.
-    </h2>
+    <div data-reveal>
+      <p class="rapi-bubble">Cara Pakai</p>
+      <h2 class="mt-3 max-w-2xl text-display-lg font-extrabold">
+        Tiga langkah, nggak sampai dua menit.
+      </h2>
+    </div>
+  </div>
 
-    <ol class="mt-10 grid gap-4 md:grid-cols-3" data-reveal>
+  <!-- Versi menempel — cuma di layar lebar -->
+  <div data-tahapan class="relative mt-12 hidden lg:block" style="height:280vh">
+    <div class="sticky top-0 flex h-screen items-center">
+      <div class="rapi-container grid w-full grid-cols-12 items-center gap-12">
+        <ol class="col-span-7 space-y-3">
+          {
+            langkah.map((l, i) => (
+              <li
+                data-tahap={i}
+                class="flex gap-5 rounded-rapi-xl border border-transparent p-6 transition-all duration-500"
+              >
+                <span
+                  data-tahap-angka
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border-[1.5px] border-rapi-gray-300 text-[16px] font-extrabold text-rapi-gray-600 transition-all duration-500"
+                >
+                  {l.no}
+                </span>
+                <span>
+                  <span class="block text-[20px] font-bold">{l.judul}</span>
+                  <span
+                    data-tahap-isi
+                    class="mt-1.5 block max-w-md text-[15px] leading-relaxed text-rapi-gray-600 transition-opacity duration-500"
+                  >
+                    {l.isi}
+                  </span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+
+        <!-- Layar HP yang isinya berganti mengikuti langkah -->
+        <div class="col-span-5 justify-self-center">
+          <div class="relative w-[264px] rounded-[2.25rem] border-[10px] border-rapi-navy/85 bg-rapi-navy shadow-rapi-elevated">
+            <div class="relative h-[520px] overflow-hidden rounded-[1.6rem] bg-rapi-offwhite">
+              {/* Layar 1 — masuk */}
+              <div
+                data-layar="0"
+                class="absolute inset-0 flex flex-col items-center justify-center gap-3 px-6 text-center transition-all duration-500"
+              >
+                <img src="/logo-rapi.png" alt="" width="120" height="72" class="h-9 w-auto" />
+                <p class="mt-2 text-[15px] font-bold text-rapi-navy">Halo! Aku Rapi</p>
+                <p class="text-[12px] leading-relaxed text-rapi-gray-600">
+                  Masuk dulu yuk, biar catatanmu aman
+                </p>
+                <span class="mt-3 flex w-full items-center justify-center gap-2 rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white py-2.5 text-[13px] font-bold text-rapi-navy">
+                  Lanjut pakai Google
+                </span>
+                <span class="w-full rounded-rapi-md bg-rapi-blue py-2.5 text-[13px] font-bold text-white">
+                  Masuk
+                </span>
+              </div>
+
+              {/* Layar 2 — pasang ke layar utama */}
+              <div
+                data-layar="1"
+                class="absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center transition-all duration-500"
+              >
+                <div class="rounded-rapi-lg border border-rapi-gray-300 bg-white p-4 shadow-rapi-card">
+                  <img src="/favicon-32.png" alt="" width="48" height="48" class="mx-auto h-12 w-12 rounded-rapi-md" />
+                  <p class="mt-2 text-[12px] font-bold text-rapi-navy">Tambahkan ke Layar Utama</p>
+                </div>
+                <Icon name="arrow" class="h-5 w-5 rotate-90 text-rapi-blue" />
+                <div class="flex gap-3">
+                  {
+                    [0, 1, 2].map((n) => (
+                      <span
+                        class={`h-11 w-11 rounded-rapi-md ${n === 1 ? 'bg-rapi-blue' : 'bg-rapi-gray-300/60'}`}
+                      />
+                    ))
+                  }
+                </div>
+                <p class="text-[11px] text-rapi-gray-600">Ikon Rapi nongol di layar utama</p>
+              </div>
+
+              {/* Layar 3 — catat */}
+              <div
+                data-layar="2"
+                class="absolute inset-0 flex flex-col justify-end p-4 transition-all duration-500"
+              >
+                <div class="rounded-rapi-xl border border-rapi-gray-300/60 bg-white p-4 shadow-rapi-elevated">
+                  <span class="mx-auto block h-1 w-9 rounded-full bg-rapi-gray-300"></span>
+                  <p class="mt-3 text-[13px] font-bold text-rapi-navy">Tambah Transaksi</p>
+                  <div class="mt-2.5 rounded-rapi-md border-[1.5px] border-rapi-blue/25 px-3 py-2.5 text-[13px] text-rapi-navy">
+                    nasi padang 32rb
+                  </div>
+                  <div class="mt-2.5 flex items-center gap-2.5 rounded-rapi-md border border-rapi-yellow/40 bg-rapi-yellow/10 px-3 py-2.5">
+                    <span class="text-base">🍜</span>
+                    <span class="flex-1">
+                      <span class="block text-[14px] font-bold tabular-nums text-rapi-navy">
+                        Rp 32.000
+                      </span>
+                      <span class="block text-[11px] text-rapi-gray-600">Makanan · Pengeluaran</span>
+                    </span>
+                    <Icon name="check" class="h-4 w-4 text-rapi-income" />
+                  </div>
+                  <span class="mt-3 block rounded-rapi-md bg-rapi-blue py-2.5 text-center text-[13px] font-bold text-white">
+                    Simpan Rp 32.000
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Versi HP — tumpukan biasa, tanpa menempel -->
+  <div class="rapi-container mt-10 lg:hidden">
+    <ol data-stagger class="grid gap-4 sm:grid-cols-3">
       {
         langkah.map((l) => (
           <li class="rapi-card">

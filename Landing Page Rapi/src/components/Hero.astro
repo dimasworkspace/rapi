@@ -21,8 +21,8 @@ import Icon from '@/components/Icon.astro'
          Simetri sempurna itu yang bikin halaman terasa template. -->
     <div class="grid items-center gap-14 lg:grid-cols-12">
       <div class="lg:col-span-7">
-        <p class="animate-rapi-reveal inline-flex items-center gap-2 rounded-full border border-rapi-yellow/30 bg-rapi-yellow/10 px-3 py-1.5 text-[12px] font-bold uppercase tracking-[0.16em] text-rapi-yellow">
-          <Icon name="bolt" class="h-3.5 w-3.5" />
+        <p class="rapi-bubble rapi-bubble--kuning animate-rapi-reveal">
+          <Icon name="bolt" class="mr-1 inline h-3.5 w-3.5 align-[-2px]" />
           {SITE.hashtag}
         </p>
 
@@ -31,7 +31,10 @@ import Icon from '@/components/Icon.astro'
           style="animation-delay:80ms"
         >
           <span class="block">Nyatat duit</span>
-          <span class="block text-rapi-yellow">secepat ngetik chat.</span>
+          <span class="block">
+            secepat
+            <span class="rapi-stabilo rapi-stabilo--penuh text-rapi-navy">ngetik chat.</span>
+          </span>
         </h1>
 
         <p

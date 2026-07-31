@@ -115,7 +115,69 @@ if (kurangiGerak) {
     perbarui()
   }
 
-  // 4) Tombol magnetik — CTA menarik kursor sedikit waktu didekati.
+  // 4) Tahapan "Cara Pakai" yang TERIKAT ke gulir.
+  //    Bedanya dengan reveal: reveal muncul sekali lalu selesai — digulir
+  //    balik nggak terjadi apa-apa. Di sini kemajuannya dihitung dari posisi
+  //    section, jadi maju-mundur ikut bergerak. Itu yang bikin terasa
+  //    dikendalikan, bukan ditonton.
+  const tahapan = document.querySelector<HTMLElement>('[data-tahapan]')
+  if (tahapan && innerWidth >= 1024) {
+    const baris = Array.from(tahapan.querySelectorAll<HTMLElement>('[data-tahap]'))
+    const layar = Array.from(tahapan.querySelectorAll<HTMLElement>('[data-layar]'))
+    let aktifTerakhir = -1
+
+    const setAktif = (idx: number) => {
+      if (idx === aktifTerakhir) return
+      aktifTerakhir = idx
+
+      baris.forEach((li, i) => {
+        const aktif = i === idx
+        li.style.borderColor = aktif ? 'rgba(2,72,193,0.25)' : 'transparent'
+        li.style.background = aktif ? '#fff' : 'transparent'
+        li.style.boxShadow = aktif ? '0 2px 14px rgba(17,24,53,0.07)' : 'none'
+
+        const angka = li.querySelector<HTMLElement>('[data-tahap-angka]')
+        if (angka) {
+          angka.style.background = aktif ? '#F8D613' : 'transparent'
+          angka.style.borderColor = aktif ? '#F8D613' : '#D8DCE6'
+          angka.style.color = aktif ? '#111835' : '#5B6478'
+        }
+        const isi = li.querySelector<HTMLElement>('[data-tahap-isi]')
+        if (isi) isi.style.opacity = aktif ? '1' : '0.45'
+      })
+
+      layar.forEach((s, i) => {
+        const aktif = i === idx
+        s.style.opacity = aktif ? '1' : '0'
+        s.style.transform = aktif ? 'none' : 'translateY(14px)'
+        s.style.pointerEvents = aktif ? 'auto' : 'none'
+      })
+    }
+
+    let menungguTahap = false
+    const hitungTahap = () => {
+      menungguTahap = false
+      const r = tahapan.getBoundingClientRect()
+      const totalGulir = tahapan.offsetHeight - innerHeight
+      if (totalGulir <= 0) return setAktif(0)
+      // 0 saat section mulai menempel, 1 saat mau lepas
+      const maju = Math.min(Math.max(-r.top / totalGulir, 0), 0.999)
+      setAktif(Math.floor(maju * baris.length))
+    }
+
+    addEventListener(
+      'scroll',
+      () => {
+        if (menungguTahap) return
+        menungguTahap = true
+        requestAnimationFrame(hitungTahap)
+      },
+      { passive: true },
+    )
+    hitungTahap()
+  }
+
+  // 5) Tombol magnetik — CTA menarik kursor sedikit waktu didekati.
   //    Maksimal 6px: cukup buat terasa hidup, nggak sampai terasa mainan.
   //    Cuma buat perangkat bermouse; di layar sentuh nggak ada gunanya.
   if (matchMedia('(pointer: fine)').matches) {
