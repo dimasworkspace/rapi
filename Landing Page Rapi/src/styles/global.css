@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Token Rapi — disamakan dengan app biar landing page dan produknya
+   terasa satu keluarga, bukan dua hal yang kebetulan mirip. */
+:root {
+  --rapi-yellow: #f8d613;
+  --rapi-navy: #111835;
+  --rapi-blue: #0248c1;
+  --rapi-offwhite: #fbfcfc;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-rapi-offwhite font-sans text-rapi-navy;
+  }
+
+  /* Hormati preferensi kurangi gerakan — sama seperti di app */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Wadah lebar konsisten di semua section */
+  .rapi-container {
+    @apply mx-auto w-full max-w-content px-5 sm:px-8;
+  }
+
+  /* Tombol utama — kuning, aksi paling penting di halaman */
+  .rapi-btn-primary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-rapi-md
+           bg-rapi-yellow px-6 text-[15px] font-bold text-rapi-navy
+           shadow-rapi-card transition-transform hover:-translate-y-0.5
+           active:translate-y-0 active:scale-[0.98];
+  }
+
+  /* Tombol sekunder — untuk aksi pendamping */
+  .rapi-btn-ghost {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-rapi-md
+           border-[1.5px] border-rapi-navy/15 px-6 text-[15px] font-bold
+           text-rapi-navy transition-colors hover:border-rapi-blue hover:text-rapi-blue;
+  }
+
+  .rapi-card {
+    @apply rounded-rapi-lg border border-rapi-gray-300/50 bg-white p-6 shadow-rapi-card;
+  }
+}

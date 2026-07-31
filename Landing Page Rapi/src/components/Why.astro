@@ -1,0 +1,59 @@
+---
+// Bagian "kenapa" — bicara soal masalahnya dulu, baru posisi Rapi.
+// Nadanya nggak boleh menghakimi: user berhenti nyatat bukan karena malas.
+const poin = [
+  {
+    angka: '< 10 detik',
+    judul: 'Sekali catat',
+    isi: 'Dari buka app sampai tersimpan. Kalau lebih lama dari itu, orang berhenti.',
+  },
+  {
+    angka: '0',
+    judul: 'Form yang harus diisi',
+    isi: 'Nggak ada dropdown kategori, nggak ada kolom wajib. Tulis kalimat biasa, selesai.',
+  },
+  {
+    angka: 'Gratis',
+    judul: 'Termasuk AI-nya',
+    isi: 'Nggak perlu bikin API key, nggak perlu bayar apa pun buat mulai.',
+  },
+]
+---
+
+<section id="kenapa" class="border-y border-rapi-gray-300/40 bg-white py-20 md:py-28">
+  <div class="rapi-container">
+    <div class="grid gap-12 md:grid-cols-2">
+      <div>
+        <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Kenapa Rapi</p>
+        <h2 class="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tight">
+          Kamu bukan males nyatat. Aplikasinya aja yang kebanyakan maunya.
+        </h2>
+        <p class="mt-5 text-[16px] leading-relaxed text-rapi-gray-600">
+          Kebanyakan app keuangan minta kamu pilih kategori, isi tanggal, tentukan dompet,
+          lalu tekan simpan — untuk satu kopi seharga 20 ribu. Tiga hari juga capek.
+        </p>
+        <p class="mt-4 text-[16px] leading-relaxed text-rapi-gray-600">
+          Rapi kebalikannya. Kamu cukup bilang apa yang terjadi, dan sisanya urusan dia.
+        </p>
+      </div>
+
+      <ul class="grid gap-4 self-center">
+        {
+          poin.map((p) => (
+            <li class="rapi-card flex items-start gap-4">
+              <span class="shrink-0 text-[22px] font-extrabold leading-tight text-rapi-blue">
+                {p.angka}
+              </span>
+              <span>
+                <span class="block text-[15px] font-bold">{p.judul}</span>
+                <span class="mt-1 block text-[13px] leading-relaxed text-rapi-gray-600">
+                  {p.isi}
+                </span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</section>

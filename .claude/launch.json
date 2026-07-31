@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 5173,
       "autoPort": true
+    },
+    {
+      "name": "rapi-landing",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "Landing Page Rapi", "--", "--port", "4321"],
+      "port": 4321,
+      "autoPort": true
     }
   ]
 }

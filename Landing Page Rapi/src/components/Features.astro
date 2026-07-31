@@ -1,0 +1,84 @@
+---
+// Fitur dikelompokkan: 3 cara mencatat dulu (itu inti Rapi), baru sisanya.
+const caraCatat = [
+  {
+    emoji: '⌨️',
+    judul: 'Ketik sekenanya',
+    isi: 'Tulis "makan siang 25rb" apa adanya. Nominal, kategori, dan jenisnya kebaca otomatis — nggak ada form panjang.',
+  },
+  {
+    emoji: '🎙️',
+    judul: 'Ngomong aja',
+    isi: 'Lagi nyetir atau tangan penuh? Sebutin transaksinya, Rapi yang nulis. Selesai sebelum kamu sempat lupa.',
+  },
+  {
+    emoji: '📸',
+    judul: 'Foto struknya',
+    isi: 'Jepret struk belanja, AI-nya baca sendiri totalnya. Nggak usah ngetik satu per satu.',
+  },
+]
+
+const lainnya = [
+  {
+    emoji: '💬',
+    judul: 'Rapi AI',
+    isi: 'Tanya apa aja soal keuanganmu. Jawabannya dari catatanmu yang beneran, bukan template.',
+  },
+  {
+    emoji: '📊',
+    judul: 'Laporan yang ngomong',
+    isi: 'Bukan cuma grafik. Rapi kasih tahu kategori paling boros dan bandingannya dengan bulan lalu.',
+  },
+  {
+    emoji: '📈',
+    judul: 'Investasi',
+    isi: 'Saham, reksa dana, kripto, emas. Untung ruginya kehitung sendiri.',
+  },
+  {
+    emoji: '☁️',
+    judul: 'Sinkron otomatis',
+    isi: 'Catat di HP, kebuka di laptop. Datamu ikut ke mana pun kamu masuk.',
+  },
+]
+---
+
+<section id="fitur" class="py-20 md:py-28">
+  <div class="rapi-container">
+    <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Fitur</p>
+    <h2 class="mt-3 max-w-2xl text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tight">
+      Tiga cara nyatat. Pilih yang paling nggak ngerepotin.
+    </h2>
+    <p class="mt-4 max-w-xl text-[16px] leading-relaxed text-rapi-gray-600">
+      Kebanyakan orang berhenti nyatat karena ribet, bukan karena nggak mau. Jadi Rapi
+      bikin langkahnya sesedikit mungkin.
+    </p>
+
+    <div class="mt-10 grid gap-4 md:grid-cols-3">
+      {
+        caraCatat.map((f) => (
+          <article class="rapi-card">
+            <span class="text-3xl" aria-hidden="true">
+              {f.emoji}
+            </span>
+            <h3 class="mt-3 text-[17px] font-bold">{f.judul}</h3>
+            <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">{f.isi}</p>
+          </article>
+        ))
+      }
+    </div>
+
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        lainnya.map((f) => (
+          <article class="rapi-card">
+            <span class="text-2xl" aria-hidden="true">
+              {f.emoji}
+            </span>
+            <h3 class="mt-3 text-[15px] font-bold">{f.judul}</h3>
+            <p class="mt-1.5 text-[13px] leading-relaxed text-rapi-gray-600">{f.isi}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

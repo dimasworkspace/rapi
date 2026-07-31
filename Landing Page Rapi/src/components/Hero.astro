@@ -1,0 +1,85 @@
+---
+import { APP_URL, SITE } from '@/consts'
+---
+
+<section class="relative overflow-hidden bg-rapi-navy text-white">
+  <!-- Aksen latar — glow biru & kuning, senada hero di dalam app -->
+  <div aria-hidden="true" class="pointer-events-none absolute inset-0">
+    <div class="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-rapi-blue/40 blur-3xl"></div>
+    <div class="absolute -bottom-32 -left-20 h-80 w-80 rounded-full bg-rapi-yellow/15 blur-3xl"></div>
+  </div>
+
+  <div class="rapi-container relative grid items-center gap-12 py-20 md:grid-cols-2 md:py-28">
+    <div>
+      <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-yellow">
+        {SITE.hashtag}
+      </p>
+      <!-- Pakai span block, bukan <br />: patahan barisnya tetap sama, tapi
+           pembaca layar & mesin pencari tetap membacanya sebagai dua kata
+           terpisah ("keuangan semudah", bukan "keuangansemudah"). -->
+      <h1 class="mt-4 text-[clamp(2.25rem,6vw,3.5rem)] font-extrabold leading-[1.08] tracking-tight">
+        <span class="block">Nyatat keuangan</span>
+        <span class="block">semudah ngobrol.</span>
+      </h1>
+      <p class="mt-5 max-w-lg text-[17px] leading-relaxed text-white/75">
+        Ketik <em class="not-italic font-semibold text-white">"makan siang 25rb"</em>, ngomong aja,
+        atau foto struknya. Rapi yang ngerapiin — kamu tinggal lanjut hidup.
+      </p>
+
+      <div class="mt-8 flex flex-wrap items-center gap-3">
+        <a href={APP_URL} class="rapi-btn-primary">Mulai Gratis</a>
+        <a href="#fitur" class="rapi-btn-ghost !border-white/25 !text-white hover:!border-rapi-yellow hover:!text-rapi-yellow">
+          Lihat fiturnya
+        </a>
+      </div>
+
+      <p class="mt-5 text-[13px] text-white/50">
+        Gratis · Nggak perlu kartu kredit · Jalan di HP & laptop
+      </p>
+    </div>
+
+    <!-- Pratinjau app dalam bingkai HP.
+         CATATAN: ini tiruan sederhana pakai token yang sama, dibikin supaya
+         halaman nggak kosong sebelum ada tangkapan layar asli. Ganti dengan
+         screenshot Dashboard beneran begitu tersedia. -->
+    <div class="justify-self-center">
+      <div class="w-[280px] rounded-[2.25rem] border-[10px] border-black/40 bg-rapi-navy shadow-rapi-elevated">
+        <div class="rounded-[1.6rem] bg-gradient-to-br from-rapi-navy via-[#17265e] to-[#0a3db2] p-5">
+          <p class="text-center text-[11px] text-white/50">Selamat sore 🌤️</p>
+          <p class="mt-1 text-center text-lg font-bold">Halo, Dimas</p>
+
+          <p class="mt-6 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">
+            Total Saldo
+          </p>
+          <p class="mt-1 text-center text-[28px] font-bold leading-none tracking-tight tabular-nums">
+            Rp 2.865.000
+          </p>
+
+          <div class="mt-5 grid grid-cols-3 gap-1.5 text-center">
+            <div class="rounded-rapi-md border border-emerald-300/25 bg-emerald-400/10 px-1 py-2">
+              <p class="text-[9px] font-bold uppercase text-emerald-200/80">Masuk</p>
+              <p class="mt-0.5 text-[10px] font-bold tabular-nums">Rp 3.800.000</p>
+            </div>
+            <div class="rounded-rapi-md border border-rapi-yellow/50 bg-rapi-yellow/15 px-1 py-2">
+              <p class="text-[15px] font-bold leading-none text-rapi-yellow">+</p>
+              <p class="mt-1 text-[9px] font-bold uppercase text-white/85">Catat hari ini</p>
+            </div>
+            <div class="rounded-rapi-md border border-red-300/25 bg-red-400/10 px-1 py-2">
+              <p class="text-[9px] font-bold uppercase text-red-200/80">Keluar</p>
+              <p class="mt-0.5 text-[10px] font-bold tabular-nums">Rp 935.000</p>
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-3">
+            <p class="text-[9px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
+              Rangkuman Minggu Ini
+            </p>
+            <p class="mt-1 text-[11px] font-semibold leading-snug">
+              🛍️ Belanja nyedot paling banyak minggu ini: Rp 935.000.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

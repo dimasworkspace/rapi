@@ -239,16 +239,28 @@ const callServerProxy = async (
   const { data, error } = await requireInvoke(system, messages, image)
 
   if (error) {
-    // supabase-js membungkus error HTTP; baca body-nya buat pesan yang tepat
+    // supabase-js membungkus error HTTP; baca body-nya buat pesan yang tepat.
+    // Kode di ujung pesan (mis. E502) sengaja ditampilkan: tanpa itu semua
+    // kegagalan terlihat sama di mata user, dan kita ikut buta waktu ada yang
+    // lapor. Satu angka kecil memotong tebakan jadi jawaban.
     const status = (error as { context?: { status?: number } }).context?.status
     if (status === 429) {
       throw new RapiAiError(
-        'Kuota AI harianmu sudah habis nih. Coba lagi besok, atau pasang API key sendiri di Profil buat tanpa batas 😊',
+        'Kuota AI harianmu sudah habis nih. Coba lagi besok, atau pasang API key sendiri di Profil buat tanpa batas 😊 (E429)',
       )
     }
-    if (status === 401) throw new RapiAiError('Sesimu berakhir. Coba masuk ulang ya 🔑')
-    if (status === 500) throw new RapiAiError('Fitur AI belum disetel pemilik app. Coba lagi nanti ya 😊')
-    throw new RapiAiError('Server AI lagi sibuk. Coba lagi bentar ya 😊')
+    if (status === 401) throw new RapiAiError('Sesimu berakhir. Coba masuk ulang ya 🔑 (E401)')
+    if (status === 500) {
+      throw new RapiAiError('Fitur AI belum disetel pemilik app. Coba lagi nanti ya 😊 (E500)')
+    }
+    // Tanpa status = permintaannya nggak pernah sampai ke server (jaringan/CORS),
+    // beda penyebab dari server yang menjawab tapi gagal.
+    if (status === undefined) {
+      console.error('[rapi-ai] permintaan gagal terkirim:', error)
+      throw new RapiAiError('Nggak bisa nyambung ke server AI. Cek internetmu ya 📶 (E000)')
+    }
+    console.error('[rapi-ai] server menolak, status', status, error)
+    throw new RapiAiError(`Server AI lagi sibuk. Coba lagi bentar ya 😊 (E${status})`)
   }
 
   const res = data as { text?: string; used?: number; quota?: number }

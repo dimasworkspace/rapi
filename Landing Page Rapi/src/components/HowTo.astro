@@ -1,0 +1,42 @@
+---
+const langkah = [
+  {
+    no: '1',
+    judul: 'Buka Rapi',
+    isi: 'Nggak ada yang perlu diunduh dari toko aplikasi. Buka alamatnya, masuk pakai Google atau email, selesai.',
+  },
+  {
+    no: '2',
+    judul: 'Pasang ke layar utama',
+    isi: 'Dari menu browser, pilih "Tambahkan ke Layar Utama". Mulai saat itu Rapi punya ikon sendiri dan kebuka fullscreen — persis app biasa.',
+  },
+  {
+    no: '3',
+    judul: 'Catat yang pertama',
+    isi: 'Tekan tombol +, tulis apa yang barusan kamu beli. Itu aja. Sisanya Rapi yang rapiin.',
+  },
+]
+---
+
+<section id="cara-pakai" class="py-20 md:py-28">
+  <div class="rapi-container">
+    <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Cara Pakai</p>
+    <h2 class="mt-3 max-w-2xl text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tight">
+      Tiga langkah, nggak sampai dua menit.
+    </h2>
+
+    <ol class="mt-10 grid gap-4 md:grid-cols-3">
+      {
+        langkah.map((l) => (
+          <li class="rapi-card">
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-rapi-yellow text-[17px] font-extrabold text-rapi-navy">
+              {l.no}
+            </span>
+            <h3 class="mt-4 text-[17px] font-bold">{l.judul}</h3>
+            <p class="mt-2 text-[14px] leading-relaxed text-rapi-gray-600">{l.isi}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>

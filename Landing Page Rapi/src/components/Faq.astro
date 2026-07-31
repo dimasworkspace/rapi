@@ -1,0 +1,58 @@
+---
+// Pertanyaan disusun dari yang paling bikin ragu buat mendaftar.
+// Jawabannya jujur — termasuk yang belum bisa, karena itu yang bikin dipercaya.
+const faq = [
+  {
+    t: 'Rapi gratis?',
+    j: 'Gratis, termasuk fitur AI-nya. Kamu nggak perlu bikin API key atau bayar apa pun buat mulai. Ada batas wajar pemakaian AI per hari biar adil buat semua orang.',
+  },
+  {
+    t: 'Datanya aman?',
+    j: 'Catatanmu tersimpan di akunmu sendiri dan cuma bisa dibuka oleh kamu — dijaga aturan akses di tingkat database, bukan sekadar disembunyikan di tampilan. Rapi juga nggak menjual data ke siapa pun.',
+  },
+  {
+    t: 'Perlu diunduh dari Play Store atau App Store?',
+    j: 'Nggak. Rapi jalan langsung di browser dan bisa dipasang ke layar utama HP-mu, lengkap dengan ikon sendiri dan bisa dibuka tanpa internet. Nggak makan memori seperti app biasa.',
+  },
+  {
+    t: 'Bisa dipakai di HP dan laptop sekaligus?',
+    j: 'Bisa. Catat di HP, langsung kebuka di laptop selama kamu masuk dengan akun yang sama.',
+  },
+  {
+    t: 'Rapi bisa nyambung ke rekening bank?',
+    j: 'Belum, dan ini sengaja. Rapi fokus bikin pencatatan manual jadi secepat mungkin dulu. Menyambung ke bank artinya minta akses ke data yang sangat sensitif — itu kami tunda sampai benar-benar siap.',
+  },
+  {
+    t: 'Kalau AI-nya salah baca?',
+    j: 'Tinggal ketuk hasil bacanya, ubah kategorinya. Rapi selalu nunjukin tebakannya sebelum disimpan, jadi nggak ada yang masuk diam-diam.',
+  },
+]
+---
+
+<section id="faq" class="border-t border-rapi-gray-300/40 bg-white py-20 md:py-28">
+  <div class="rapi-container max-w-3xl">
+    <p class="text-[13px] font-bold uppercase tracking-[0.18em] text-rapi-blue">Tanya Jawab</p>
+    <h2 class="mt-3 text-[clamp(1.75rem,4vw,2.5rem)] font-extrabold leading-tight tracking-tight">
+      Yang biasanya ditanyain
+    </h2>
+
+    <div class="mt-10 divide-y divide-rapi-gray-300/50 border-y border-rapi-gray-300/50">
+      {
+        faq.map((f) => (
+          <details class="group py-5">
+            <summary class="flex cursor-pointer items-center justify-between gap-4 text-[16px] font-bold marker:content-['']">
+              {f.t}
+              <span
+                aria-hidden="true"
+                class="shrink-0 text-rapi-blue transition-transform group-open:rotate-45"
+              >
+                +
+              </span>
+            </summary>
+            <p class="mt-3 text-[15px] leading-relaxed text-rapi-gray-600">{f.j}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
