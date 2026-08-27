@@ -51,6 +51,7 @@ export default function App() {
   const initAuth = useAuthStore((s) => s.init)
   const user = useAuthStore((s) => s.user)
   const authLoading = useAuthStore((s) => s.loading)
+  const localMode = useAuthStore((s) => s.localMode)
   const showToast = useUiStore((s) => s.showToast)
   const openAdd = useUiStore((s) => s.openAdd)
   const openAddWithPhoto = useUiStore((s) => s.openAddWithPhoto)
@@ -88,7 +89,7 @@ export default function App() {
   }, [user, showToast, t])
 
   // Mode backend: tunggu cek sesi, lalu wajib login
-  if (isSupabaseConfigured) {
+  if (isSupabaseConfigured && !localMode) {
     if (authLoading) return <Splash />
     if (!user) return <Login />
     if (syncing) return <Splash />

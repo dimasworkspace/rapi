@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AuthError } from '@supabase/supabase-js'
-import { Eye, EyeOff, Loader2, Mail } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, WifiOff } from 'lucide-react'
 import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiMascot } from '@/components/rapi/RapiMascot'
@@ -13,6 +13,9 @@ const INPUT =
 
 /** Ubah error mentah Supabase jadi pesan ramah ala Rapi. */
 const friendlyError = (e: unknown, t: Dict): string => {
+  if (e instanceof Error && /fetch|network|timeout|abort|offline/i.test(e.message)) {
+    return t.auth.errOffline
+  }
   if (e instanceof AuthError) {
     const m = e.message.toLowerCase()
     if (m.includes('invalid login')) return t.auth.errWrong
@@ -21,7 +24,6 @@ const friendlyError = (e: unknown, t: Dict): string => {
     if (m.includes('at least 6') || m.includes('password should be'))
       return t.auth.errShortPassword
   }
-  if (e instanceof Error && /fetch|network/i.test(e.message)) return t.auth.errOffline
   return t.auth.errGeneric
 }
 
@@ -56,6 +58,8 @@ export default function Login() {
   const signInWithEmail = useAuthStore((s) => s.signInWithEmail)
   const signUpWithEmail = useAuthStore((s) => s.signUpWithEmail)
   const pendingEmail = useAuthStore((s) => s.pendingEmail)
+  const backendUnavailable = useAuthStore((s) => s.backendUnavailable)
+  const continueLocally = useAuthStore((s) => s.continueLocally)
   const clearPendingEmail = useAuthStore((s) => s.clearPendingEmail)
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
@@ -108,6 +112,22 @@ export default function Login() {
         <p className="mt-2 max-w-xs text-sm leading-relaxed text-rapi-gray-600">
           {t.auth.subtitle}
         </p>
+      </div>
+
+      <div className="animate-rapi-fade-up mt-6 rounded-rapi-md border border-rapi-yellow/60 bg-rapi-yellow/15 p-3 text-center">
+        {backendUnavailable || error === t.auth.errOffline ? (
+          <p className="text-xs leading-relaxed text-rapi-navy">{t.auth.errOffline}</p>
+        ) : (
+          <p className="text-xs leading-relaxed text-rapi-navy">{t.auth.localModeHint}</p>
+        )}
+        <button
+          type="button"
+          onClick={continueLocally}
+          className="mx-auto mt-2 flex min-h-11 items-center gap-2 text-[13px] font-bold text-rapi-blue"
+        >
+          <WifiOff size={15} />
+          {t.auth.continueLocal}
+        </button>
       </div>
 
       {/* Google — jalur utama, paling sedikit friksi */}

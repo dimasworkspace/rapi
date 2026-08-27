@@ -34,7 +34,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     return (
       <div className="flex min-h-dvh flex-col items-center justify-center gap-4 bg-rapi-offwhite px-8 text-center dark:bg-rapi-dark">
-        <img src="/rapi-mascot.png" alt="Rapi" width={447} height={640} className="h-28 w-auto object-contain drop-shadow-md" />
+        <img src="/logo-rapi.png" alt="Logo Rapi" width={104} height={63} className="h-20 w-auto object-contain" />
         <div>
           <p className="text-lg font-bold text-rapi-navy dark:text-rapi-dark-ink">
             {en ? 'Oops, something broke 😔' : 'Waduh, ada yang error 😔'}

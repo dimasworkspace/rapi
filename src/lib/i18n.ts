@@ -250,6 +250,8 @@ const id = {
     errEmailUsed: 'Email ini sudah terdaftar. Coba masuk aja 😊',
     errGeneric: 'Oops, ada yang salah nih. Coba lagi ya 😊',
     errOffline: 'Nggak bisa nyambung ke server. Cek internetmu ya 📶',
+    continueLocal: 'Lanjut pakai mode lokal',
+    localModeHint: 'Lagi tanpa koneksi? Catatan tetap bisa disimpan di perangkat ini.',
   },
 }
 
@@ -488,6 +490,8 @@ const en: typeof id = {
     errEmailUsed: 'This email is already registered. Try signing in 😊',
     errGeneric: 'Oops, something went wrong. Try again 😊',
     errOffline: "Can't reach the server. Check your connection 📶",
+    continueLocal: 'Continue in local mode',
+    localModeHint: 'No connection right now? You can still save records on this device.',
   },
 }
 

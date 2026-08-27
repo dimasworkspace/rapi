@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 
-/** Maskot Rapi dalam frame bulat glass — dipakai di Rapi AI & empty state. */
+/** Identitas visual Rapi dalam frame bulat glass. */
 export function RapiMascot({ size = 128 }: { size?: number }) {
   return (
     <div
@@ -10,15 +10,15 @@ export function RapiMascot({ size = 128 }: { size?: number }) {
       {/* Glow lembut biar karakternya "hidup" di dalam kaca */}
       <div aria-hidden className="absolute inset-3 rounded-full bg-rapi-blue/15 blur-xl" />
       <motion.img
-        src="/rapi-mascot.png"
-        alt="Maskot Rapi"
-        width={447}
-        height={640}
+        src="/logo-rapi.png"
+        alt="Logo Rapi"
+        width={104}
+        height={63}
         loading="lazy"
         decoding="async"
         animate={{ y: [0, -5, 0] }}
         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        className="relative h-[78%] w-auto object-contain drop-shadow-md"
+        className="relative h-auto w-[78%] object-contain"
       />
     </div>
   )

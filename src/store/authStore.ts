@@ -7,6 +7,10 @@ interface AuthState {
   session: Session | null
   /** true selama cek sesi awal — cegah kedip layar login sebelum sesi kebaca. */
   loading: boolean
+  /** true kalau server tidak terjangkau saat cek sesi awal. */
+  backendUnavailable: boolean
+  /** Mode lokal dipilih user untuk tetap memakai app tanpa koneksi server. */
+  localMode: boolean
   /** Terisi kalau daftar via email butuh konfirmasi. */
   pendingEmail: string | null
   init: () => void
@@ -14,14 +18,19 @@ interface AuthState {
   signInWithEmail: (email: string, password: string) => Promise<void>
   signUpWithEmail: (email: string, password: string) => Promise<void>
   signOut: () => Promise<void>
+  continueLocally: () => void
   clearPendingEmail: () => void
 }
+
+const SESSION_TIMEOUT_MS = 8_000
 
 export const useAuthStore = create<AuthState>()((set) => ({
   user: null,
   session: null,
   // Mode lokal (tanpa backend): nggak ada yang perlu ditunggu
   loading: isSupabaseConfigured,
+  backendUnavailable: false,
+  localMode: false,
   pendingEmail: null,
 
   init: () => {
@@ -29,10 +38,20 @@ export const useAuthStore = create<AuthState>()((set) => ({
       set({ loading: false })
       return
     }
-    // Sesi tersimpan (mis. habis reload / balik dari OAuth Google)
-    supabase.auth.getSession().then(({ data }) => {
-      set({ session: data.session, user: data.session?.user ?? null, loading: false })
+    // Sesi tersimpan (mis. habis reload / balik dari OAuth Google). Jangan
+    // biarkan request yang macet menahan seluruh aplikasi di splash screen.
+    const sessionRequest = supabase.auth.getSession()
+    const timeout = new Promise<never>((_, reject) => {
+      window.setTimeout(() => reject(new Error('Auth session check timed out')), SESSION_TIMEOUT_MS)
     })
+    Promise.race([sessionRequest, timeout])
+      .then(({ data }) => {
+        set({ session: data.session, user: data.session?.user ?? null, loading: false })
+      })
+      .catch((error: unknown) => {
+        console.error('[auth] gagal membaca sesi:', error)
+        set({ loading: false, backendUnavailable: true })
+      })
     // Ikuti perubahan: login, logout, token refresh
     supabase.auth.onAuthStateChange((_event, session) => {
       set({ session, user: session?.user ?? null, loading: false })
@@ -67,6 +86,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
     await requireSupabase().auth.signOut()
     set({ user: null, session: null })
   },
+
+  continueLocally: () => set({ localMode: true, backendUnavailable: false }),
 
   clearPendingEmail: () => set({ pendingEmail: null }),
 }))
