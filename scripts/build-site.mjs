@@ -34,6 +34,7 @@ jalan('npm run build')
 renameSync(dist, sementara)
 
 // 2) Landing page -> "Landing Page Rapi"/dist
+jalan('npm ci --include=dev', landing)
 jalan('npm run build', landing)
 
 // 3) Landing ke akar dist/, app ke dist/app/
