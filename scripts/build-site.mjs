@@ -30,7 +30,7 @@ const jalan = (perintah, cwd = akar) => {
 // 1) App -> dist/, lalu diamankan ke .dist-app/
 rmSync(dist, { recursive: true, force: true })
 rmSync(sementara, { recursive: true, force: true })
-jalan('npm run build')
+jalan('npm run build:app')
 renameSync(dist, sementara)
 
 // 2) Landing page -> "Landing Page Rapi"/dist
