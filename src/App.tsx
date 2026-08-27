@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { MotionConfig } from 'framer-motion'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import { AppLayout } from '@/components/layout/AppLayout'
@@ -7,21 +7,22 @@ import { useT } from '@/lib/i18n'
 import { consumeLaunchIntent } from '@/lib/launchIntent'
 import { isSupabaseConfigured } from '@/lib/supabase'
 import { registerSync, setSyncErrorHandler, syncOnLogin } from '@/lib/sync'
-import AIChat from '@/pages/AIChat'
 import ComingSoon from '@/pages/ComingSoon'
-import Dashboard from '@/pages/Dashboard'
-import Investments from '@/pages/Investments'
 import Login from '@/pages/Login'
 import Onboarding from '@/pages/Onboarding'
-import Reports from '@/pages/Reports'
-import Settings from '@/pages/Settings'
-import Transactions from '@/pages/Transactions'
 import { useAuthStore } from '@/store/authStore'
 import { useUiStore } from '@/store/uiStore'
 import { useUserStore } from '@/store/userStore'
 
 // Hubungkan store ke server sekali saja, saat modul dimuat
 registerSync()
+
+const AIChat = lazy(() => import('@/pages/AIChat'))
+const Dashboard = lazy(() => import('@/pages/Dashboard'))
+const Investments = lazy(() => import('@/pages/Investments'))
+const Reports = lazy(() => import('@/pages/Reports'))
+const Settings = lazy(() => import('@/pages/Settings'))
+const Transactions = lazy(() => import('@/pages/Transactions'))
 
 function NotFound() {
   const t = useT()
@@ -102,19 +103,21 @@ export default function App() {
     <MotionConfig reducedMotion="user">
       {/* basename ikut base Vite ("/app/"), jadi rute internal tetap benar
           waktu app disajikan di bawah subpath, bukan di akar domain. */}
-      <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <Routes>
-          <Route element={<AppLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/transaksi" element={<Transactions />} />
-            <Route path="/laporan" element={<Reports />} />
-            <Route path="/ai" element={<AIChat />} />
-            <Route path="/profil" element={<Settings />} />
-            <Route path="/investasi" element={<Investments />} />
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+      <Suspense fallback={<Splash />}>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
+          <Routes>
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/transaksi" element={<Transactions />} />
+              <Route path="/laporan" element={<Reports />} />
+              <Route path="/ai" element={<AIChat />} />
+              <Route path="/profil" element={<Settings />} />
+              <Route path="/investasi" element={<Investments />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </Suspense>
     </MotionConfig>
   )
 }
