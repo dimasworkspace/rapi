@@ -9,7 +9,6 @@ import { DonutChart } from '@/components/rapi/DonutChart'
 import { GrowthChart, type GrowthPoint } from '@/components/rapi/GrowthChart'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
 import { SPRING_POP } from '@/lib/motion'
@@ -159,7 +158,6 @@ export default function Reports() {
 
       {!hasData ? (
         <RapiCard className="mt-5 flex flex-col items-center gap-3 px-6 py-12 text-center">
-          <RapiMascot size={110} />
           <p className="text-[13px] leading-relaxed text-rapi-gray-600">
             {t.reports.emptyData(periodLabel)}
           </p>

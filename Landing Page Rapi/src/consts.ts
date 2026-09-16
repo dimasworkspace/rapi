@@ -16,7 +16,7 @@ export const SITE = {
   tagline: 'Catat keuangan tanpa ribet.',
   hashtag: '#RapiinAja',
   description:
-    'Rapi bikin nyatat keuangan segampang ngobrol. Ketik, ngomong, atau foto struk — langsung kecatat rapi. Gratis, jalan di HP mana aja.',
+    'Catat keuangan secepat ngetik chat. Tulis, ngomong, atau foto struk — Rapi membaca nominal dan merapikan catatanmu. Gratis di HP dan laptop.',
   locale: 'id_ID',
 } as const
 

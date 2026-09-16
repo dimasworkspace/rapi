@@ -4,7 +4,6 @@ import { ArrowUp, Settings2, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { TopBar } from '@/components/layout/TopBar'
 import { RapiButton } from '@/components/rapi/RapiButton'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { chatWithAi, RapiAiError, useAiReady } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
@@ -162,7 +161,6 @@ export default function AIChat() {
       {!ready ? (
         /* Cuma kejadian di mode lokal (tanpa akun): arahkan pasang key sendiri */
         <div className="rapi-surface animate-rapi-fade-up mt-4 flex flex-col items-center gap-3 rounded-rapi-lg px-6 py-12 text-center">
-          <RapiMascot size={120} />
           <p className="mt-1 text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
             {t.ai.needAiTitle}
           </p>
@@ -180,7 +178,6 @@ export default function AIChat() {
           <div className="flex flex-1 flex-col gap-2.5 pt-1">
             {chat.length === 0 && (
               <div className="animate-rapi-fade-up mt-6 flex flex-col items-center gap-3 text-center">
-                <RapiMascot size={132} />
                 <p className="mt-1 text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
                   {t.ai.helloName(name)}
                 </p>

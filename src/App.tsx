@@ -1,8 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
-import { MotionConfig } from 'framer-motion'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { AppLayout } from '@/components/layout/AppLayout'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { useT } from '@/lib/i18n'
 import { consumeLaunchIntent } from '@/lib/launchIntent'
 import { isSupabaseConfigured } from '@/lib/supabase'
@@ -23,6 +20,9 @@ const Investments = lazy(() => import('@/pages/Investments'))
 const Reports = lazy(() => import('@/pages/Reports'))
 const Settings = lazy(() => import('@/pages/Settings'))
 const Transactions = lazy(() => import('@/pages/Transactions'))
+const AppLayout = lazy(() =>
+  import('@/components/layout/AppLayout').then(({ AppLayout: layout }) => ({ default: layout })),
+)
 
 function NotFound() {
   const t = useT()
@@ -40,8 +40,12 @@ function NotFound() {
 /** Layar tunggu saat cek sesi / tarik data — jangan kedip ke layar login dulu. */
 function Splash() {
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-rapi-offwhite dark:bg-rapi-dark">
-      <RapiMascot size={110} />
+    <div
+      className="flex min-h-dvh items-center justify-center bg-rapi-offwhite dark:bg-rapi-dark"
+      role="status"
+      aria-busy="true"
+    >
+      <span className="sr-only">Memuat aplikasi</span>
     </div>
   )
 }
@@ -100,24 +104,20 @@ export default function App() {
   if (!onboarded) return <Onboarding />
 
   return (
-    <MotionConfig reducedMotion="user">
-      {/* basename ikut base Vite ("/app/"), jadi rute internal tetap benar
-          waktu app disajikan di bawah subpath, bukan di akar domain. */}
-      <Suspense fallback={<Splash />}>
-        <BrowserRouter basename={import.meta.env.BASE_URL}>
-          <Routes>
-            <Route element={<AppLayout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/transaksi" element={<Transactions />} />
-              <Route path="/laporan" element={<Reports />} />
-              <Route path="/ai" element={<AIChat />} />
-              <Route path="/profil" element={<Settings />} />
-              <Route path="/investasi" element={<Investments />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </Suspense>
-    </MotionConfig>
+    <Suspense fallback={<Splash />}>
+      <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <Routes>
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/transaksi" element={<Transactions />} />
+            <Route path="/laporan" element={<Reports />} />
+            <Route path="/ai" element={<AIChat />} />
+            <Route path="/profil" element={<Settings />} />
+            <Route path="/investasi" element={<Investments />} />
+            <Route path="*" element={<NotFound />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </Suspense>
   )
 }

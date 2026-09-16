@@ -3,7 +3,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Camera, ChevronDown, Keyboard, Loader2, Mic, X } from 'lucide-react'
 import { Icon3D } from '@/components/rapi/Icon3D'
 import { RapiButton } from '@/components/rapi/RapiButton'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { aiReady, parseReceiptWithAi, RapiAiError } from '@/lib/ai'
 import { formatRupiah } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
@@ -222,7 +221,7 @@ function AddTransactionForm({ onClose }: { onClose: () => void }) {
       {/* Overlay saat scan struk — feedback jelas selama AI vision jalan (aturan progressive-loading) */}
       {scanning && (
         <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-rapi-lg bg-[#EAF1FF]/80 text-center backdrop-blur-sm dark:bg-rapi-dark-surface/85">
-          <RapiMascot size={96} />
+          <Loader2 size={24} className="animate-spin text-rapi-blue" aria-hidden />
           <div>
             <p className="text-sm font-bold text-rapi-navy dark:text-rapi-dark-ink">
               {t.add.scanningTitle}

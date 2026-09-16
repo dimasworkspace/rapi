@@ -18,6 +18,35 @@ const fetchWithTimeout: typeof fetch = (input, init) => {
   })
 }
 
+const REMEMBER_LOGIN_KEY = 'rapi-remember-login'
+const sessionMemory = new Map<string, string>()
+
+const shouldRememberLogin = (): boolean => localStorage.getItem(REMEMBER_LOGIN_KEY) !== 'false'
+
+const authStorage = {
+  getItem: (key: string): string | null =>
+    shouldRememberLogin() ? localStorage.getItem(key) : (sessionMemory.get(key) ?? null),
+  setItem: (key: string, value: string): void => {
+    if (shouldRememberLogin()) localStorage.setItem(key, value)
+    else sessionMemory.set(key, value)
+  },
+  removeItem: (key: string): void => {
+    localStorage.removeItem(key)
+    sessionMemory.delete(key)
+  },
+}
+
+/** Atur apakah sesi auth boleh bertahan setelah browser ditutup. */
+export function setRememberLogin(remember: boolean): void {
+  localStorage.setItem(REMEMBER_LOGIN_KEY, String(remember))
+  if (!remember) {
+    for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+      const key = localStorage.key(index)
+      if (key?.startsWith('sb-')) localStorage.removeItem(key)
+    }
+  }
+}
+
 /** Backend aktif? Dipakai UI buat memutuskan tampilkan login atau mode lokal. */
 export const isSupabaseConfigured = Boolean(url && anonKey)
 
@@ -27,6 +56,7 @@ export const supabase: SupabaseClient | null = isSupabaseConfigured
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true, // wajib buat callback OAuth Google
+        storage: authStorage,
       },
       global: { fetch: fetchWithTimeout },
     })

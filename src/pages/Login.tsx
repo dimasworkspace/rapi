@@ -3,9 +3,9 @@ import { AuthError } from '@supabase/supabase-js'
 import { Eye, EyeOff, Loader2, Mail, WifiOff } from 'lucide-react'
 import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { RapiButton } from '@/components/rapi/RapiButton'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { type Dict, useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
+import { setRememberLogin } from '@/lib/supabase'
 import { useAuthStore } from '@/store/authStore'
 
 const INPUT =
@@ -66,6 +66,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberLogin, setRememberLoginState] = useState(true)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -81,12 +82,16 @@ export default function Login() {
     }
   }
 
+  const runAuth = (fn: () => Promise<void>) => {
+    setRememberLogin(rememberLogin)
+    return run(fn)
+  }
+
   // Daftar via email → tunggu konfirmasi
   if (pendingEmail) {
     return (
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-4 px-8 text-center">
         <AmbientBackground />
-        <RapiMascot size={120} />
         <p className="text-lg font-bold text-rapi-navy dark:text-rapi-dark-ink">
           {t.auth.checkEmailTitle}
         </p>
@@ -105,7 +110,6 @@ export default function Login() {
       <AmbientBackground />
 
       <div className="animate-rapi-fade-up flex flex-col items-center text-center">
-        <RapiMascot size={124} />
         <h1 className="mt-4 text-2xl font-bold text-rapi-navy dark:text-rapi-dark-ink">
           {t.auth.welcome}
         </h1>
@@ -134,7 +138,7 @@ export default function Login() {
       <button
         type="button"
         disabled={busy}
-        onClick={() => run(signInWithGoogle)}
+        onClick={() => runAuth(signInWithGoogle)}
         style={{ animationDelay: '90ms' }}
         className="animate-rapi-fade-up mt-7 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-rapi-md border-[1.5px] border-rapi-gray-300 bg-white text-sm font-bold text-rapi-navy transition-transform active:scale-[0.98] disabled:opacity-50 dark:border-white/15 dark:bg-white/10 dark:text-rapi-dark-ink"
       >
@@ -160,8 +164,8 @@ export default function Login() {
           e.preventDefault()
           run(() =>
             mode === 'signin'
-              ? signInWithEmail(email.trim(), password)
-              : signUpWithEmail(email.trim(), password),
+                ? runAuth(() => signInWithEmail(email.trim(), password))
+                : runAuth(() => signUpWithEmail(email.trim(), password)),
           )
         }}
       >
@@ -210,6 +214,16 @@ export default function Login() {
             </button>
           </div>
         </div>
+
+        <label className="flex min-h-11 items-center gap-2 text-left text-[13px] text-rapi-gray-600">
+          <input
+            type="checkbox"
+            checked={rememberLogin}
+            onChange={(e) => setRememberLoginState(e.target.checked)}
+            className="h-4 w-4 accent-rapi-blue"
+          />
+          <span>{t.auth.rememberLogin}</span>
+        </label>
 
         {error && (
           <p

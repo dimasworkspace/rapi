@@ -7,7 +7,6 @@ import '@/index.css'
 
 // Service worker PWA — auto-update diam-diam saat ada versi baru
 registerSW({
-  immediate: true,
   onRegisteredSW: (_swUrl, registration) => {
     if (!registration) return
     const checkForUpdate = () => void registration.update()

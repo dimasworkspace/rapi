@@ -1,5 +1,6 @@
 import { format, isToday, isYesterday } from 'date-fns'
-import { enUS as localeEn, id as localeId } from 'date-fns/locale'
+import { enUS as localeEn } from 'date-fns/locale/en-US'
+import { id as localeId } from 'date-fns/locale/id'
 import { useSettingsStore } from '@/store/settingsStore'
 
 // Format Rupiah — selalu IDR, SELALU angka penuh: "Rp 2.865.000".

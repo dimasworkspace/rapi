@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { PageWrapper } from '@/components/layout/PageWrapper'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatRupiah } from '@/lib/formatters'
 import { type Dict, useT } from '@/lib/i18n'
@@ -219,21 +218,9 @@ export default function Dashboard() {
       </header>
 
       <div className="px-5">
-        {/* Rangkuman keuangan mingguan — biru (senada button & FAB), diupdate otomatis */}
-        <button
-          type="button"
-          onClick={() => navigate('/laporan')}
-          className="mt-5 w-full rounded-rapi-lg bg-gradient-to-br from-rapi-blue to-[#0334A0] p-4 text-left shadow-rapi-card transition-transform hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
-        >
-          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-yellow">
-            {t.dashboard.weekTitle}
-          </p>
-          <p className="mt-1.5 text-[15px] font-semibold leading-snug text-white">{weeklySummary}</p>
-        </button>
-
         {/* Transaksi terbaru — heading & link navy */}
         <div className="mb-2.5 mt-7 flex items-center justify-between">
-          <h2 className="text-[11px] font-bold uppercase tracking-[0.14em] text-rapi-navy dark:text-rapi-dark-ink">
+          <h2 className="text-xs font-bold uppercase tracking-[0.12em] text-rapi-navy dark:text-rapi-dark-ink">
             {t.dashboard.recent}
           </h2>
           {transactions.length > 0 && (
@@ -249,7 +236,6 @@ export default function Dashboard() {
 
         {recent.length === 0 ? (
           <RapiCard className="flex flex-col items-center gap-3 px-6 py-10 text-center">
-            <RapiMascot size={110} />
             <p className="text-sm leading-relaxed text-rapi-gray-600">{t.dashboard.emptyTitle}</p>
             <RapiButton variant="accent" onClick={openAdd}>
               {t.dashboard.emptyCta}
@@ -282,6 +268,22 @@ export default function Dashboard() {
             )}
           </div>
         )}
+
+        <button
+          type="button"
+          onClick={() => navigate('/laporan')}
+          className="rapi-surface mt-5 flex w-full items-center justify-between gap-4 rounded-rapi-lg p-4 text-left transition-colors hover:border-rapi-blue/40 active:bg-rapi-gray-100 dark:hover:border-rapi-blue/60 dark:active:bg-white/10"
+        >
+          <span>
+            <span className="block text-xs font-bold uppercase tracking-[0.12em] text-rapi-blue">
+              {t.dashboard.weekTitle}
+            </span>
+            <span className="mt-1.5 block text-sm font-semibold leading-snug text-rapi-navy dark:text-rapi-dark-ink">
+              {weeklySummary}
+            </span>
+          </span>
+          <ChevronRight size={18} className="shrink-0 text-rapi-blue" aria-hidden />
+        </button>
       </div>
     </PageWrapper>
   )

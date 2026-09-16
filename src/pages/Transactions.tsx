@@ -3,7 +3,6 @@ import { PageWrapper } from '@/components/layout/PageWrapper'
 import { TopBar } from '@/components/layout/TopBar'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { RapiCard } from '@/components/rapi/RapiCard'
-import { RapiMascot } from '@/components/rapi/RapiMascot'
 import { TransactionItem } from '@/components/rapi/TransactionItem'
 import { formatDayLabel } from '@/lib/formatters'
 import { useT } from '@/lib/i18n'
@@ -44,7 +43,6 @@ export default function Transactions() {
 
       {groups.length === 0 ? (
         <RapiCard className="mt-4 flex flex-col items-center gap-3 px-6 py-10 text-center">
-          <RapiMascot size={110} />
           <p className="text-sm leading-relaxed text-rapi-gray-600">{t.transactions.empty}</p>
           <RapiButton variant="accent" onClick={openAdd}>
             {t.transactions.emptyCta}
