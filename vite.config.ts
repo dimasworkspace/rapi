@@ -48,8 +48,8 @@ export default defineConfig({
       includeAssets: [
         'favicon-16.png',
         'favicon-32.png',
+        'favicon.png',
         'apple-touch-icon.png',
-        'rapi-mascot.png',
       ],
       manifest: {
         name: 'Rapi — Catat Keuangan Tanpa Ribet',

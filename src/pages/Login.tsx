@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { AuthError } from '@supabase/supabase-js'
 import { Eye, EyeOff, Loader2, Mail, WifiOff } from 'lucide-react'
-import { AmbientBackground } from '@/components/layout/AmbientBackground'
 import { RapiButton } from '@/components/rapi/RapiButton'
 import { type Dict, useT } from '@/lib/i18n'
 import { cn } from '@/lib/utils'
@@ -90,8 +89,7 @@ export default function Login() {
   // Daftar via email → tunggu konfirmasi
   if (pendingEmail) {
     return (
-      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-4 px-8 text-center">
-        <AmbientBackground />
+      <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-4 bg-rapi-offwhite px-8 text-center dark:bg-rapi-dark">
         <p className="text-lg font-bold text-rapi-navy dark:text-rapi-dark-ink">
           {t.auth.checkEmailTitle}
         </p>
@@ -106,8 +104,7 @@ export default function Login() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center px-6 py-10">
-      <AmbientBackground />
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center bg-rapi-offwhite px-6 py-10 dark:bg-rapi-dark">
 
       <div className="animate-rapi-fade-up flex flex-col items-center text-center">
         <h1 className="mt-4 text-2xl font-bold text-rapi-navy dark:text-rapi-dark-ink">
